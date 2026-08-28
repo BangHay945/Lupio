@@ -1,0 +1,420 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Ultra-Sleek Modern Custom Scrollbar ─────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.2);
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+html[data-theme="light"] * {
+  scrollbar-color: rgba(15, 23, 42, 0.2) transparent;
+}
+
+/* ─── Lupio Design Tokens ──────────────────────────── */
+:root {
+  /* Brand */
+  --brand: 152 88% 44%;           /* emerald-ish */
+  --brand-fg: 0 0% 4%;
+
+  /* Base */
+  --background: 220 12% 11%;      /* matching card color */
+  --foreground: 210 20% 94%;
+  --surface-1: 220 13% 9%;        /* sidebar */
+  --surface-2: 220 12% 11%;       /* cards */
+  --surface-3: 220 11% 14%;       /* hover */
+  --border-subtle: 220 10% 18%;
+
+  /* Semantic */
+  --muted-fg: 215 12% 48%;
+  --live: 152 72% 45%;
+  --error: 4 86% 58%;
+  --warning: 38 95% 56%;
+  --info: 214 80% 60%;
+}
+
+@theme inline {
+  --color-background:   hsl(var(--background));
+  --color-foreground:   hsl(var(--foreground));
+  --color-card:         hsl(var(--surface-2));
+  --color-card-foreground: hsl(var(--foreground));
+  --color-popover:      hsl(var(--surface-2));
+  --color-popover-foreground: hsl(var(--foreground));
+  --color-primary:      hsl(var(--brand));
+  --color-primary-foreground: hsl(var(--brand-fg));
+  --color-secondary:    hsl(var(--surface-3));
+  --color-secondary-foreground: hsl(var(--foreground));
+  --color-muted:        hsl(var(--surface-3));
+  --color-muted-foreground: hsl(var(--muted-fg));
+  --color-accent:       hsl(var(--surface-3));
+  --color-accent-foreground: hsl(var(--foreground));
+  --color-destructive:  hsl(var(--error));
+  --color-border:       hsl(var(--border-subtle));
+  --color-input:        hsl(var(--surface-3));
+  --color-ring:         hsl(var(--brand) / 50%);
+  --font-sans: var(--font-outfit);
+  --font-mono: var(--font-geist-mono);
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 20px;
+  /* sidebar compat */
+  --color-sidebar: hsl(var(--surface-1));
+  --color-sidebar-foreground: hsl(var(--foreground));
+  --color-sidebar-primary: hsl(var(--brand));
+  --color-sidebar-primary-foreground: hsl(var(--brand-fg));
+  --color-sidebar-accent: hsl(var(--surface-3));
+  --color-sidebar-accent-foreground: hsl(var(--foreground));
+  --color-sidebar-border: hsl(var(--border-subtle));
+  --color-sidebar-ring: hsl(var(--brand) / 50%);
+  --color-chart-1: hsl(var(--brand));
+  --color-chart-2: hsl(var(--info));
+  --color-chart-3: hsl(var(--warning));
+  --color-chart-4: hsl(var(--error));
+  --color-chart-5: hsl(var(--muted-fg));
+  --radius: 0.75rem;
+}
+
+/* Keep shadcn compat vars */
+.dark {
+  --background: 220 12% 11%;
+  --foreground: 210 20% 94%;
+  --card: 220 12% 11%;
+  --card-foreground: 210 20% 94%;
+  --popover: 220 12% 11%;
+  --popover-foreground: 210 20% 94%;
+  --primary: 152 72% 45%;
+  --primary-foreground: 0 0% 4%;
+  --secondary: 220 11% 14%;
+  --secondary-foreground: 210 20% 94%;
+  --muted: 220 11% 14%;
+  --muted-foreground: 215 12% 48%;
+  --accent: 220 11% 14%;
+  --accent-foreground: 210 20% 94%;
+  --destructive: 4 86% 58%;
+  --border: 220 10% 18%;
+  --input: 220 11% 14%;
+  --ring: 152 72% 45%;
+  --sidebar: 220 13% 9%;
+  --sidebar-foreground: 210 20% 94%;
+  --sidebar-primary: 152 72% 45%;
+  --sidebar-primary-foreground: 0 0% 4%;
+  --sidebar-accent: 220 11% 14%;
+  --sidebar-accent-foreground: 210 20% 94%;
+  --sidebar-border: 220 10% 18%;
+  --sidebar-ring: 152 72% 45%;
+}
+
+/* ─── Smooth Theme Transition System ─── */
+html,
+body,
+main,
+aside,
+header,
+input,
+select,
+textarea,
+table,
+tr,
+td,
+th,
+[class*="bg-card"],
+.bg-card,
+[class*="bg-black"],
+[class*="bg-zinc"] {
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ─── Clean Outline Light Mode (No Shadow, Crisp Defined Borders) ─── */
+:root[data-theme="light"] {
+  --background: 210 40% 98%;
+  --foreground: 222.2 84% 4.9%;
+  --surface-1: 0 0% 100%;
+  --surface-2: 0 0% 100%;
+  --surface-3: 210 40% 96.1%;
+  --border-subtle: 214.3 31.8% 91.4%;
+  --muted-fg: 215.4 16.3% 46.9%;
+  color-scheme: light;
+}
+
+html[data-theme="light"],
+html[data-theme="light"] body {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Remove all shadows in Light Mode */
+html[data-theme="light"] *,
+html[data-theme="light"] [class*="shadow"] {
+  box-shadow: none !important;
+}
+
+/* App Outer Shell & Main Canvas */
+html[data-theme="light"] [class*="bg-black"] {
+  background-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] main {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] header,
+html[data-theme="light"] header button,
+html[data-theme="light"] header div[title] {
+  background-color: transparent !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+/* Cards, Tables & Content Panels Light Mode Pure White Background */
+html[data-theme="light"] [class*="bg-transparent"],
+html[data-theme="light"] button[class*="bg-transparent"] {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] table,
+html[data-theme="light"] thead,
+html[data-theme="light"] tbody,
+html[data-theme="light"] tr,
+html[data-theme="light"] th,
+html[data-theme="light"] td,
+html[data-theme="light"] [data-slot="table-container"],
+html[data-theme="light"] [class*="bg-card"],
+html[data-theme="light"] .bg-card,
+html[data-theme="light"] [class*="bg-black/"],
+html[data-theme="light"] [class*="bg-zinc-950"],
+html[data-theme="light"] [class*="bg-zinc-900"],
+html[data-theme="light"] [class*="bg-zinc-800"] {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Borders & Texts */
+html[data-theme="light"] [class*="border-white"],
+html[data-theme="light"] [class*="border-zinc"] {
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] [class*="text-white"],
+html[data-theme="light"] .text-foreground {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .text-muted-foreground,
+html[data-theme="light"] [class*="text-zinc-400"],
+html[data-theme="light"] [class*="text-zinc-500"] {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea,
+html[data-theme="light"] [data-slot="input"] {
+  background-color: transparent !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+/* Glowing Emerald Focus Outline for Inputs in Light Mode */
+html[data-theme="light"] input:focus,
+html[data-theme="light"] input:focus-visible,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] select:focus-visible,
+html[data-theme="light"] textarea:focus,
+html[data-theme="light"] textarea:focus-visible,
+html[data-theme="light"] [data-slot="input"]:focus,
+html[data-theme="light"] [data-slot="input"]:focus-visible {
+  border-color: #059669 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px #059669, 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Media Card Video Preview Thumbnail Area Color & Hover */
+.media-thumbnail-preview,
+html[data-theme="light"] .media-thumbnail-preview {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  transition: background-color 0.25s ease, border-color 0.25s ease !important;
+}
+
+.group:hover .media-thumbnail-preview,
+html[data-theme="light"] .group:hover .media-thumbnail-preview {
+  background-color: #1e293b !important;
+}
+
+html[data-theme="light"] .media-thumbnail-preview svg {
+  color: #94a3b8 !important;
+}
+
+/* Sidebar Light Mode Specific Styles */
+html[data-theme="light"] aside,
+html[data-theme="light"] aside[class*="border"] {
+  background-color: #f8fafc !important;
+  border-color: #f8fafc !important;
+  outline-color: #f8fafc !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] aside div.border-b {
+  background-color: transparent !important;
+  border-color: #f8fafc !important;
+}
+
+/* Sidebar Server Status Pill in Light Mode */
+html[data-theme="light"] aside .sidebar-status-pill {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: none !important;
+}
+
+/* Transparent Pill Tab Switcher in Light Mode */
+html[data-theme="light"] .pill-tab-switcher {
+  background-color: transparent !important;
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] .pill-tab-switcher button {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .pill-tab-switcher button[class*="bg-emerald"] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #059669 !important;
+}
+
+html[data-theme="light"] aside nav a {
+  color: #475569 !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+html[data-theme="light"] aside nav a:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] aside nav a.sidebar-active {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid #a7f3d0 !important;
+  border-color: #a7f3d0 !important;
+}
+
+html[data-theme="light"] aside nav a.sidebar-active svg {
+  color: #047857 !important;
+}
+
+/* Vibrant Accent Status Badges in Light Mode */
+html[data-theme="light"] [class*="bg-emerald-500/10"],
+html[data-theme="light"] [class*="bg-emerald-500/20"] {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #a7f3d0 !important;
+}
+
+html[data-theme="light"] [class*="text-emerald-400"] {
+  color: #059669 !important;
+}
+
+html[data-theme="light"] [class*="bg-blue-500/10"] {
+  background-color: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-color: #bfdbfe !important;
+}
+
+html[data-theme="light"] [class*="text-blue-400"] {
+  color: #2563eb !important;
+}
+
+html[data-theme="light"] [class*="bg-purple-500/10"] {
+  background-color: #faf5ff !important;
+  color: #7e22ce !important;
+  border-color: #e9d5ff !important;
+}
+
+html[data-theme="light"] [class*="text-purple-400"] {
+  color: #9333ea !important;
+}
+
+/* Recharts Telemetry SVG text & line colors in Light Mode */
+html[data-theme="light"] .recharts-cartesian-grid-horizontal line,
+html[data-theme="light"] .recharts-cartesian-grid-vertical line {
+  stroke: #cbd5e1 !important;
+}
+
+html[data-theme="light"] .recharts-text,
+html[data-theme="light"] .recharts-cartesian-axis-tick-value,
+html[data-theme="light"] .recharts-layer text,
+html[data-theme="light"] text.recharts-cartesian-axis-tick-value,
+html[data-theme="light"] .recharts-legend-item-text {
+  fill: #334155 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .recharts-cartesian-axis-line,
+html[data-theme="light"] .recharts-cartesian-axis-tick-line {
+  stroke: #94a3b8 !important;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html, body {
+    @apply bg-background text-foreground font-sans antialiased;
+    height: 100%;
+  }
+}
+
+/* ─── Lupio Custom Utilities ───────────────────────── */
+@layer utilities {
+  .lupio-glow {
+    box-shadow: 0 0 40px -10px hsl(var(--brand) / 20%);
+  }
+  .lupio-border-glow {
+    border-color: hsl(var(--brand) / 30%);
+    box-shadow: inset 0 0 0 1px hsl(var(--brand) / 10%);
+  }
+  .surface-1  { background: hsl(var(--surface-1)); }
+  .surface-2  { background: hsl(var(--surface-2)); }
+  .surface-3  { background: hsl(var(--surface-3)); }
+  .text-brand { color: hsl(var(--brand)); }
+  .bg-brand   { background: hsl(var(--brand)); }
+  .border-brand { border-color: hsl(var(--brand) / 30%); }
+}

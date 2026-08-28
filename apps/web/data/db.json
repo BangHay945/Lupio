@@ -1,0 +1,870 @@
+{
+  "streams": [
+    {
+      "id": "str_1787716225406",
+      "name": "tessss",
+      "status": "OFFLINE",
+      "channelName": "agent@avachat.id",
+      "playlistName": "Single File",
+      "resolution": "720p",
+      "fps": 30,
+      "bitrate": "4000 Kbps",
+      "uptime": "0m",
+      "restartCount": 2,
+      "currentVideo": "Initializing...",
+      "channelId": "ch_1787720713885"
+    }
+  ],
+  "media": [
+    {
+      "id": "med_1787567678156",
+      "filename": "HOTEL NADA AJYAD - MUTAMTOUR.mp4",
+      "duration": "03:45",
+      "resolution": "1080p",
+      "size": "22.3 MB",
+      "filepath": "C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4",
+      "type": "video",
+      "uploadDate": "2026-08-24",
+      "title": "",
+      "description": "",
+      "thumbnail": ""
+    }
+  ],
+  "playlists": [
+    {
+      "id": "pl_1787724120004",
+      "name": "New Playlist",
+      "itemCount": 1,
+      "totalDuration": "15m",
+      "createdAt": "2026-08-26",
+      "mediaItems": [
+        {
+          "id": "med_1787567678156",
+          "filename": "HOTEL NADA AJYAD - MUTAMTOUR.mp4",
+          "duration": "03:45",
+          "resolution": "1080p",
+          "size": "22.3 MB",
+          "filepath": "C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4",
+          "type": "video",
+          "uploadDate": "2026-08-24"
+        }
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "id": "ch_1787720713885",
+      "name": "agent@avachat.id",
+      "platform": "YouTube",
+      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
+      "streamKey": "mwfu-8p05-e80s-f9u9-fkhk",
+      "status": "Active",
+      "isDefault": false
+    },
+    {
+      "id": "ch_1787718922713",
+      "name": "hy",
+      "platform": "YouTube",
+      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
+      "streamKey": "mwfu-8p05-e80s-f9u9-fkhk",
+      "status": "Active",
+      "isDefault": false
+    },
+    {
+      "id": "ch_1787716225341",
+      "name": "tessss Channel",
+      "platform": "YouTube",
+      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
+      "streamKey": "rb70-c1a1-ky5z-0w6q-b5mt",
+      "status": "Active",
+      "isDefault": false
+    }
+  ],
+  "logs": [
+    {
+      "id": "log_1787917922801_y5nr",
+      "timestamp": "2026-08-28T11:52:02.801Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated system settings."
+    },
+    {
+      "id": "log_1787917914307_w82p",
+      "timestamp": "2026-08-28T11:51:54.310Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated system settings."
+    },
+    {
+      "id": "log_1787917768057_o7ru",
+      "timestamp": "2026-08-28T11:49:28.058Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated system settings."
+    },
+    {
+      "id": "log_1787917713529_rxmk",
+      "timestamp": "2026-08-28T11:48:33.529Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated system settings."
+    },
+    {
+      "id": "log_1787829417107_a0zr",
+      "timestamp": "2026-08-27T11:16:57.107Z",
+      "level": "info",
+      "source": "media",
+      "message": "Updated metadata for media item \"HOTEL NADA AJYAD - MUTAMTOUR.mp4\""
+    },
+    {
+      "id": "log_1787825120737_ch0i",
+      "timestamp": "2026-08-27T10:05:20.737Z",
+      "level": "info",
+      "source": "media",
+      "message": "Updated metadata for media item \"HOTEL NADA AJYAD - MUTAMTOUR.mp4\""
+    },
+    {
+      "id": "log_1787730718969_i272",
+      "timestamp": "2026-08-26T07:51:58.969Z",
+      "level": "info",
+      "source": "scheduler",
+      "message": "Deleted time-based schedule rule ID rule_1"
+    },
+    {
+      "id": "log_1787730717284_i1h0",
+      "timestamp": "2026-08-26T07:51:57.284Z",
+      "level": "info",
+      "source": "scheduler",
+      "message": "Deleted time-based schedule rule ID rule_2"
+    },
+    {
+      "id": "log_1787724132133_p6g9",
+      "timestamp": "2026-08-26T06:02:12.133Z",
+      "level": "info",
+      "source": "playlist",
+      "message": "Saved playlist \"New Playlist\""
+    },
+    {
+      "id": "log_1787724120015_u19h",
+      "timestamp": "2026-08-26T06:02:00.015Z",
+      "level": "info",
+      "source": "playlist",
+      "message": "Saved playlist \"New Playlist\""
+    },
+    {
+      "id": "log_1787721028283_lttv",
+      "timestamp": "2026-08-26T05:10:28.283Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited (code: null, signal: SIGKILL)"
+    },
+    {
+      "id": "log_1787721028035_8xxm",
+      "timestamp": "2026-08-26T05:10:28.035Z",
+      "level": "info",
+      "source": "system",
+      "message": "Stream \"tessss\" stopped by user."
+    },
+    {
+      "id": "log_1787721019162_30kk",
+      "timestamp": "2026-08-26T05:10:19.175Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000001c4f6957a80] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787721012219_rpxj",
+      "timestamp": "2026-08-26T05:10:12.219Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000001c4f629dcc0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787721000718_entg",
+      "timestamp": "2026-08-26T05:10:00.718Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Output #0, flv, to 'rtmp://a.rtmp.youtube.com/live2/mwfu-8p05-e80s-f9u9-fkhk':"
+    },
+    {
+      "id": "log_1787721000323_23w8",
+      "timestamp": "2026-08-26T05:10:00.323Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?] for help\r\n[h264 @ 000001c4f5e984c0] Late SEI is n"
+    },
+    {
+      "id": "log_1787720999621_jb04",
+      "timestamp": "2026-08-26T05:09:59.621Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-versio"
+    },
+    {
+      "id": "log_1787720999188_2acm",
+      "timestamp": "2026-08-26T05:09:59.188Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" -> rtmp://a.rtmp.youtube.com/live2"
+    },
+    {
+      "id": "log_1787720999168_8kq7",
+      "timestamp": "2026-08-26T05:09:59.168Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Live streaming to YouTube RTMP: rtmp://a.rtmp.youtube.com/live2/mwfu****"
+    },
+    {
+      "id": "log_1787720994158_21na",
+      "timestamp": "2026-08-26T05:09:54.159Z",
+      "level": "info",
+      "source": "system",
+      "message": "Stream \"tessss\" stopped by user."
+    },
+    {
+      "id": "log_1787720923499_lpbt",
+      "timestamp": "2026-08-26T05:08:43.499Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b62916980] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720921576_4nbh",
+      "timestamp": "2026-08-26T05:08:41.576Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efe7b900] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720915460_q5mi",
+      "timestamp": "2026-08-26T05:08:35.460Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b6278c000] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720913928_jleb",
+      "timestamp": "2026-08-26T05:08:33.928Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efe7c400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720908612_7q8p",
+      "timestamp": "2026-08-26T05:08:28.612Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b620c1c00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720907100_r6o5",
+      "timestamp": "2026-08-26T05:08:27.100Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efb7f000] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720901463_bnxz",
+      "timestamp": "2026-08-26T05:08:21.463Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b6248f000] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720900466_5gyr",
+      "timestamp": "2026-08-26T05:08:20.466Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233ef9d16c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720895149_i0h8",
+      "timestamp": "2026-08-26T05:08:15.149Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b620c9440] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720893449_1mqx",
+      "timestamp": "2026-08-26T05:08:13.449Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233ef88e4c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720888432_lrbo",
+      "timestamp": "2026-08-26T05:08:08.432Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b625cfd80] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720878396_n2q5",
+      "timestamp": "2026-08-26T05:07:58.396Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b6285b380] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720875724_s605",
+      "timestamp": "2026-08-26T05:07:55.724Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.\r\n[h264 @ 00000233f0006880]"
+    },
+    {
+      "id": "log_1787720875694_dego",
+      "timestamp": "2026-08-26T05:07:55.694Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233f0006880] Late SEI"
+    },
+    {
+      "id": "log_1787720867821_gk5x",
+      "timestamp": "2026-08-26T05:07:47.821Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.\r\n[h264 @ 0000023b6278b900]"
+    },
+    {
+      "id": "log_1787720867774_s54h",
+      "timestamp": "2026-08-26T05:07:47.774Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b6278b900] Late SEI"
+    },
+    {
+      "id": "log_1787720857536_ahac",
+      "timestamp": "2026-08-26T05:07:37.536Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b6278c700] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720844063_9y19",
+      "timestamp": "2026-08-26T05:07:24.063Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efb80000] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720837317_8k3n",
+      "timestamp": "2026-08-26T05:07:17.317Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 0000023b621a0380] profile High, level 3.1, 4:2:0, 8-bit\r\n[libx264 @ 0000023b621a0380] 264 - core 164 r3172 c1c9931 - H.264/MPEG-4 AVC codec - Copyleft 2003-2023 - http://www.videolan.org/x2"
+    },
+    {
+      "id": "log_1787720837266_9apq",
+      "timestamp": "2026-08-26T05:07:17.266Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 0000023b621a0380] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2"
+    },
+    {
+      "id": "log_1787720837192_6lv2",
+      "timestamp": "2026-08-26T05:07:17.192Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 0000023b621a0380] using SAR=1/1"
+    },
+    {
+      "id": "log_1787720837064_4hlt",
+      "timestamp": "2026-08-26T05:07:17.064Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 0000023b622e16c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720837035_35pz",
+      "timestamp": "2026-08-26T05:07:17.035Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?] for help"
+    },
+    {
+      "id": "log_1787720836553_87wa",
+      "timestamp": "2026-08-26T05:07:16.557Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream #0:0[0x1](und): Video: h264 (High) (avc1 / 0x31637661), yuv420p(tv, bt709, progressive), 720x1280 [SAR 1:1 DAR 9:16], 1151 kb/s, 30 fps, 30 tbr, 15360 tbn (default)\r\n    Metadata:\r\n      handle"
+    },
+    {
+      "id": "log_1787720836526_bi6r",
+      "timestamp": "2026-08-26T05:07:16.526Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4':\r\n  Metadata:\r\n    major_brand     : isom\r\n    minor_version   : 512\r\n    compatible_"
+    },
+    {
+      "id": "log_1787720836467_cguf",
+      "timestamp": "2026-08-26T05:07:16.467Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-versio"
+    },
+    {
+      "id": "log_1787720836290_pi1t",
+      "timestamp": "2026-08-26T05:07:16.290Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" -> rtmp://a.rtmp.youtube.com/live2"
+    },
+    {
+      "id": "log_1787720836231_9l9e",
+      "timestamp": "2026-08-26T05:07:16.235Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Live streaming to YouTube RTMP: rtmp://a.rtmp.youtube.com/live2/mwfu****"
+    },
+    {
+      "id": "log_1787720834691_p9x2",
+      "timestamp": "2026-08-26T05:07:14.691Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233ef859440] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720828773_neoe",
+      "timestamp": "2026-08-26T05:07:08.773Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efcbfd80] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720823174_qqti",
+      "timestamp": "2026-08-26T05:07:03.174Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233eff4b280] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720816141_bqkd",
+      "timestamp": "2026-08-26T05:06:56.141Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efe7b900] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720808456_7ywy",
+      "timestamp": "2026-08-26T05:06:48.456Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efe7c400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720797183_dkfn",
+      "timestamp": "2026-08-26T05:06:37.183Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233efb7f000] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720789422_k3sm",
+      "timestamp": "2026-08-26T05:06:29.422Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000233ef890380] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2\r\n[libx264 @ 00000233ef890380] profile High, level 3.1, 4:2:0, 8-bit\r\n[libx264 @ 00000233ef890380] 264"
+    },
+    {
+      "id": "log_1787720789376_9526",
+      "timestamp": "2026-08-26T05:06:29.376Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000233ef890380] using SAR=1/1"
+    },
+    {
+      "id": "log_1787720789269_lpd5",
+      "timestamp": "2026-08-26T05:06:29.269Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 00000233ef9d16c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720789230_97cj",
+      "timestamp": "2026-08-26T05:06:29.230Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?] for help"
+    },
+    {
+      "id": "log_1787720788710_9gvw",
+      "timestamp": "2026-08-26T05:06:28.710Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4':\r\n  Metadata:\r\n    major_brand     : isom\r\n    minor_version   : 512\r\n    compatible_"
+    },
+    {
+      "id": "log_1787720788684_pg72",
+      "timestamp": "2026-08-26T05:06:28.684Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-versio"
+    },
+    {
+      "id": "log_1787720788515_0ong",
+      "timestamp": "2026-08-26T05:06:28.515Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited (code: null, signal: SIGKILL)"
+    },
+    {
+      "id": "log_1787720788378_tb2x",
+      "timestamp": "2026-08-26T05:06:28.379Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" -> rtmp://a.rtmp.youtube.com/live2"
+    },
+    {
+      "id": "log_1787720788337_p7e6",
+      "timestamp": "2026-08-26T05:06:28.337Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Live streaming to YouTube RTMP: rtmp://a.rtmp.youtube.com/live2/mwfu****"
+    },
+    {
+      "id": "log_1787720788248_7s8z",
+      "timestamp": "2026-08-26T05:06:28.248Z",
+      "level": "info",
+      "source": "system",
+      "message": "Stream \"tessss\" stopped by user."
+    },
+    {
+      "id": "log_1787720784214_3pdl",
+      "timestamp": "2026-08-26T05:06:24.214Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c1d64c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720778118_5351",
+      "timestamp": "2026-08-26T05:06:18.118Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c04bd00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720772813_cxwd",
+      "timestamp": "2026-08-26T05:06:12.813Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278ba11c00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720767721_23lb",
+      "timestamp": "2026-08-26T05:06:07.721Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bd4f800] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720761452_ry0p",
+      "timestamp": "2026-08-26T05:06:01.452Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278ba19440] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720741298_hulr",
+      "timestamp": "2026-08-26T05:05:41.298Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c11adc0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720735913_w4fq",
+      "timestamp": "2026-08-26T05:05:35.914Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c2918c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720735842_nq59",
+      "timestamp": "2026-08-26T05:05:35.842Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated stream settings for \"tessss\""
+    },
+    {
+      "id": "log_1787720728268_z22s",
+      "timestamp": "2026-08-26T05:05:28.268Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c04c400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720716939_76gk",
+      "timestamp": "2026-08-26T05:05:16.939Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bd4e400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720713971_ncf2",
+      "timestamp": "2026-08-26T05:05:13.971Z",
+      "level": "info",
+      "source": "channel",
+      "message": "Saved channel \"agent@avachat.id\""
+    },
+    {
+      "id": "log_1787720706497_kn3u",
+      "timestamp": "2026-08-26T05:05:06.497Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bba16c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720683990_27hc",
+      "timestamp": "2026-08-26T05:04:43.990Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c04bd00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720677348_puid",
+      "timestamp": "2026-08-26T05:04:37.348Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278ba11c00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720670915_9rau",
+      "timestamp": "2026-08-26T05:04:30.915Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bd4f800] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720664069_tplw",
+      "timestamp": "2026-08-26T05:04:24.069Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278ba19440] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720650825_7l8k",
+      "timestamp": "2026-08-26T05:04:10.825Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278be8f8c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720641719_a4u2",
+      "timestamp": "2026-08-26T05:04:01.719Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c11adc0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720633432_6cg0",
+      "timestamp": "2026-08-26T05:03:53.432Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c2918c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720626885_2b2q",
+      "timestamp": "2026-08-26T05:03:46.885Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c04c400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720621162_zwix",
+      "timestamp": "2026-08-26T05:03:41.162Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bd4e400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720614827_9zdo",
+      "timestamp": "2026-08-26T05:03:34.827Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bba16c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720608891_yvo4",
+      "timestamp": "2026-08-26T05:03:28.891Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bed5b00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720602848_usvk",
+      "timestamp": "2026-08-26T05:03:22.848Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278be8fcc0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720596946_azgh",
+      "timestamp": "2026-08-26T05:03:16.946Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c1d64c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720591019_740x",
+      "timestamp": "2026-08-26T05:03:11.019Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c04bd00] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720578798_xffe",
+      "timestamp": "2026-08-26T05:02:58.798Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bd4f800] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720561034_7e9a",
+      "timestamp": "2026-08-26T05:02:41.034Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c11adc0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720554911_j2gp",
+      "timestamp": "2026-08-26T05:02:34.911Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.\r\n[h264 @ 00000227"
+    },
+    {
+      "id": "log_1787720554893_mt7u",
+      "timestamp": "2026-08-26T05:02:34.893Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c2918c0]"
+    },
+    {
+      "id": "log_1787720548833_xm8i",
+      "timestamp": "2026-08-26T05:02:28.834Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278c04c400] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720542832_tfir",
+      "timestamp": "2026-08-26T05:02:22.832Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been implemented.\r\n[h264 @ 00000227"
+    },
+    {
+      "id": "log_1787720542811_qdyd",
+      "timestamp": "2026-08-26T05:02:22.811Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bd4e400]"
+    },
+    {
+      "id": "log_1787720537251_8w9d",
+      "timestamp": "2026-08-26T05:02:17.251Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000002278ba60380] using cpu capabilities: MMX2 SSE2Fast SSSE3 SSE4.2 AVX FMA3 BMI2 AVX2\r\n[libx264 @ 000002278ba60380] profile High, level 3.1, 4:2:0, 8-bit\r\n[libx264 @ 000002278ba60380] 264"
+    },
+    {
+      "id": "log_1787720537247_d9qy",
+      "timestamp": "2026-08-26T05:02:17.247Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000002278ba60380] using SAR=1/1"
+    },
+    {
+      "id": "log_1787720537230_j0az",
+      "timestamp": "2026-08-26T05:02:17.230Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] [h264 @ 000002278bba16c0] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means that your file has a feature which has not been impl"
+    },
+    {
+      "id": "log_1787720537207_k4px",
+      "timestamp": "2026-08-26T05:02:17.207Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?] for help"
+    },
+    {
+      "id": "log_1787720536696_c7cg",
+      "timestamp": "2026-08-26T05:02:16.696Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4':\r\n  Metadata:\r\n    major_brand     : isom\r\n    minor_version   : 512\r\n    compatible_"
+    },
+    {
+      "id": "log_1787720536678_smws",
+      "timestamp": "2026-08-26T05:02:16.678Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 project)\r\n  configuration: --enable-gpl --enable-versio"
+    },
+    {
+      "id": "log_1787720536597_181x",
+      "timestamp": "2026-08-26T05:02:16.597Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" -> rtmp://a.rtmp.youtube.com/live2"
+    },
+    {
+      "id": "log_1787720536593_u209",
+      "timestamp": "2026-08-26T05:02:16.593Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "[tessss] Live streaming to YouTube RTMP: rtmp://a.rtmp.youtube.com/live2/mwfu****"
+    }
+  ],
+  "settings": {
+    "serverName": "Lupio Production Node 1",
+    "language": "English",
+    "ffmpegPath": "ffmpeg",
+    "hardwareAccel": "None (CPU Only)",
+    "threadCount": 4,
+    "defaultResolution": "1080p",
+    "globalBitrate": "8000",
+    "reconnectDelay": 10,
+    "telegramBotToken": "",
+    "telegramChatId": "",
+    "discordWebhookUrl": "",
+    "enableWebhooks": true,
+    "backupMediaId": "",
+    "globalWatermarkText": "LUPIO LIVE 24/7",
+    "enableAutoHealing": true,
+    "maxWatchdogRetries": 3,
+    "enableAudioNormalizer": true,
+    "loudnessLevel": "-16 LUFS (EBU R128)",
+    "adminName": "Haidar Ali",
+    "adminEmail": "admin@lupio.com"
+  },
+  "scheduleRules": [],
+  "users": [
+    {
+      "id": "usr_admin",
+      "name": "Admin Operator",
+      "email": "admin@lupio.local",
+      "role": "Admin",
+      "status": "Active",
+      "createdAt": "2026-08-26"
+    },
+    {
+      "id": "usr_operator",
+      "name": "Studio Operator 1",
+      "email": "operator1@lupio.local",
+      "role": "Operator",
+      "status": "Active",
+      "createdAt": "2026-08-26"
+    }
+  ],
+  "apiKeys": [
+    {
+      "id": "key_primary",
+      "name": "OBS Remote Automation Key",
+      "key": "lup_live_sec_984f1a23c89b",
+      "createdAt": "2026-08-26",
+      "lastUsed": "Just now"
+    }
+  ]
+}

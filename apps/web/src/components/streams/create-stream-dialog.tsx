@@ -1,0 +1,488 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { apiService } from "@/lib/services/api";
+import { Channel, MediaItem, Playlist, Stream } from "@/lib/mock-data";
+import { toast } from "@/components/ui/toast";
+import { Tv, Film, Video, Key, Play, Plus, Pencil, Layers, Type, ShieldAlert, Share2 } from "lucide-react";
+
+interface CreateStreamDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  stream?: Stream | null;
+  onSuccess: () => void;
+}
+
+export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: CreateStreamDialogProps) {
+  const [streamName, setStreamName] = useState("");
+  const [channels, setChannels] = useState<Channel[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  
+  const [selectedChannelId, setSelectedChannelId] = useState("");
+  const [selectedMultiChannelIds, setSelectedMultiChannelIds] = useState<string[]>([]);
+  const [contentType, setContentType] = useState<"media" | "playlist">("media");
+  const [selectedMediaId, setSelectedMediaId] = useState("");
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState("");
+  const [preset, setPreset] = useState("1080p30");
+
+  // Advanced Overlay & Anti-Drop Backup
+  const [watermarkText, setWatermarkText] = useState("");
+  const [tickerText, setTickerText] = useState("");
+  const [backupMediaId, setBackupMediaId] = useState("");
+  
+  // Custom Channel Inline State
+  const [showAddChannel, setShowAddChannel] = useState(false);
+  const [newChannelName, setNewChannelName] = useState("");
+  const [newStreamKey, setNewStreamKey] = useState("");
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      loadInitialData();
+    }
+  }, [open, stream]);
+
+  const loadInitialData = async () => {
+    try {
+      const [chData, plData, medData] = await Promise.all([
+        apiService.getChannels(),
+        apiService.getPlaylists(),
+        apiService.getMedia(),
+      ]);
+      setChannels(Array.isArray(chData) ? chData : []);
+      setPlaylists(Array.isArray(plData) ? plData : []);
+      setMediaItems(Array.isArray(medData) ? medData : []);
+
+      if (stream) {
+        setStreamName(stream.name || "");
+        setWatermarkText(stream.watermarkText || "");
+        setTickerText(stream.tickerText || "");
+        setBackupMediaId(stream.backupMediaId || "");
+        setSelectedMultiChannelIds(stream.multiChannelIds || []);
+
+        if (stream.resolution === "720p") setPreset("720p30");
+        else if (stream.resolution === "4K") setPreset("4k60");
+        else setPreset("1080p30");
+
+        const matchingChannel = (Array.isArray(chData) ? chData : []).find(c => c.name === stream.channelName || c.id === stream.channelId);
+        if (matchingChannel) setSelectedChannelId(matchingChannel.id);
+      } else {
+        setStreamName("");
+        setWatermarkText("");
+        setTickerText("");
+        setBackupMediaId("");
+        setSelectedMultiChannelIds([]);
+        if (Array.isArray(chData) && chData.length > 0) setSelectedChannelId(chData[0].id);
+        if (Array.isArray(medData) && medData.length > 0) setSelectedMediaId(medData[0].id);
+        if (Array.isArray(plData) && plData.length > 0) setSelectedPlaylistId(plData[0].id);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const toggleMultiChannel = (cid: string) => {
+    setSelectedMultiChannelIds((prev) =>
+      prev.includes(cid) ? prev.filter((id) => id !== cid) : [...prev, cid]
+    );
+  };
+
+  const handleSave = async (startNow: boolean) => {
+    if (!streamName.trim()) {
+      (toast as any)({ title: "Validation Error", description: "Please enter a stream name.", type: "error" });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      let finalChannelId = selectedChannelId;
+      let finalChannelName = channels.find((c) => c.id === selectedChannelId)?.name || "YouTube Channel";
+
+      if (showAddChannel) {
+        if (!newStreamKey.trim()) {
+          (toast as any)({ title: "Validation Error", description: "Please enter your YouTube Stream Key.", type: "error" });
+          setLoading(false);
+          return;
+        }
+        const createdChannel = await apiService.saveChannel({
+          name: newChannelName.trim() || "My YouTube Channel",
+          platform: "YouTube",
+          rtmpUrl: "rtmp://a.rtmp.youtube.com/live2",
+          streamKey: newStreamKey.trim(),
+          status: "Active",
+        });
+        finalChannelId = createdChannel.id;
+        finalChannelName = createdChannel.name;
+      }
+
+      let res = "1080p";
+      let fps = 30;
+      let bitrate = "8000 Kbps";
+
+      if (preset === "720p30") {
+        res = "720p";
+        fps = 30;
+        bitrate = "4000 Kbps";
+      } else if (preset === "4k60") {
+        res = "4K";
+        fps = 60;
+        bitrate = "15000 Kbps";
+      }
+
+      let playlistName = "Single File";
+      if (contentType === "playlist") {
+        playlistName = playlists.find((p) => p.id === selectedPlaylistId)?.name || "Custom Playlist";
+      } else {
+        playlistName = mediaItems.find((m) => m.id === selectedMediaId)?.filename || "Single File";
+      }
+
+      const payload = {
+        name: streamName.trim(),
+        channelName: finalChannelName,
+        channelId: finalChannelId,
+        playlistName,
+        resolution: res,
+        fps,
+        bitrate,
+        multiChannelIds: selectedMultiChannelIds,
+        watermarkText: watermarkText.trim(),
+        tickerText: tickerText.trim(),
+        backupMediaId,
+        enableOverlay: Boolean(watermarkText || tickerText),
+      };
+
+      if (stream) {
+        // Edit Mode
+        const updated = await apiService.updateStream(stream.id, payload);
+
+        if (startNow) {
+          await apiService.controlStream(stream.id, "start");
+        }
+
+        (toast as any)({
+          title: "Stream Updated! ✨",
+          description: `"${updated.name}" settings updated successfully.`,
+          type: "success",
+        });
+      } else {
+        // Create Mode
+        const createdStream = await apiService.createStream({
+          ...payload,
+          videoBitrate: bitrate,
+          scheduleType: startNow ? "now" : "later",
+        });
+
+        if (startNow && createdStream?.id) {
+          await apiService.controlStream(createdStream.id, "start");
+        }
+
+        (toast as any)({
+          title: startNow ? "Stream Live! 🚀" : "Stream Created",
+          description: startNow ? `"${streamName}" is now streaming live.` : `"${streamName}" saved successfully.`,
+          type: "success",
+        });
+      }
+
+      setStreamName("");
+      setShowAddChannel(false);
+      setNewChannelName("");
+      setNewStreamKey("");
+      onOpenChange(false);
+      onSuccess();
+    } catch (e: any) {
+      (toast as any)({ title: "Error", description: e.message || "Failed to save stream", type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[620px] bg-zinc-950 border border-white/10 p-6 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="gap-1">
+          <DialogTitle className="text-xl font-bold flex items-center gap-2">
+            {stream ? (
+              <>
+                <Pencil className="h-5 w-5 text-emerald-400" /> Edit Stream Settings
+              </>
+            ) : (
+              <>
+                <Video className="h-5 w-5 text-emerald-400" /> Create Live Stream
+              </>
+            )}
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Configure multi-destination restreaming, overlays, emergency backup, and output resolution.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-3 text-xs">
+          {/* Stream Name */}
+          <div className="space-y-1.5">
+            <label className="font-semibold uppercase tracking-wider text-muted-foreground">Stream Title *</label>
+            <Input
+              placeholder="e.g. 24/7 Lofi Study Beats"
+              value={streamName}
+              onChange={(e) => setStreamName(e.target.value)}
+              className="bg-white/5 border-white/10 h-10"
+            />
+          </div>
+
+          {/* Primary Target Channel */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Tv className="h-3.5 w-3.5" /> Primary Target Channel
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowAddChannel(!showAddChannel)}
+                className="text-[11px] font-medium text-emerald-400 hover:underline flex items-center gap-1"
+              >
+                <Plus className="h-3 w-3" /> {showAddChannel ? "Select Existing" : "Add New Key"}
+              </button>
+            </div>
+
+            {showAddChannel ? (
+              <div className="p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/5 space-y-2.5">
+                <div>
+                  <label className="text-[10px] uppercase text-muted-foreground">Channel Name</label>
+                  <Input
+                    placeholder="e.g. My YouTube Channel"
+                    value={newChannelName}
+                    onChange={(e) => setNewChannelName(e.target.value)}
+                    className="bg-white/5 border-white/10 h-9 text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase text-muted-foreground flex items-center gap-1">
+                    <Key className="h-3 w-3 text-emerald-400" /> YouTube Stream Key *
+                  </label>
+                  <Input
+                    type="password"
+                    placeholder="Paste key from YouTube Studio..."
+                    value={newStreamKey}
+                    onChange={(e) => setNewStreamKey(e.target.value)}
+                    className="bg-white/5 border-white/10 h-9 text-xs"
+                  />
+                </div>
+              </div>
+            ) : (
+              <select
+                value={selectedChannelId}
+                onChange={(e) => setSelectedChannelId(e.target.value)}
+                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {channels.length === 0 && <option value="">No channels available (Click Add New Key)</option>}
+                {channels.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} ({c.platform})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Multi-Destination Restreaming (Simultaneous Push) */}
+          {channels.length > 1 && (
+            <div className="space-y-2 p-3 rounded-xl border border-white/10 bg-black/40">
+              <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                <Share2 className="h-4 w-4 text-emerald-400" /> Multi-Destination Restreaming (Simultaneous Push)
+              </label>
+              <p className="text-[11px] text-muted-foreground">Select additional platforms to broadcast to at the same time:</p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {channels
+                  .filter((c) => c.id !== selectedChannelId)
+                  .map((c) => {
+                    const selected = selectedMultiChannelIds.includes(c.id);
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => toggleMultiChannel(c.id)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border transition-all ${
+                          selected
+                            ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                            : "bg-white/5 border-white/10 text-muted-foreground hover:bg-white/10"
+                        }`}
+                      >
+                        <span className={`h-2 w-2 rounded-full ${selected ? "bg-emerald-400" : "bg-zinc-600"}`} />
+                        {c.name} ({c.platform})
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          )}
+
+          {/* Video Overlays (Watermark & Running Ticker) */}
+          <div className="grid gap-3 md:grid-cols-2 p-3 rounded-xl border border-white/10 bg-black/40">
+            <div className="space-y-1">
+              <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                <Type className="h-3.5 w-3.5 text-blue-400" /> Watermark Logo Text
+              </label>
+              <Input
+                placeholder="e.g. LUPIO LIVE 24/7"
+                value={watermarkText}
+                onChange={(e) => setWatermarkText(e.target.value)}
+                className="bg-white/5 border-white/10 h-9 text-xs"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                <Layers className="h-3.5 w-3.5 text-yellow-400" /> Running Text Ticker Banner
+              </label>
+              <Input
+                placeholder="e.g. Subscribe for daily 24/7 stream!"
+                value={tickerText}
+                onChange={(e) => setTickerText(e.target.value)}
+                className="bg-white/5 border-white/10 h-9 text-xs"
+              />
+            </div>
+          </div>
+
+          {/* Emergency Backup Video (Anti-Drop 24/7) */}
+          <div className="space-y-1.5">
+            <label className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <ShieldAlert className="h-3.5 w-3.5 text-amber-400" /> Emergency Backup Video (Anti-Drop 24/7)
+            </label>
+            <select
+              value={backupMediaId}
+              onChange={(e) => setBackupMediaId(e.target.value)}
+              className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+            >
+              <option value="">None (Use Synthetic Test Pattern)</option>
+              {mediaItems.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.filename} ({m.duration})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Content Source */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Film className="h-3.5 w-3.5" /> Video Content Source
+              </label>
+              <div className="flex gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setContentType("media")}
+                  className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                    contentType === "media" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "text-muted-foreground hover:text-white"
+                  }`}
+                >
+                  Single Video
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setContentType("playlist")}
+                  className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                    contentType === "playlist" ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "text-muted-foreground hover:text-white"
+                  }`}
+                >
+                  Playlist
+                </button>
+              </div>
+            </div>
+
+            {contentType === "media" ? (
+              <select
+                value={selectedMediaId}
+                onChange={(e) => setSelectedMediaId(e.target.value)}
+                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {mediaItems.length === 0 && <option value="">No media files uploaded</option>}
+                {mediaItems.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.filename} ({m.duration})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select
+                value={selectedPlaylistId}
+                onChange={(e) => setSelectedPlaylistId(e.target.value)}
+                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              >
+                {playlists.length === 0 && <option value="">No playlists created</option>}
+                {playlists.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.itemCount} items, {p.totalDuration})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Stream Preset */}
+          <div className="space-y-1.5">
+            <label className="font-semibold uppercase tracking-wider text-muted-foreground">Output Quality Preset</label>
+            <div className="grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => setPreset("720p30")}
+                className={`p-2.5 rounded-xl border text-center transition-all ${
+                  preset === "720p30" ? "border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold" : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+                }`}
+              >
+                <div className="font-semibold text-xs">720p HD</div>
+                <div className="text-[10px] text-muted-foreground">30 FPS • 4Mbps</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPreset("1080p30")}
+                className={`p-2.5 rounded-xl border text-center transition-all ${
+                  preset === "1080p30" ? "border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold" : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+                }`}
+              >
+                <div className="font-semibold text-xs">1080p Full HD</div>
+                <div className="text-[10px] text-muted-foreground">30 FPS • 8Mbps</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPreset("4k60")}
+                className={`p-2.5 rounded-xl border text-center transition-all ${
+                  preset === "4k60" ? "border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold" : "border-white/10 bg-white/5 text-muted-foreground hover:bg-white/10"
+                }`}
+              >
+                <div className="font-semibold text-xs">4K Ultra HD</div>
+                <div className="text-[10px] text-muted-foreground">60 FPS • 15Mbps</div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-white/10">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading} className="text-xs">
+            Cancel
+          </Button>
+
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => handleSave(false)} disabled={loading} className="text-xs">
+              Save Draft
+            </Button>
+            <Button
+              onClick={() => handleSave(true)}
+              disabled={loading}
+              className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-1.5 text-xs px-4"
+            >
+              <Play className="h-3.5 w-3.5 fill-black" />
+              {loading ? "Starting..." : "Start Streaming Now"}
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
