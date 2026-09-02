@@ -5,27 +5,10 @@ import { db } from "./db";
 
 export function getFfmpegPath(): string {
   const settings = db.getSettings();
-  let ffmpegPath = settings.ffmpegPath || "ffmpeg";
-
-  const bundledStaticPath = path.join(
-    process.cwd(),
-    "node_modules",
-    "ffmpeg-static",
-    process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"
-  );
-
-  if (fs.existsSync(bundledStaticPath)) {
-    return bundledStaticPath;
+  if (settings.ffmpegPath && fs.existsSync(settings.ffmpegPath)) {
+    return settings.ffmpegPath;
   }
-
-  try {
-    const ffmpegStatic = require("ffmpeg-static");
-    if (ffmpegStatic && fs.existsSync(ffmpegStatic)) {
-      return ffmpegStatic;
-    }
-  } catch (e) {}
-
-  return ffmpegPath;
+  return "ffmpeg";
 }
 
 export interface ProbeResult {
@@ -51,7 +34,7 @@ export async function probeMedia(filePath: string, mediaId: string): Promise<Pro
   // 1. Probe duration & resolution using ffmpeg -i
   try {
     const stderr = await new Promise<string>((resolve) => {
-      const child = spawn(ffmpegPath, ["-i", filePath], { stdio: ["ignore", "pipe", "pipe"] });
+      const child = spawn(/*turbopackIgnore: true*/ ffmpegPath, ["-i", filePath], { stdio: ["ignore", "pipe", "pipe"] });
       let output = "";
       child.stderr?.on("data", (chunk: Buffer) => {
         output += chunk.toString();
@@ -86,6 +69,7 @@ export async function probeMedia(filePath: string, mediaId: string): Promise<Pro
   try {
     await new Promise<void>((resolve) => {
       const thumbChild = spawn(
+        /*turbopackIgnore: true*/
         ffmpegPath,
         [
           "-ss", "00:00:01",

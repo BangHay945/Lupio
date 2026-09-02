@@ -85,6 +85,16 @@ export function KPICards({ metrics }: KPICardsProps) {
         <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.storageUsed}<span className="text-sm font-normal text-muted-foreground">/{metrics.storageTotal}G</span></p>
         <MiniBar value={metrics.storageUsed} max={metrics.storageTotal} color="bg-sky-500" />
       </div>
+
+      {/* Upload Bandwidth */}
+      <div className="rounded-2xl border border-white/10 bg-card p-6">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Bandwidth</span>
+          <Network className="h-3.5 w-3.5 text-emerald-400" />
+        </div>
+        <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.uploadBandwidth}<span className="text-sm font-normal text-muted-foreground"> Mbps</span></p>
+        <MiniBar value={metrics.uploadBandwidth} max={50} color="bg-emerald-500" />
+      </div>
     </div>
   );
 }

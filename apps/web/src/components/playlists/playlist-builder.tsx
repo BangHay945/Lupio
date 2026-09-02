@@ -23,7 +23,7 @@ import { Playlist, MediaItem } from "@/lib/mock-data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Plus, GripVertical, Trash2, Save, FileVideo, Clock, ListVideo } from "lucide-react";
+import { Search, Plus, GripVertical, Trash2, Save, FileVideo, Clock, ListVideo, Shuffle } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { apiService } from "@/lib/services/api";
 import { CustomSelect } from "@/components/ui/select";
@@ -130,6 +130,7 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
   const [name, setName] = useState(initialPlaylist?.name || "New Playlist");
   const [playlistItems, setPlaylistItems] = useState<MediaItem[]>(initialPlaylist?.mediaItems || []);
   const [transitionEffect, setTransitionEffect] = useState<string>(initialPlaylist?.transitionEffect || "full");
+  const [isShuffled, setIsShuffled] = useState<boolean>(initialPlaylist?.isShuffled || false);
   const [availableMedia, setAvailableMedia] = useState<MediaItem[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(true);
   const [search, setSearch] = useState("");
@@ -228,12 +229,13 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
         itemCount: playlistItems.length,
         totalDuration: computedDuration,
         transitionEffect,
+        isShuffled,
         createdAt: new Date().toISOString().split("T")[0],
       });
 
       (toast as any)({
         title: "Playlist Saved",
-        description: `"${name}" (${playlistItems.length} tracks, ${computedDuration}) saved with ${transitionEffect} transition.`,
+        description: `"${name}" (${playlistItems.length} tracks, ${computedDuration}) saved with ${transitionEffect} transition${isShuffled ? " & Shuffle Mode ON" : ""}.`,
         type: "success",
       });
       router.push("/playlists");
@@ -320,19 +322,36 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
                 <span>Total Duration: {calculateTotalDuration(playlistItems)}</span>
               </CardDescription>
 
-              <div className="flex items-center gap-2 ml-auto min-w-[220px]">
-                <span className="text-[11px] font-semibold text-muted-foreground uppercase shrink-0">Transition:</span>
-                <CustomSelect
-                  value={transitionEffect}
-                  onChange={setTransitionEffect}
-                  triggerClassName="h-9 px-3 text-xs rounded-xl"
-                  options={[
-                    { value: "full", label: "🌟 Smooth Blend (Video & Audio Fade)" },
-                    { value: "fade", label: "🎬 Video Black Fade (1.0s)" },
-                    { value: "crossfade", label: "🎵 Soft Audio Crossfade" },
-                    { value: "none", label: "⚡ Direct Cut (Instant)" },
-                  ]}
-                />
+              <div className="flex items-center gap-2 ml-auto flex-wrap">
+                {/* Shuffle Mode Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setIsShuffled(!isShuffled)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+                    isShuffled
+                      ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                      : "bg-white/5 text-muted-foreground border-white/10 hover:border-white/20"
+                  }`}
+                  title="Randomize track order on each loop iteration"
+                >
+                  <Shuffle className="h-3.5 w-3.5" />
+                  <span>{isShuffled ? "Shuffle ON" : "Sequential"}</span>
+                </button>
+
+                <div className="flex items-center gap-1.5 min-w-[200px]">
+                  <span className="text-[11px] font-semibold text-muted-foreground uppercase shrink-0">Transition:</span>
+                  <CustomSelect
+                    value={transitionEffect}
+                    onChange={setTransitionEffect}
+                    triggerClassName="h-8 px-2.5 text-xs rounded-xl"
+                    options={[
+                      { value: "full", label: "🌟 Smooth Blend" },
+                      { value: "fade", label: "🎬 Black Fade (1.0s)" },
+                      { value: "crossfade", label: "🎵 Audio Crossfade" },
+                      { value: "none", label: "⚡ Direct Cut" },
+                    ]}
+                  />
+                </div>
               </div>
             </div>
           </div>

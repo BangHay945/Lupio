@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { apiService } from "@/lib/services/api";
 import { Channel, MediaItem, Playlist, Stream } from "@/lib/mock-data";
 import { toast } from "@/components/ui/toast";
-import { Tv, Film, Video, Key, Play, Plus, Pencil, Layers, Type, ShieldAlert, Share2 } from "lucide-react";
+import { Tv, Film, Video, Key, Play, Plus, Pencil, Layers, Type, ShieldAlert, Share2, Clock } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
 
 interface CreateStreamDialogProps {
@@ -35,6 +35,7 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
   const [tickerText, setTickerText] = useState("");
   const [backupMediaId, setBackupMediaId] = useState("");
   const [transitionEffect, setTransitionEffect] = useState("full");
+  const [maxDurationHours, setMaxDurationHours] = useState<number>(0);
   
   // Custom Channel Inline State
   const [showAddChannel, setShowAddChannel] = useState(false);
@@ -66,6 +67,7 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         setTickerText(stream.tickerText || "");
         setBackupMediaId(stream.backupMediaId || "");
         setTransitionEffect(stream.transitionEffect || "full");
+        setMaxDurationHours(stream.maxDurationHours || 0);
         if (stream.channelId) setSelectedChannelId(stream.channelId);
         if (stream.multiChannelIds) setSelectedMultiChannelIds(stream.multiChannelIds);
 
@@ -77,6 +79,7 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         setWatermarkText("");
         setTickerText("");
         setBackupMediaId("");
+        setMaxDurationHours(0);
         setSelectedMultiChannelIds([]);
         if (Array.isArray(chData) && chData.length > 0) setSelectedChannelId(chData[0].id);
         if (Array.isArray(medData) && medData.length > 0) setSelectedMediaId(medData[0].id);
@@ -159,6 +162,7 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         watermarkText: watermarkText.trim(),
         tickerText: tickerText.trim(),
         backupMediaId,
+        maxDurationHours: Number(maxDurationHours) || 0,
         enableOverlay: Boolean(watermarkText || tickerText),
       };
 
@@ -487,6 +491,29 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
                 <div className="text-[10px] text-muted-foreground">60 FPS • 15Mbps</div>
               </button>
             </div>
+          </div>
+
+          {/* Feature 4: Live Stream Duration / Auto-Stop Timer */}
+          <div className="space-y-1.5">
+            <label className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+              <span className="flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-blue-400" /> Live Duration (Auto-Stop Timer)
+              </span>
+              <span className="text-[10px] text-emerald-400 font-normal">Graceful Shutdown</span>
+            </label>
+            <CustomSelect
+              value={String(maxDurationHours)}
+              onChange={(val) => setMaxDurationHours(Number(val))}
+              options={[
+                { value: "0", label: "♾️ 24/7 Infinite Non-Stop (No Auto-Stop)" },
+                { value: "2", label: "⏱️ 2 Hours (Auto-Stop)" },
+                { value: "4", label: "⏱️ 4 Hours (Auto-Stop)" },
+                { value: "6", label: "⏱️ 6 Hours (Auto-Stop)" },
+                { value: "8", label: "⏱️ 8 Hours (Auto-Stop)" },
+                { value: "12", label: "⏱️ 12 Hours (Auto-Stop)" },
+                { value: "24", label: "⏱️ 24 Hours (Auto-Stop)" },
+              ]}
+            />
           </div>
         </div>
 

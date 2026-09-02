@@ -49,6 +49,7 @@ export function StreamTable({ streams }: StreamTableProps) {
   const [ruleModalOpen, setRuleModalOpen] = useState(false);
   const [ruleStartTime, setRuleStartTime] = useState("08:00");
   const [ruleEndTime, setRuleEndTime] = useState("18:00");
+  const [ruleAction, setRuleAction] = useState<"switch" | "start" | "stop">("switch");
   const [selectedPlaylistId, setSelectedPlaylistId] = useState("");
   const [savingRule, setSavingRule] = useState(false);
 
@@ -116,8 +117,24 @@ export function StreamTable({ streams }: StreamTableProps) {
     }
   };
 
+  const handleAction = async (type: "stop" | "restart" | "delete", streamId: string, streamName: string) => {
+    if (type === "stop") {
+      await apiService.controlStream(streamId, "stop");
+      setLocalStreams(prev => prev.map(s => s.id === streamId ? { ...s, status: "OFFLINE" as const } : s));
+      (toast as any)({ title: "Stream Stopped", description: `"${streamName}" has been stopped.`, type: "info" });
+    } else if (type === "restart") {
+      await apiService.controlStream(streamId, "restart");
+      setLocalStreams(prev => prev.map(s => s.id === streamId ? { ...s, status: "STARTING" as const } : s));
+      (toast as any)({ title: "Stream Restarting", description: `"${streamName}" is restarting…`, type: "info" });
+    } else if (type === "delete") {
+      await apiService.deleteStream(streamId);
+      setLocalStreams(prev => prev.filter(s => s.id !== streamId));
+      (toast as any)({ title: "Stream Deleted", description: `"${streamName}" has been removed.`, type: "error" });
+    }
+  };
+
   const handleCreateRule = async () => {
-    if (!selectedPlaylistId) {
+    if (ruleAction !== "stop" && !selectedPlaylistId) {
       (toast as any)({ title: "Validation Error", description: "Please select a target playlist.", type: "error" });
       return;
     }
@@ -125,19 +142,21 @@ export function StreamTable({ streams }: StreamTableProps) {
     setSavingRule(true);
     try {
       const pl = playlists.find((p) => p.id === selectedPlaylistId);
+      const actionName = ruleAction === "stop" ? "🛑 Scheduled Stop" : ruleAction === "start" ? `▶️ Start: ${pl?.name}` : (pl?.name || "Target Playlist");
       const newRule = await apiService.saveScheduleRule({
         streamName: "All Streams",
         startTime: ruleStartTime,
         endTime: ruleEndTime,
-        playlistId: selectedPlaylistId,
-        playlistName: pl?.name || "Target Playlist",
+        playlistId: ruleAction === "stop" ? "none" : selectedPlaylistId,
+        playlistName: actionName,
         active: true,
+        action: ruleAction,
       });
 
       setScheduleRules((prev) => [...prev, newRule]);
       (toast as any)({
-        title: "Rule Created! ⏰",
-        description: `Auto-switch to "${pl?.name}" at ${ruleStartTime}-${ruleEndTime}.`,
+        title: "Schedule Rule Saved! ⏰",
+        description: `Action "${ruleAction.toUpperCase()}" scheduled for ${ruleStartTime}-${ruleEndTime}.`,
         type: "success",
       });
       setRuleModalOpen(false);
@@ -704,14 +723,30 @@ export function StreamTable({ streams }: StreamTableProps) {
     <DialogContent className="border border-slate-200 dark:border-white/10 bg-white/98 dark:bg-zinc-950/98 text-foreground sm:max-w-md rounded-2xl shadow-2xl p-6">
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2 text-base font-bold">
-          <Clock className="h-4 w-4 text-emerald-400" /> Add Time-Based Playlist Switcher Rule
+          <Clock className="h-4 w-4 text-emerald-400" /> Add 24/7 Schedule Automation Rule
         </DialogTitle>
       </DialogHeader>
 
       <div className="space-y-4 py-3">
+        {/* Action Type Selector */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-muted-foreground">Rule Action Type</label>
+          <CustomSelect
+            value={ruleAction}
+            onChange={(val) => setRuleAction(val as any)}
+            options={[
+              { value: "switch", label: "🔄 Switch Playlist (Ganti Playlist Otomatis)" },
+              { value: "start", label: "▶️ Start Stream (Mulai Siaran Otomatis)" },
+              { value: "stop", label: "🛑 STOP Stream (Hentikan Siaran Otomatis)" },
+            ]}
+          />
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-muted-foreground">Start Time</label>
+            <label className="text-xs font-semibold text-muted-foreground">
+              {ruleAction === "stop" ? "Stop At (Time)" : "Start Time"}
+            </label>
             <Input
               type="time"
               value={ruleStartTime}
@@ -720,7 +755,9 @@ export function StreamTable({ streams }: StreamTableProps) {
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-muted-foreground">End Time</label>
+            <label className="text-xs font-semibold text-muted-foreground">
+              {ruleAction === "stop" ? "Until (Time Window)" : "End Time"}
+            </label>
             <Input
               type="time"
               value={ruleEndTime}
@@ -730,18 +767,20 @@ export function StreamTable({ streams }: StreamTableProps) {
           </div>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-xs font-semibold text-muted-foreground">Target Playlist to Play</label>
-          <CustomSelect
-            value={selectedPlaylistId}
-            onChange={setSelectedPlaylistId}
-            placeholder="Select target playlist..."
-            options={playlists.map((pl) => ({
-              value: pl.id,
-              label: `${pl.name} (${pl.itemCount} videos, ${pl.totalDuration})`,
-            }))}
-          />
-        </div>
+        {ruleAction !== "stop" && (
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">Target Playlist to Play</label>
+            <CustomSelect
+              value={selectedPlaylistId}
+              onChange={setSelectedPlaylistId}
+              placeholder="Select target playlist..."
+              options={playlists.map((pl) => ({
+                value: pl.id,
+                label: `${pl.name} (${pl.itemCount} videos, ${pl.totalDuration})`,
+              }))}
+            />
+          </div>
+        )}
       </div>
 
       <DialogFooter className="gap-2 sm:gap-0">

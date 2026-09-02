@@ -38,6 +38,26 @@ export class StreamManager {
 
   constructor() {
     this.startWatchdogDaemon();
+    this.initBootRecovery();
+  }
+
+  /**
+   * Recovers active streams and schedules automatically after server / VPS restart
+   */
+  private async initBootRecovery() {
+    try {
+      setTimeout(async () => {
+        const streams = db.getStreams();
+        for (const stream of streams) {
+          if (stream.status === "LIVE" || stream.status === "STARTING" || stream.status === "RESTARTING") {
+            db.addLog("info", "watchdog", `[Server Boot Recovery] Auto-resuming stream "${stream.name}" after server restart...`);
+            await this.startStream(stream.id, false);
+          }
+        }
+      }, 3000);
+    } catch (e) {
+      console.error("Boot recovery error:", e);
+    }
   }
 
   /**
@@ -54,72 +74,106 @@ export class StreamManager {
         const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 
         // -------------------------------------------------------------
-        // 1. Auto-Healing Watchdog & Encoder Stall / Freeze Detector
+        // 1. Auto-Healing Watchdog, Auto-Stop Timer & Freeze Detector
         // -------------------------------------------------------------
-        if (settings.enableAutoHealing !== false) {
-          const maxRetries = settings.maxWatchdogRetries || 3;
-          const reconnectDelay = settings.reconnectDelay || 5;
+        for (const stream of streams) {
+          if (this.intentionalStops.has(stream.id)) continue;
 
-          for (const stream of streams) {
-            if (this.intentionalStops.has(stream.id)) continue;
+          if (stream.status === "LIVE") {
+            const active = this.activeProcesses.get(stream.id);
+            
+            // Case A: Missing or dead process while stream marked LIVE
+            if (!active || !active.process || active.process.killed || active.process.exitCode !== null) {
+              if (settings.enableAutoHealing !== false && !this.reconnectingStreams.has(stream.id)) {
+                const maxRetries = settings.maxWatchdogRetries || 3;
+                const reconnectDelay = settings.reconnectDelay || 5;
+                this.triggerAutoRecovery(stream.id, "Process terminated unexpectedly", maxRetries, reconnectDelay);
+              }
+              continue;
+            }
 
-            if (stream.status === "LIVE") {
-              const active = this.activeProcesses.get(stream.id);
-              
-              // Case A: Missing or dead process while stream marked LIVE
-              if (!active || !active.process || active.process.killed || active.process.exitCode !== null) {
-                if (!this.reconnectingStreams.has(stream.id)) {
-                  this.triggerAutoRecovery(stream.id, "Process terminated unexpectedly", maxRetries, reconnectDelay);
-                }
+            const runningSeconds = Math.floor((now.getTime() - active.startedAt.getTime()) / 1000);
+
+            // Feature 4: Live Stream Auto-Stop Duration Timer
+            if (stream.maxDurationHours && stream.maxDurationHours > 0) {
+              const maxSeconds = stream.maxDurationHours * 3600;
+              if (runningSeconds >= maxSeconds) {
+                db.addLog("info", "watchdog", `[Auto-Stop Timer] Stream "${stream.name}" reached max duration limit (${stream.maxDurationHours}h). Stopping stream gracefully.`);
+                sendStreamNotification("STOP", stream.name, stream.channelName || "YouTube Live", `Stream reached max duration limit of ${stream.maxDurationHours}h.`);
+                this.intentionalStops.add(stream.id);
+                await this.stopStream(stream.id);
                 continue;
               }
+            }
 
-              // Case B: Encoder Stall / Freeze Detection (>30s no heartbeat after initial warmup)
-              const runningSeconds = Math.floor((now.getTime() - active.startedAt.getTime()) / 1000);
-              if (runningSeconds > 25 && active.lastHeartbeat) {
-                const idleSeconds = Math.floor((now.getTime() - active.lastHeartbeat.getTime()) / 1000);
-                if (idleSeconds > 35) {
-                  db.addLog("warn", "watchdog", `[Watchdog Freeze Detector] Stream "${stream.name}" encoder stalled (>35s idle). Force restarting...`);
-                  try {
-                    active.process.kill("SIGKILL");
-                  } catch (e) {}
-                  this.activeProcesses.delete(stream.id);
-                  this.triggerAutoRecovery(stream.id, "Encoder stalled (>35s idle)", maxRetries, reconnectDelay);
-                  continue;
-                }
+            // Case B: Encoder Stall / Freeze Detection (>30s no heartbeat after initial warmup)
+            if (settings.enableAutoHealing !== false && runningSeconds > 25 && active.lastHeartbeat) {
+              const idleSeconds = Math.floor((now.getTime() - active.lastHeartbeat.getTime()) / 1000);
+              if (idleSeconds > 35) {
+                db.addLog("warn", "watchdog", `[Watchdog Freeze Detector] Stream "${stream.name}" encoder stalled (>35s idle). Force restarting...`);
+                try {
+                  active.process.kill("SIGKILL");
+                } catch (e) {}
+                this.activeProcesses.delete(stream.id);
+                const maxRetries = settings.maxWatchdogRetries || 3;
+                const reconnectDelay = settings.reconnectDelay || 5;
+                this.triggerAutoRecovery(stream.id, "Encoder stalled (>35s idle)", maxRetries, reconnectDelay);
+                continue;
               }
+            }
 
-              // Case C: Stable Uptime Reset (Reset retry count after 90 seconds of stable broadcasting)
-              if (runningSeconds > 90 && (stream.restartCount || 0) > 0) {
-                stream.restartCount = 0;
-                db.saveStream(stream);
-                db.addLog("info", "watchdog", `[Watchdog] Stream "${stream.name}" is stable (>90s). Reset recovery counter to 0.`);
-              }
+            // Case C: Stable Uptime Reset (Reset retry count after 90 seconds of stable broadcasting)
+            if (runningSeconds > 90 && (stream.restartCount || 0) > 0) {
+              stream.restartCount = 0;
+              db.saveStream(stream);
+              db.addLog("info", "watchdog", `[Watchdog] Stream "${stream.name}" is stable (>90s). Reset recovery counter to 0.`);
             }
           }
         }
 
         // -------------------------------------------------------------
-        // 2. Time-Based Playlist Auto-Switcher & Scheduled Stream Trigger
+        // 2. Explicit Schedule Actions (Start, Switch, and STOP)
         // -------------------------------------------------------------
         const rules = db.getScheduleRules().filter((r) => r.active);
         for (const rule of rules) {
+          const action = rule.action || "switch";
           const isCurrentWindow = this.isTimeInWindow(timeStr, rule.startTime, rule.endTime);
-          if (isCurrentWindow) {
-            for (const stream of streams) {
-              const matchesStream = !rule.streamName || rule.streamName === stream.name || rule.streamName === "All Streams" || rule.streamId === stream.id;
-              if (matchesStream) {
+
+          for (const stream of streams) {
+            const matchesStream = !rule.streamName || rule.streamName === stream.name || rule.streamName === "All Streams" || rule.streamId === stream.id;
+            if (!matchesStream) continue;
+
+            if (action === "stop") {
+              // Explicit Stop Rule: If inside the stop window, stop the stream
+              if (isCurrentWindow && stream.status === "LIVE") {
+                db.addLog("info", "scheduler", `[Schedule STOP Action] Stopping stream "${stream.name}" per rule "${rule.playlistName || 'Scheduled Stop'}" (${rule.startTime}-${rule.endTime}).`);
+                this.intentionalStops.add(stream.id);
+                await this.stopStream(stream.id);
+              }
+            } else if (action === "start") {
+              // Explicit Start Rule: If inside the start window and offline, start the stream
+              if (isCurrentWindow && stream.status === "OFFLINE" && !this.intentionalStops.has(stream.id)) {
+                db.addLog("info", "scheduler", `[Schedule START Action] Starting stream "${stream.name}" per rule "${rule.playlistName || 'Scheduled Start'}" (${rule.startTime}-${rule.endTime}).`);
+                if (rule.playlistId) {
+                  stream.playlistId = rule.playlistId;
+                  stream.playlistName = rule.playlistName;
+                  db.saveStream(stream);
+                }
+                await this.startStream(stream.id, false);
+              }
+            } else {
+              // Default "switch": Auto-switch playlist while live, or auto-start if configured
+              if (isCurrentWindow) {
                 if (stream.status === "LIVE") {
                   const prevPlaylist = this.currentActivePlaylistMap.get(stream.id);
                   if (rule.playlistId && prevPlaylist !== rule.playlistId) {
-                    db.addLog("info", "scheduler", `[Auto-Switcher] Triggering scheduled playlist "${rule.playlistName}" (${rule.startTime}-${rule.endTime}) for stream "${stream.name}"`);
+                    db.addLog("info", "scheduler", `[Auto-Switcher] Switching to playlist "${rule.playlistName}" (${rule.startTime}-${rule.endTime}) for stream "${stream.name}"`);
                     this.currentActivePlaylistMap.set(stream.id, rule.playlistId);
                     stream.playlistName = rule.playlistName;
                     stream.playlistId = rule.playlistId;
                     db.saveStream(stream);
                   }
                 } else if (stream.status === "OFFLINE" && !this.intentionalStops.has(stream.id)) {
-                  // Auto-start stream if within active schedule window
                   db.addLog("info", "scheduler", `[Schedule Auto-Start] Starting stream "${stream.name}" for active rule "${rule.playlistName}" (${rule.startTime}-${rule.endTime}).`);
                   if (rule.playlistId) {
                     stream.playlistId = rule.playlistId;
@@ -298,9 +352,19 @@ export class StreamManager {
 
         concatManifestPath = path.join(concatDir, `${streamId}.txt`);
 
+        // Feature 2: Playlist Shuffle / Random Play Mode
+        let itemsToPlay = [...validItems];
+        if (playlist.isShuffled) {
+          for (let i = itemsToPlay.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [itemsToPlay[i], itemsToPlay[j]] = [itemsToPlay[j], itemsToPlay[i]];
+          }
+          db.addLog("info", "stream", `[Playlist Shuffle] Random playback enabled for "${playlist.name}". Shuffled ${itemsToPlay.length} track(s).`);
+        }
+
         // ffconcat format — paths must use forward slashes and be absolute
         const lines = ["ffconcat version 1.0"];
-        for (const m of validItems) {
+        for (const m of itemsToPlay) {
           // Escape backslashes for Windows paths in ffconcat
           const safePath = m.filepath!.replace(/\\/g, "/");
           lines.push(`file '${safePath}'`);
@@ -313,7 +377,7 @@ export class StreamManager {
         db.addLog(
           "info",
           "stream",
-          `[Playlist] "${playlist.name}" — ${validItems.length} track(s) loaded into ffconcat manifest for stream "${stream.name}".`
+          `[Playlist] "${playlist.name}" — ${itemsToPlay.length} track(s) loaded into ffconcat manifest for stream "${stream.name}".`
         );
       } else {
         db.addLog("warn", "stream", `[Playlist] "${playlist.name}" has no valid files on disk. Falling back to single media lookup.`);

@@ -122,11 +122,19 @@ export default function MediaPage() {
     }
   };
 
+  const totalMediaSizeBytes = mediaList.reduce((acc, item) => {
+    const sizeNum = parseFloat(item.size || "0");
+    if (item.size?.includes("GB")) return acc + sizeNum * 1024 * 1024 * 1024;
+    return acc + sizeNum * 1024 * 1024;
+  }, 0);
+  const totalMediaSizeGB = (totalMediaSizeBytes / (1024 * 1024 * 1024)).toFixed(2);
+  const storageUsedPercent = Math.min((parseFloat(totalMediaSizeGB) / 100) * 100, 100).toFixed(1);
+
   return (
     <div className="flex flex-col gap-6 w-full pb-12">
-      {/* Header Bar — Search & Upload Button */}
+      {/* Header Bar — Search, Storage Monitor & Upload Button */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3 w-full md:w-auto">
+        <div className="flex items-center gap-3 w-full md:w-auto flex-wrap">
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -139,6 +147,19 @@ export default function MediaPage() {
           <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
             {mediaList.length} items
           </span>
+
+          {/* VPS 100 GB Storage Meter Badge */}
+          <div className="hidden sm:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-card/40 text-xs shrink-0">
+            <HardDrive className="h-3.5 w-3.5 text-sky-400 shrink-0" />
+            <span className="font-semibold text-foreground text-[11px]">{totalMediaSizeGB} GB / 100 GB</span>
+            <div className="h-1.5 w-16 rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full bg-sky-500 rounded-full transition-all"
+                style={{ width: `${Math.max(Number(storageUsedPercent), 3)}%` }}
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground">({storageUsedPercent}%)</span>
+          </div>
         </div>
 
         <Button

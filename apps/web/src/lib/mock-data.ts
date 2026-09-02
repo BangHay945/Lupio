@@ -20,6 +20,7 @@ export interface Stream {
   enableOverlay?: boolean;
   backupMediaId?: string;
   transitionEffect?: string;
+  maxDurationHours?: number; // 0 or undefined for 24/7 non-stop
 }
 
 export interface SystemMetrics {
@@ -55,6 +56,7 @@ export interface Playlist {
   createdAt?: string;
   mediaItems?: MediaItem[];
   transitionEffect?: string;
+  isShuffled?: boolean;
 }
 
 export interface Channel {
@@ -76,6 +78,7 @@ export interface ScheduleRule {
   playlistId: string;
   playlistName: string;
   active: boolean;
+  action?: "switch" | "start" | "stop";
 }
 
 export interface UserAccount {
