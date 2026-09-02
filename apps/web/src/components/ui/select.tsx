@@ -107,10 +107,10 @@ export function CustomSelect({
                     type="button"
                     onClick={() => handleSelect(opt.value)}
                     className={cn(
-                      "group relative flex w-full cursor-pointer select-none items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-all duration-150 border",
+                      "select-option-item group relative flex w-full cursor-pointer select-none items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-semibold transition-all duration-150 border",
                       isSelected
                         ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 font-bold"
-                        : "border-transparent bg-transparent text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-950 dark:hover:text-white"
+                        : "border-transparent text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-950 dark:hover:text-white"
                     )}
                   >
                     <div className="flex flex-col min-w-0 pr-2">

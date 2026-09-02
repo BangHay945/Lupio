@@ -200,13 +200,25 @@ html[data-theme="light"] header div[title] {
   box-shadow: none !important;
 }
 
-/* Cards, Tables & Content Panels Light Mode Pure White Background */
-html[data-theme="light"] [class*="bg-transparent"],
-html[data-theme="light"] button[class*="bg-transparent"] {
-  background-color: transparent !important;
-  box-shadow: none !important;
+/* Custom Select & Dropdown Item Hover in Light & Dark Mode */
+.select-option-item:hover,
+html[data-theme="light"] .select-option-item:not([class*="bg-emerald"]):hover,
+html[data-theme="light"] [data-slot="dropdown-menu-item"]:not([data-variant="destructive"]):hover,
+html[data-theme="light"] [data-slot="dropdown-menu-sub-trigger"]:hover,
+html[data-theme="light"] [data-slot="dropdown-menu-checkbox-item"]:hover,
+html[data-theme="light"] [data-slot="dropdown-menu-radio-item"]:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
+.select-option-item[class*="bg-emerald"],
+html[data-theme="light"] .select-option-item[class*="bg-emerald"] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Cards, Tables & Content Panels Light Mode Pure White Background */
 html[data-theme="light"] table,
 html[data-theme="light"] thead,
 html[data-theme="light"] tbody,
