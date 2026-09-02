@@ -79,9 +79,19 @@ export class StreamManager {
         for (const stream of streams) {
           if (this.intentionalStops.has(stream.id)) continue;
 
+          const active = this.activeProcesses.get(stream.id);
+
+          // If child process is actually running in memory, ensure status is LIVE
+          if (active && active.process && !active.process.killed && active.process.exitCode === null) {
+            if (stream.status !== "LIVE") {
+              stream.status = "LIVE";
+              stream.restartCount = 0;
+              db.saveStream(stream);
+              db.addLog("info", "watchdog", `[Watchdog] Synced stream "${stream.name}" status to LIVE (Process is active).`);
+            }
+          }
+
           if (stream.status === "LIVE") {
-            const active = this.activeProcesses.get(stream.id);
-            
             // Case A: Missing or dead process while stream marked LIVE
             if (!active || !active.process || active.process.killed || active.process.exitCode !== null) {
               if (settings.enableAutoHealing !== false && !this.reconnectingStreams.has(stream.id)) {
@@ -106,27 +116,27 @@ export class StreamManager {
               }
             }
 
-            // Case B: Encoder Stall / Freeze Detection (>30s no heartbeat after initial warmup)
-            if (settings.enableAutoHealing !== false && runningSeconds > 25 && active.lastHeartbeat) {
+            // Case B: Encoder Stall / Freeze Detection (>45s no heartbeat after initial warmup)
+            if (settings.enableAutoHealing !== false && runningSeconds > 35 && active.lastHeartbeat) {
               const idleSeconds = Math.floor((now.getTime() - active.lastHeartbeat.getTime()) / 1000);
-              if (idleSeconds > 35) {
-                db.addLog("warn", "watchdog", `[Watchdog Freeze Detector] Stream "${stream.name}" encoder stalled (>35s idle). Force restarting...`);
+              if (idleSeconds > 45) {
+                db.addLog("warn", "watchdog", `[Watchdog Freeze Detector] Stream "${stream.name}" encoder stalled (>45s idle). Force restarting...`);
                 try {
                   active.process.kill("SIGKILL");
                 } catch (e) {}
                 this.activeProcesses.delete(stream.id);
                 const maxRetries = settings.maxWatchdogRetries || 3;
                 const reconnectDelay = settings.reconnectDelay || 5;
-                this.triggerAutoRecovery(stream.id, "Encoder stalled (>35s idle)", maxRetries, reconnectDelay);
+                this.triggerAutoRecovery(stream.id, "Encoder stalled (>45s idle)", maxRetries, reconnectDelay);
                 continue;
               }
             }
 
-            // Case C: Stable Uptime Reset (Reset retry count after 90 seconds of stable broadcasting)
-            if (runningSeconds > 90 && (stream.restartCount || 0) > 0) {
+            // Case C: Stable Uptime Reset (Reset retry count after 30 seconds of stable broadcasting)
+            if (runningSeconds > 30 && (stream.restartCount || 0) > 0) {
               stream.restartCount = 0;
               db.saveStream(stream);
-              db.addLog("info", "watchdog", `[Watchdog] Stream "${stream.name}" is stable (>90s). Reset recovery counter to 0.`);
+              db.addLog("info", "watchdog", `[Watchdog] Stream "${stream.name}" is stable (>30s). Reset recovery counter to 0.`);
             }
           }
         }
@@ -588,10 +598,11 @@ export class StreamManager {
         streamId,
         process: child,
         startedAt: new Date(),
-        restartCount: (stream.restartCount || 0) + 1,
+        restartCount: isBackupMode ? (stream.restartCount || 0) : 0,
       };
 
       this.intentionalStops.delete(streamId);
+      this.reconnectingStreams.delete(streamId);
       this.activeProcesses.set(streamId, activeProc);
 
       stream.status = "LIVE";
