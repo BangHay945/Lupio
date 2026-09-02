@@ -1,4 +1,4 @@
-import { spawn, ChildProcess } from "child_process";
+import { spawn, exec, ChildProcess } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
@@ -206,14 +206,15 @@ export class StreamManager {
    * Triggers an automatic auto-recovery restart for dropped / crashed streams
    */
   private async triggerAutoRecovery(streamId: string, reason: string, maxRetries: number, delaySeconds: number) {
+    if (this.intentionalStops.has(streamId)) return;
     if (this.reconnectingStreams.has(streamId)) return;
-    this.reconnectingStreams.add(streamId);
 
     const stream = db.getStreamById(streamId);
-    if (!stream) {
-      this.reconnectingStreams.delete(streamId);
+    if (!stream || stream.status === "OFFLINE") {
       return;
     }
+
+    this.reconnectingStreams.add(streamId);
 
     const currentRetries = stream.restartCount || 0;
     if (currentRetries < maxRetries) {
@@ -227,7 +228,7 @@ export class StreamManager {
 
       setTimeout(async () => {
         try {
-          if (!this.intentionalStops.has(streamId)) {
+          if (!this.intentionalStops.has(streamId) && stream.status !== "OFFLINE") {
             await this.startStream(streamId, false);
           }
         } finally {
@@ -637,9 +638,8 @@ export class StreamManager {
 
         const currentStream = db.getStreamById(streamId);
         if (currentStream) {
-          if (this.intentionalStops.has(streamId)) {
-            // User intentionally stopped the stream
-            this.intentionalStops.delete(streamId);
+          if (this.intentionalStops.has(streamId) || currentStream.status === "OFFLINE") {
+            // User intentionally stopped the stream — keep intentionalStops persistent so watchdog won't restart it
             currentStream.status = "OFFLINE";
             currentStream.restartCount = 0;
             db.saveStream(currentStream);
@@ -678,24 +678,31 @@ export class StreamManager {
     this.intentionalStops.add(streamId);
     this.reconnectingStreams.delete(streamId);
 
-    const stream = (db as any).getStreams().find((s: Stream) => s.id === streamId);
-    const procObj = this.activeProcesses.get(streamId);
-
-    if (procObj && procObj.process) {
-      try {
-        procObj.process.kill("SIGTERM");
-        setTimeout(() => {
-          if (this.activeProcesses.has(streamId)) {
-            procObj.process.kill("SIGKILL");
-            this.activeProcesses.delete(streamId);
-          }
-        }, 2000);
-      } catch (e) {
-        console.error(e);
-      }
+    const stream = db.getStreamById(streamId);
+    if (stream) {
+      stream.status = "OFFLINE";
+      stream.restartCount = 0;
+      db.saveStream(stream);
+      db.addLog("info", "system", `Stream "${stream.name}" stopped by user.`);
+      sendStreamNotification("STOP", stream.name, stream.channelName || "RTMP Target");
     }
 
+    const procObj = this.activeProcesses.get(streamId);
     this.activeProcesses.delete(streamId);
+
+    if (procObj && procObj.process) {
+      const pid = procObj.process.pid;
+      try {
+        if (process.platform === "win32" && pid) {
+          // On Windows, taskkill /pid <PID> /T /F forces the full process tree to terminate immediately
+          exec(`taskkill /pid ${pid} /T /F`, () => {});
+        } else if (pid) {
+          procObj.process.kill("SIGKILL");
+        }
+      } catch (e) {
+        console.error("Error terminating FFmpeg process:", e);
+      }
+    }
 
     // Clean up ffconcat manifest if it exists
     const concatManifestPath = path.join(process.cwd(), "data", "concat", `${streamId}.txt`);
@@ -705,14 +712,6 @@ export class StreamManager {
       } catch (e) {
         // Non-critical — ignore cleanup errors
       }
-    }
-
-    if (stream) {
-      stream.status = "OFFLINE";
-      stream.restartCount = 0;
-      db.saveStream(stream);
-      db.addLog("info", "system", `Stream "${stream.name}" stopped by user.`);
-      sendStreamNotification("STOP", stream.name, stream.channelName || "RTMP Target");
     }
 
     return { success: true, message: `Stream stopped.` };
