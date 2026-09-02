@@ -409,8 +409,18 @@ export class StreamManager {
       }
     }
 
-    // Watermark & Ticker Overlay Chain
+    // Scaling, Watermark & Ticker Overlay Chain
     const filterParts: string[] = [];
+
+    // 1. Auto-scale & pad video to match selected output resolution
+    let targetScale = "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2";
+    if (stream.resolution === "720p") {
+      targetScale = "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2";
+    } else if (stream.resolution === "4K") {
+      targetScale = "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:(ow-iw)/2:(oh-ih)/2";
+    }
+    filterParts.push(targetScale);
+
     const watermarkText = stream.watermarkText || settings.globalWatermarkText || "";
     const tickerText = stream.tickerText || "";
 
@@ -436,8 +446,8 @@ export class StreamManager {
 
     const filterArgs = filterParts.length > 0 ? ["-vf", filterParts.join(",")] : [];
 
-    // Feature 4: Audio Normalizer (EBU R128) & Soft Transition Filter Chain
-    const audioFilters: string[] = [];
+    // Feature 4: Audio Normalizer & Soft Transition Filter Chain
+    const audioFilters: string[] = ["aformat=channel_layouts=stereo:sample_rates=44100"];
     if (effectiveTransition === "crossfade" || effectiveTransition === "full") {
       audioFilters.push("afade=t=in:ss=0:d=1.5");
     }
@@ -446,17 +456,18 @@ export class StreamManager {
     }
     const audioFilterArgs = audioFilters.length > 0 ? ["-af", audioFilters.join(",")] : [];
 
-    // Multi-Destination Tee Muxer Output
-    let cleanBitrate = stream.bitrate || "8000k";
-    if (!cleanBitrate.toLowerCase().includes("k")) {
-      cleanBitrate = cleanBitrate.replace(/[^0-9]/g, "") + "k";
-    }
+    // Clean Bitrate & Buffer sizes for YouTube RTMP
+    const numBitrate = parseInt((stream.bitrate || "4000").replace(/[^0-9]/g, ""), 10) || 4000;
+    const cleanBitrate = `${numBitrate}k`;
+    const bufsize = `${numBitrate * 2}k`;
+    const fps = stream.fps || 30;
+    const gop = fps * 2; // YouTube recommends 2-second GOP
 
     let outputArgs: string[] = [];
     if (targetChannels.length > 1) {
       const teeOutputs = targetChannels.map((c) => {
         const url = c.rtmpUrl.endsWith("/") ? c.rtmpUrl : `${c.rtmpUrl}/`;
-        return `[f=flv:onfail=ignore]${url}${c.streamKey.trim()}`;
+        return `[f=flv:flvflags=no_duration_filesize:onfail=ignore]${url}${c.streamKey.trim()}`;
       }).join("|");
 
       outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", teeOutputs];
@@ -465,9 +476,9 @@ export class StreamManager {
       const rtmpBase = ch.rtmpUrl.endsWith("/") ? ch.rtmpUrl : `${ch.rtmpUrl}/`;
       const streamKey = ch.streamKey.trim();
       const destination = `${rtmpBase}${streamKey}`;
-      const isMockKey = streamKey.includes("test") || streamKey.includes("key");
+      const isMockKey = streamKey.includes("test_mock") || streamKey === "mock";
 
-      outputArgs = ["-f", isMockKey ? "null" : "flv", destination];
+      outputArgs = ["-flvflags", "no_duration_filesize", "-f", isMockKey ? "null" : "flv", destination];
     }
 
     // Hardware Acceleration & Encoder selection
@@ -487,6 +498,24 @@ export class StreamManager {
       presetArg = ["-preset", "veryfast"];
     }
 
+    const encodingArgs = [
+      "-c:v", videoCodec,
+      ...presetArg,
+      ...threadsArg,
+      "-b:v", cleanBitrate,
+      "-maxrate", cleanBitrate,
+      "-bufsize", bufsize,
+      "-r", String(fps),
+      "-g", String(gop),
+      "-keyint_min", String(fps),
+      "-sc_threshold", "0",
+      "-pix_fmt", "yuv420p",
+      "-c:a", "aac",
+      "-b:a", "128k",
+      "-ar", "44100",
+      "-ac", "2",
+    ];
+
     let ffmpegArgs: string[] = [];
     if (inputFilePath && fs.existsSync(/*turbopackIgnore: true*/ inputFilePath)) {
       if (isPlaylist) {
@@ -500,16 +529,7 @@ export class StreamManager {
           "-i", inputFilePath,
           ...filterArgs,
           ...audioFilterArgs,
-          "-c:v", videoCodec,
-          ...presetArg,
-          ...threadsArg,
-          "-b:v", cleanBitrate,
-          "-maxrate", cleanBitrate,
-          "-bufsize", "16000k",
-          "-pix_fmt", "yuv420p",
-          "-c:a", "aac",
-          "-b:a", "128k",
-          "-ar", "44100",
+          ...encodingArgs,
           ...outputArgs,
         ];
       } else {
@@ -520,16 +540,7 @@ export class StreamManager {
           "-i", inputFilePath,
           ...filterArgs,
           ...audioFilterArgs,
-          "-c:v", videoCodec,
-          ...presetArg,
-          ...threadsArg,
-          "-b:v", cleanBitrate,
-          "-maxrate", cleanBitrate,
-          "-bufsize", "16000k",
-          "-pix_fmt", "yuv420p",
-          "-c:a", "aac",
-          "-b:a", "128k",
-          "-ar", "44100",
+          ...encodingArgs,
           ...outputArgs,
         ];
       }
@@ -541,11 +552,7 @@ export class StreamManager {
         "-f", "lavfi", "-i", "sine=frequency=1000:sample_rate=44100",
         ...filterArgs,
         ...audioFilterArgs,
-        "-c:v", "libx264",
-        "-preset", "ultrafast",
-        "-b:v", cleanBitrate,
-        "-c:a", "aac",
-        "-b:a", "128k",
+        ...encodingArgs,
         ...outputArgs,
       ];
     }

@@ -3,16 +3,24 @@
     {
       "id": "str_1787716225406",
       "name": "tessss",
-      "status": "ERROR",
-      "channelName": "agent@avachat.id",
-      "playlistName": "Single File",
+      "status": "OFFLINE",
+      "channelName": "tessss Channel",
+      "playlistName": "HOTEL NADA AJYAD - MUTAMTOUR.mp4",
       "resolution": "720p",
       "fps": 30,
       "bitrate": "4000 Kbps",
       "uptime": "0m",
-      "restartCount": 4,
+      "restartCount": 0,
       "currentVideo": "Initializing...",
-      "channelId": "ch_1787720713885"
+      "channelId": "ch_1787716225341",
+      "playlistId": "med_1787567678156",
+      "transitionEffect": "full",
+      "multiChannelIds": [],
+      "watermarkText": "",
+      "tickerText": "",
+      "backupMediaId": "",
+      "maxDurationHours": 0,
+      "enableOverlay": false
     }
   ],
   "media": [
@@ -53,34 +61,310 @@
   ],
   "channels": [
     {
-      "id": "ch_1787720713885",
-      "name": "agent@avachat.id",
-      "platform": "YouTube",
-      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
-      "streamKey": "mwfu-8p05-e80s-f9u9-fkhk",
-      "status": "Active",
-      "isDefault": false
-    },
-    {
-      "id": "ch_1787718922713",
-      "name": "hy",
-      "platform": "YouTube",
-      "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
-      "streamKey": "mwfu-8p05-e80s-f9u9-fkhk",
-      "status": "Active",
-      "isDefault": false
-    },
-    {
       "id": "ch_1787716225341",
       "name": "tessss Channel",
       "platform": "YouTube",
       "rtmpUrl": "rtmp://a.rtmp.youtube.com/live2",
-      "streamKey": "rb70-c1a1-ky5z-0w6q-b5mt",
+      "streamKey": "bsdm-qjb8-qmgu-h2y6-2jmw",
       "status": "Active",
       "isDefault": false
     }
   ],
   "logs": [
+    {
+      "id": "log_1788339783756_kzez",
+      "timestamp": "2026-09-02T09:03:03.760Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788339783684_nn4o",
+      "timestamp": "2026-09-02T09:03:03.684Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788339783561_75tn",
+      "timestamp": "2026-09-02T09:03:03.561Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
+    },
+    {
+      "id": "log_1788339782363_npcs",
+      "timestamp": "2026-09-02T09:03:02.364Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788339781935_p3de",
+      "timestamp": "2026-09-02T09:03:01.936Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788339781878_yf15",
+      "timestamp": "2026-09-02T09:03:01.879Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788339781698_i6w7",
+      "timestamp": "2026-09-02T09:03:01.698Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated stream settings for \"tessss\""
+    },
+    {
+      "id": "log_1788339754270_0tbr",
+      "timestamp": "2026-09-02T09:02:34.270Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated channel \"tessss Channel\""
+    },
+    {
+      "id": "log_1788339694636_pr52",
+      "timestamp": "2026-09-02T09:01:34.636Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788339694580_apo4",
+      "timestamp": "2026-09-02T09:01:34.580Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967291"
+    },
+    {
+      "id": "log_1788339694560_d96e",
+      "timestamp": "2026-09-02T09:01:34.560Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [out#0/flv @ 0000014f209c4ec0] Error opening output rtmp://a.rtmp.youtube.com/live2/mwfu-8p05-e80s-f9u9-fkhk: I/O error\r\nError opening output file rtm"
+    },
+    {
+      "id": "log_1788339693981_ecbw",
+      "timestamp": "2026-09-02T09:01:33.981Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788339693668_jyps",
+      "timestamp": "2026-09-02T09:01:33.668Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788339693661_q4nt",
+      "timestamp": "2026-09-02T09:01:33.661Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788339693468_tblx",
+      "timestamp": "2026-09-02T09:01:33.468Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated stream settings for \"tessss\""
+    },
+    {
+      "id": "log_1788339630798_dc1v",
+      "timestamp": "2026-09-02T09:00:30.799Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788339630778_grse",
+      "timestamp": "2026-09-02T09:00:30.778Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788339630464_sevs",
+      "timestamp": "2026-09-02T09:00:30.464Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000001ed7a23b080] [Eval @ 000000dc25dff050] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001ed7a23b080] Unable t"
+    },
+    {
+      "id": "log_1788339630408_1393",
+      "timestamp": "2026-09-02T09:00:30.408Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (nul"
+    },
+    {
+      "id": "log_1788339629691_upum",
+      "timestamp": "2026-09-02T09:00:29.691Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788339629102_778t",
+      "timestamp": "2026-09-02T09:00:29.102Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788339629074_ye8w",
+      "timestamp": "2026-09-02T09:00:29.074Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788339628892_02as",
+      "timestamp": "2026-09-02T09:00:28.892Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated stream settings for \"tessss\""
+    },
+    {
+      "id": "log_1788339628667_k8nq",
+      "timestamp": "2026-09-02T09:00:28.667Z",
+      "level": "info",
+      "source": "channel",
+      "message": "Saved channel \"t2\""
+    },
+    {
+      "id": "log_1788339583895_3w8m",
+      "timestamp": "2026-09-02T08:59:43.895Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788339583788_0hmf",
+      "timestamp": "2026-09-02T08:59:43.788Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788339583722_yj35",
+      "timestamp": "2026-09-02T08:59:43.725Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000229924ab080] [Eval @ 000000e539dfeb00] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000229924ab080] Unable t"
+    },
+    {
+      "id": "log_1788339583083_7juo",
+      "timestamp": "2026-09-02T08:59:43.083Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
+    },
+    {
+      "id": "log_1788339582388_7sud",
+      "timestamp": "2026-09-02T08:59:42.388Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4':\r\n  Metadata:\r\n    major_brand     "
+    },
+    {
+      "id": "log_1788339581293_r2xu",
+      "timestamp": "2026-09-02T08:59:41.293Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788339581274_5lqo",
+      "timestamp": "2026-09-02T08:59:41.274Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788339580984_ci4b",
+      "timestamp": "2026-09-02T08:59:40.984Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated stream settings for \"tessss\""
+    },
+    {
+      "id": "log_1788339550054_hx4f",
+      "timestamp": "2026-09-02T08:59:10.055Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788339549958_plxp",
+      "timestamp": "2026-09-02T08:59:09.958Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788339549686_ado7",
+      "timestamp": "2026-09-02T08:59:09.687Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [vost#0:0/libx264 @ 0000018d8cc35cc0] Error while opening encoder - maybe incorrect parameters such as bit_rate, rate, width or height.\r\nError while f"
+    },
+    {
+      "id": "log_1788339549522_6m0m",
+      "timestamp": "2026-09-02T08:59:09.523Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 0000018d8cc36080] [Eval @ 00000001001fef20] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 0000018d8cc36080] Unable t"
+    },
+    {
+      "id": "log_1788339549337_bjqb",
+      "timestamp": "2026-09-02T08:59:09.337Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788339548801_ob33",
+      "timestamp": "2026-09-02T08:59:08.801Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #1, lavfi, from 'sine=frequency=1000:sample_rate=44100':\r\n  Duration: N/A, start: 0.000000, bitrate: 705 kb/s\r\n  Stream #1:0: Audio: pcm_s16le, "
+    },
+    {
+      "id": "log_1788339543892_5bfe",
+      "timestamp": "2026-09-02T08:59:03.892Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788339543885_yyrf",
+      "timestamp": "2026-09-02T08:59:03.885Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788339538799_gha1",
+      "timestamp": "2026-09-02T08:58:58.799Z",
+      "level": "info",
+      "source": "system",
+      "message": "Updated stream settings for \"tessss\""
+    },
+    {
+      "id": "log_1788339525189_t502",
+      "timestamp": "2026-09-02T08:58:45.189Z",
+      "level": "info",
+      "source": "channel",
+      "message": "Saved channel \"agent@avachat.id\""
+    },
     {
       "id": "log_1788259439094_p2u9",
       "timestamp": "2026-09-01T10:43:59.094Z",
