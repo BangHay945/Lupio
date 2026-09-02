@@ -45,7 +45,7 @@ export default function DashboardPage() {
             Loading live operational streams...
           </div>
         ) : (
-          <ActiveStreams streams={streams} />
+          <ActiveStreams streams={streams} onRefresh={loadData} />
         )}
         <QuickActions />
       </div>
