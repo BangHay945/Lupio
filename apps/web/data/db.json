@@ -3,14 +3,14 @@
     {
       "id": "str_1787716225406",
       "name": "tessss",
-      "status": "STARTING",
+      "status": "LIVE",
       "channelName": "tessss Channel",
       "playlistName": "HOTEL NADA AJYAD - MUTAMTOUR.mp4",
       "resolution": "720p",
       "fps": 30,
       "bitrate": "4000 Kbps",
       "uptime": "1m",
-      "restartCount": 1,
+      "restartCount": 0,
       "currentVideo": "Initializing...",
       "channelId": "ch_1787716225341",
       "playlistId": "med_1787567678156",
@@ -20,7 +20,8 @@
       "tickerText": "",
       "backupMediaId": "",
       "maxDurationHours": 0,
-      "enableOverlay": false
+      "enableOverlay": false,
+      "manualStop": true
     }
   ],
   "media": [
@@ -72,1401 +73,1401 @@
   ],
   "logs": [
     {
-      "id": "log_1788345143338_n5kp",
-      "timestamp": "2026-09-02T10:32:23.339Z",
+      "id": "log_1788346818163_3ydv",
+      "timestamp": "2026-09-02T11:00:18.163Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346817041_yh8e",
+      "timestamp": "2026-09-02T11:00:17.041Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788345142957_9md2",
-      "timestamp": "2026-09-02T10:32:22.957Z",
+      "id": "log_1788346816861_qi6r",
+      "timestamp": "2026-09-02T11:00:16.861Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788345142546_snld",
-      "timestamp": "2026-09-02T10:32:22.546Z",
+      "id": "log_1788346816762_accb",
+      "timestamp": "2026-09-02T11:00:16.762Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000001f70250b080] [Eval @ 0000000feb7fe990] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001f70250b080] Unable t"
+    },
+    {
+      "id": "log_1788346816685_xswe",
+      "timestamp": "2026-09-02T11:00:16.685Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346816551_4gvv",
+      "timestamp": "2026-09-02T11:00:16.551Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346816022_esjn",
+      "timestamp": "2026-09-02T11:00:16.022Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346815781_5s2q",
+      "timestamp": "2026-09-02T11:00:15.781Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346815733_9dls",
+      "timestamp": "2026-09-02T11:00:15.734Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346808126_b33r",
+      "timestamp": "2026-09-02T11:00:08.126Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346806650_yuza",
+      "timestamp": "2026-09-02T11:00:06.650Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346805511_x9yl",
+      "timestamp": "2026-09-02T11:00:05.511Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346805347_c72r",
+      "timestamp": "2026-09-02T11:00:05.347Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346805120_idy7",
+      "timestamp": "2026-09-02T11:00:05.120Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346803478_ucn3",
+      "timestamp": "2026-09-02T11:00:03.478Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000213fbceb080] [Eval @ 000000d360fff060] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000213fbceb080] Unable t"
+    },
+    {
+      "id": "log_1788346801601_ls6c",
+      "timestamp": "2026-09-02T11:00:01.601Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
+    },
+    {
+      "id": "log_1788346800434_uanz",
+      "timestamp": "2026-09-02T11:00:00.434Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
     },
     {
-      "id": "log_1788345141084_qfar",
-      "timestamp": "2026-09-02T10:32:21.090Z",
+      "id": "log_1788346799851_08u1",
+      "timestamp": "2026-09-02T10:59:59.851Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346799803_vn6w",
+      "timestamp": "2026-09-02T10:59:59.803Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346798253_kfnr",
+      "timestamp": "2026-09-02T10:59:58.253Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346797288_gty4",
+      "timestamp": "2026-09-02T10:59:57.288Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346788829_5iz7",
+      "timestamp": "2026-09-02T10:59:48.829Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 1"
+    },
+    {
+      "id": "log_1788346788627_8lxu",
+      "timestamp": "2026-09-02T10:59:48.627Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346788387_5c49",
+      "timestamp": "2026-09-02T10:59:48.387Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346784868_f5uq",
+      "timestamp": "2026-09-02T10:59:44.868Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788346784661_sauf",
+      "timestamp": "2026-09-02T10:59:44.662Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346782440_j7j5",
+      "timestamp": "2026-09-02T10:59:42.440Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346782231_kaid",
+      "timestamp": "2026-09-02T10:59:42.231Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346782162_7s2v",
+      "timestamp": "2026-09-02T10:59:42.162Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346781400_ob6t",
+      "timestamp": "2026-09-02T10:59:41.400Z",
       "level": "info",
       "source": "system",
-      "message": "Stream \"tessss\" stopped by user."
+      "message": "Stream \"tessss\" stopped by user (manualStop=true)."
     },
     {
-      "id": "log_1788345138684_nsta",
-      "timestamp": "2026-09-02T10:32:18.684Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788345138172_yzz3",
-      "timestamp": "2026-09-02T10:32:18.172Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788345138128_khj0",
-      "timestamp": "2026-09-02T10:32:18.128Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788345128082_i4au",
-      "timestamp": "2026-09-02T10:32:08.082Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788345127454_bec3",
-      "timestamp": "2026-09-02T10:32:07.455Z",
+      "id": "log_1788346776587_oe9x",
+      "timestamp": "2026-09-02T10:59:36.587Z",
       "level": "warn",
       "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294957243). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788345126854_ev03",
-      "timestamp": "2026-09-02T10:32:06.854Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788345126630_651w",
-      "timestamp": "2026-09-02T10:32:06.631Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788345125622_86ep",
-      "timestamp": "2026-09-02T10:32:05.623Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788345120547_wo5v",
-      "timestamp": "2026-09-02T10:32:00.547Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788345120433_ln6x",
-      "timestamp": "2026-09-02T10:32:00.433Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788345113546_s6mk",
-      "timestamp": "2026-09-02T10:31:53.546Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788345108609_wgim",
-      "timestamp": "2026-09-02T10:31:48.609Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788345108028_mvv0",
-      "timestamp": "2026-09-02T10:31:48.028Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788345101458_lnqj",
-      "timestamp": "2026-09-02T10:31:41.477Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788345100314_uwca",
-      "timestamp": "2026-09-02T10:31:40.314Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788345095010_rkvz",
-      "timestamp": "2026-09-02T10:31:35.010Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788345094877_reav",
-      "timestamp": "2026-09-02T10:31:34.877Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] [h264 @ 0000019d40e1a780] Late SEI is not implemented. Update your FFmpeg version to the newest one from Git. If the problem still occurs, it means th"
-    },
-    {
-      "id": "log_1788345093087_gc6a",
-      "timestamp": "2026-09-02T10:31:33.106Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
-    },
-    {
-      "id": "log_1788345092842_ngmk",
-      "timestamp": "2026-09-02T10:31:32.842Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
-    },
-    {
-      "id": "log_1788345091660_l7yj",
-      "timestamp": "2026-09-02T10:31:31.660Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: "
-    },
-    {
-      "id": "log_1788345091549_btlb",
-      "timestamp": "2026-09-02T10:31:31.549Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788345091243_k1sj",
-      "timestamp": "2026-09-02T10:31:31.243Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788345089615_1mmr",
-      "timestamp": "2026-09-02T10:31:29.616Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788345089031_46q5",
-      "timestamp": "2026-09-02T10:31:29.032Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788345087441_xzb6",
-      "timestamp": "2026-09-02T10:31:27.453Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Server Boot Recovery] Auto-resuming stream \"tessss\" after server restart..."
-    },
-    {
-      "id": "log_1788345083299_9gjy",
-      "timestamp": "2026-09-02T10:31:23.299Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788345080429_r78z",
-      "timestamp": "2026-09-02T10:31:20.429Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294957243). Reconnecting in 10s (Attempt #2/3)..."
-    },
-    {
-      "id": "log_1788345080389_yecd",
-      "timestamp": "2026-09-02T10:31:20.389Z",
+      "id": "log_1788346776555_7m8a",
+      "timestamp": "2026-09-02T10:59:36.555Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294957243"
     },
     {
-      "id": "log_1788345079510_ex1z",
-      "timestamp": "2026-09-02T10:31:19.510Z",
+      "id": "log_1788346774812_5jvw",
+      "timestamp": "2026-09-02T10:59:34.812Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [out#0/flv @ 000001c3743aeb00] Error closing file: Error number -10053 occurred\r\n[out#0/flv @ 000001c3743aeb00] video:1733kB audio:6kB subtitle:0kB ot"
+      "message": "[tessss] [out#0/flv @ 0000021c01cec8c0] Error writing trailer: Error number -10053 occurred\r\n[out#0/flv @ 0000021c01cec8c0] Error closing file: Error number -1"
     },
     {
-      "id": "log_1788345079495_tk0z",
-      "timestamp": "2026-09-02T10:31:19.495Z",
+      "id": "log_1788346774209_9bsp",
+      "timestamp": "2026-09-02T10:59:34.209Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [out#0/flv @ 000001c3743aeb00] Error writing trailer: Error number -10053 occurred\r\n"
+      "message": "[tessss] Error submitting a packet to the muxer: Error number -10053 occurred\r\n[out#0/flv @ 0000021c01cec8c0] Error muxing a packet\r\n"
     },
     {
-      "id": "log_1788345078639_lu3o",
-      "timestamp": "2026-09-02T10:31:18.639Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] [aost#0:1/aac @ 000001c3751b2cc0] Error submitting a packet to the muxer: Error number -10053 occurred\r\n[out#0/flv @ 000001c3743aeb00] Error muxing a "
+      "id": "log_1788346772608_xld3",
+      "timestamp": "2026-09-02T10:59:32.608Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788345078167_q7nq",
-      "timestamp": "2026-09-02T10:31:18.167Z",
+      "id": "log_1788346771297_xakw",
+      "timestamp": "2026-09-02T10:59:31.297Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788345077610_71y3",
-      "timestamp": "2026-09-02T10:31:17.610Z",
+      "id": "log_1788346769665_x1j0",
+      "timestamp": "2026-09-02T10:59:29.665Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788345071202_crke",
-      "timestamp": "2026-09-02T10:31:11.233Z",
+      "id": "log_1788346755468_nxec",
+      "timestamp": "2026-09-02T10:59:15.469Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 000001fb3e33b080] [Eval @ 0000009cc27fed60] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001fb3e33b080] Unable t"
+      "message": "[tessss] [libx264 @ 0000018c4d94b080] [Eval @ 0000000a1cbfeb50] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 0000018c4d94b080] Unable t"
     },
     {
-      "id": "log_1788345058395_heut",
-      "timestamp": "2026-09-02T10:30:58.395Z",
+      "id": "log_1788346751419_fscq",
+      "timestamp": "2026-09-02T10:59:11.419Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
     },
     {
-      "id": "log_1788345056482_yd0y",
-      "timestamp": "2026-09-02T10:30:56.482Z",
+      "id": "log_1788346747248_hbvt",
+      "timestamp": "2026-09-02T10:59:07.248Z",
       "level": "info",
       "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
     },
     {
-      "id": "log_1788345050529_c3g7",
-      "timestamp": "2026-09-02T10:30:50.529Z",
+      "id": "log_1788346744857_oxq5",
+      "timestamp": "2026-09-02T10:59:04.857Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788345050352_869d",
-      "timestamp": "2026-09-02T10:30:50.352Z",
+      "id": "log_1788346744661_qhs4",
+      "timestamp": "2026-09-02T10:59:04.662Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788345048687_uone",
-      "timestamp": "2026-09-02T10:30:48.687Z",
+      "id": "log_1788346736828_s8tq",
+      "timestamp": "2026-09-02T10:58:56.828Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: ("
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
     },
     {
-      "id": "log_1788345047527_0yav",
-      "timestamp": "2026-09-02T10:30:47.527Z",
+      "id": "log_1788346734722_e2p4",
+      "timestamp": "2026-09-02T10:58:54.722Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] ontconfig error: Cannot load default"
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No su"
     },
     {
-      "id": "log_1788345046984_y8vh",
-      "timestamp": "2026-09-02T10:30:46.984Z",
+      "id": "log_1788346731602_0qq3",
+      "timestamp": "2026-09-02T10:58:51.602Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788345046924_dxq4",
-      "timestamp": "2026-09-02T10:30:46.924Z",
+      "id": "log_1788346731569_pmiu",
+      "timestamp": "2026-09-02T10:58:51.569Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788345046886_thdg",
-      "timestamp": "2026-09-02T10:30:46.886Z",
+      "id": "log_1788346731516_1p5w",
+      "timestamp": "2026-09-02T10:58:51.516Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Server Boot Recovery] Auto-resuming stream \"tessss\" after server restart..."
     },
     {
-      "id": "log_1788345044951_en60",
-      "timestamp": "2026-09-02T10:30:44.967Z",
+      "id": "log_1788346725891_5fgf",
+      "timestamp": "2026-09-02T10:58:45.891Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788345039649_pdw8",
-      "timestamp": "2026-09-02T10:30:39.649Z",
+      "id": "log_1788346723817_dmpb",
+      "timestamp": "2026-09-02T10:58:43.817Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788345039335_j2f1",
-      "timestamp": "2026-09-02T10:30:39.335Z",
+      "id": "log_1788346723525_ialc",
+      "timestamp": "2026-09-02T10:58:43.525Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788345036715_h1xf",
-      "timestamp": "2026-09-02T10:30:36.715Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 00000245c302b080] [Eval @ 0000005b43bfea10] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000245c302b080] Unable t"
-    },
-    {
-      "id": "log_1788345036673_ilfy",
-      "timestamp": "2026-09-02T10:30:36.673Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ontconfig error: Cannot load"
-    },
-    {
-      "id": "log_1788345035165_hzzq",
-      "timestamp": "2026-09-02T10:30:35.165Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot lo"
-    },
-    {
-      "id": "log_1788345034661_uubs",
-      "timestamp": "2026-09-02T10:30:34.661Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788345034292_05ue",
-      "timestamp": "2026-09-02T10:30:34.292Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788345034238_o7pc",
-      "timestamp": "2026-09-02T10:30:34.238Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788345024252_tp15",
-      "timestamp": "2026-09-02T10:30:24.252Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788345023907_9ws9",
-      "timestamp": "2026-09-02T10:30:23.925Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
-    },
-    {
-      "id": "log_1788345023628_w8gf",
-      "timestamp": "2026-09-02T10:30:23.628Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788345023532_8ild",
-      "timestamp": "2026-09-02T10:30:23.532Z",
+      "id": "log_1788346720998_jy0y",
+      "timestamp": "2026-09-02T10:58:40.998Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
     },
     {
-      "id": "log_1788345020464_3ren",
-      "timestamp": "2026-09-02T10:30:20.465Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+      "id": "log_1788346720644_fu4o",
+      "timestamp": "2026-09-02T10:58:40.644Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
     },
     {
-      "id": "log_1788345020029_162d",
-      "timestamp": "2026-09-02T10:30:20.029Z",
+      "id": "log_1788346719422_zwwz",
+      "timestamp": "2026-09-02T10:58:39.422Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ontconfig error: Cannot load default config file: No suc"
+    },
+    {
+      "id": "log_1788346718693_p6uq",
+      "timestamp": "2026-09-02T10:58:38.693Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788345019972_kxj1",
-      "timestamp": "2026-09-02T10:30:19.972Z",
+      "id": "log_1788346718623_qa9q",
+      "timestamp": "2026-09-02T10:58:38.623Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788345013920_vvbd",
-      "timestamp": "2026-09-02T10:30:13.920Z",
+      "id": "log_1788346710724_c6bc",
+      "timestamp": "2026-09-02T10:58:30.725Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788345008450_ugs8",
-      "timestamp": "2026-09-02T10:30:08.450Z",
+      "id": "log_1788346708279_hit3",
+      "timestamp": "2026-09-02T10:58:28.279Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788345007955_4gor",
-      "timestamp": "2026-09-02T10:30:07.955Z",
+      "id": "log_1788346707503_ai91",
+      "timestamp": "2026-09-02T10:58:27.503Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788345006950_zxy9",
-      "timestamp": "2026-09-02T10:30:06.950Z",
+      "id": "log_1788346700311_qnyi",
+      "timestamp": "2026-09-02T10:58:20.311Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
     },
     {
-      "id": "log_1788345003558_b25j",
-      "timestamp": "2026-09-02T10:30:03.558Z",
+      "id": "log_1788346699873_m06n",
+      "timestamp": "2026-09-02T10:58:19.873Z",
       "level": "info",
       "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
     },
     {
-      "id": "log_1788345003009_win0",
-      "timestamp": "2026-09-02T10:30:03.009Z",
+      "id": "log_1788346695994_k4j9",
+      "timestamp": "2026-09-02T10:58:15.994Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788345002865_h9h0",
-      "timestamp": "2026-09-02T10:30:02.865Z",
+      "id": "log_1788346695865_ievh",
+      "timestamp": "2026-09-02T10:58:15.866Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344990609_30ll",
-      "timestamp": "2026-09-02T10:29:50.609Z",
+      "id": "log_1788346688452_dbpp",
+      "timestamp": "2026-09-02T10:58:08.452Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344990137_kc9k",
-      "timestamp": "2026-09-02T10:29:50.137Z",
+      "id": "log_1788346683470_a8zf",
+      "timestamp": "2026-09-02T10:58:03.470Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346683130_h22r",
+      "timestamp": "2026-09-02T10:58:03.130Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346677659_fdzs",
+      "timestamp": "2026-09-02T10:57:57.659Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788346663886_umgd",
+      "timestamp": "2026-09-02T10:57:43.886Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346663111_ijm0",
+      "timestamp": "2026-09-02T10:57:43.111Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346663052_m1ha",
+      "timestamp": "2026-09-02T10:57:43.052Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346651376_y22n",
+      "timestamp": "2026-09-02T10:57:31.376Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346648154_vyox",
+      "timestamp": "2026-09-02T10:57:28.154Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346647717_owpr",
+      "timestamp": "2026-09-02T10:57:27.717Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346647045_pite",
+      "timestamp": "2026-09-02T10:57:27.045Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788346643954_h3yh",
+      "timestamp": "2026-09-02T10:57:23.954Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346643212_jcta",
+      "timestamp": "2026-09-02T10:57:23.212Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346643102_52kk",
+      "timestamp": "2026-09-02T10:57:23.102Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346632603_zxyv",
+      "timestamp": "2026-09-02T10:57:12.603Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346632303_fcbq",
+      "timestamp": "2026-09-02T10:57:12.303Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346632067_p21i",
+      "timestamp": "2026-09-02T10:57:12.067Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346629050_kbhb",
+      "timestamp": "2026-09-02T10:57:09.050Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n[libx264 @ 000001cc0477b080] [Eval @ 0000001c87ffed30] Invalid chars 'bps' at"
+    },
+    {
+      "id": "log_1788346623440_99kl",
+      "timestamp": "2026-09-02T10:57:03.440Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788346622618_3tz7",
+      "timestamp": "2026-09-02T10:57:02.618Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346620769_jxeb",
+      "timestamp": "2026-09-02T10:57:00.769Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346620469_2iwy",
+      "timestamp": "2026-09-02T10:57:00.469Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346607564_h7fs",
+      "timestamp": "2026-09-02T10:56:47.589Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346606954_zwvw",
+      "timestamp": "2026-09-02T10:56:46.954Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
     },
     {
-      "id": "log_1788344989760_lqas",
-      "timestamp": "2026-09-02T10:29:49.760Z",
+      "id": "log_1788346606543_ahi6",
+      "timestamp": "2026-09-02T10:56:46.543Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344988755_hu7d",
-      "timestamp": "2026-09-02T10:29:48.755Z",
+      "id": "log_1788346606204_ocmy",
+      "timestamp": "2026-09-02T10:56:46.204Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
+      "message": "[tessss] [libx264 @ 000002bea080b080] [Eval @ 000000ffa47fe8a0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000002bea080b080] Unable t"
     },
     {
-      "id": "log_1788344984630_kzfn",
-      "timestamp": "2026-09-02T10:29:44.630Z",
+      "id": "log_1788346606162_k5qv",
+      "timestamp": "2026-09-02T10:56:46.162Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+      "message": "[tessss] Fontconfig error: Cannot load default config file: "
     },
     {
-      "id": "log_1788344984160_a38y",
-      "timestamp": "2026-09-02T10:29:44.160Z",
+      "id": "log_1788346605402_f61c",
+      "timestamp": "2026-09-02T10:56:45.402Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4':\r\n  Metadata:\r\n    major_brand     "
+    },
+    {
+      "id": "log_1788346604426_rhbd",
+      "timestamp": "2026-09-02T10:56:44.426Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788344984101_mfak",
-      "timestamp": "2026-09-02T10:29:44.101Z",
+      "id": "log_1788346604325_kvea",
+      "timestamp": "2026-09-02T10:56:44.326Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344980107_a6py",
-      "timestamp": "2026-09-02T10:29:40.107Z",
+      "id": "log_1788346596960_v32m",
+      "timestamp": "2026-09-02T10:56:36.960Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344972717_h0o3",
-      "timestamp": "2026-09-02T10:29:32.717Z",
+      "id": "log_1788346593796_tiwh",
+      "timestamp": "2026-09-02T10:56:33.796Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788344972416_0rvy",
-      "timestamp": "2026-09-02T10:29:32.416Z",
+      "id": "log_1788346593611_nhju",
+      "timestamp": "2026-09-02T10:56:33.611Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344971912_qsvm",
-      "timestamp": "2026-09-02T10:29:31.913Z",
+      "id": "log_1788346589105_shln",
+      "timestamp": "2026-09-02T10:56:29.106Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+      "message": "[tessss] [libx264 @ 000002616170b080] [Eval @ 000000b20d1feef0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000002616170b080] Unable t"
     },
     {
-      "id": "log_1788344969343_pfcq",
-      "timestamp": "2026-09-02T10:29:29.343Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344967771_ppp5",
-      "timestamp": "2026-09-02T10:29:27.771Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344967512_s38t",
-      "timestamp": "2026-09-02T10:29:27.513Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344954669_3ulf",
-      "timestamp": "2026-09-02T10:29:14.669Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344952973_52ja",
-      "timestamp": "2026-09-02T10:29:12.973Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344952422_468g",
-      "timestamp": "2026-09-02T10:29:12.422Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344951178_bqme",
-      "timestamp": "2026-09-02T10:29:11.179Z",
+      "id": "log_1788346588735_7qks",
+      "timestamp": "2026-09-02T10:56:28.735Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+      "message": "[tessss] Fontconfig error: Cannot load default config file: N"
     },
     {
-      "id": "log_1788344950321_khi0",
-      "timestamp": "2026-09-02T10:29:10.321Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344946132_x084",
-      "timestamp": "2026-09-02T10:29:06.132Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344946007_xwy9",
-      "timestamp": "2026-09-02T10:29:06.008Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344935918_l64j",
-      "timestamp": "2026-09-02T10:28:55.919Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344935318_4zvm",
-      "timestamp": "2026-09-02T10:28:55.318Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344934843_duui",
-      "timestamp": "2026-09-02T10:28:54.843Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344930151_genw",
-      "timestamp": "2026-09-02T10:28:50.152Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344925010_gzt2",
-      "timestamp": "2026-09-02T10:28:45.010Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344923803_40l5",
-      "timestamp": "2026-09-02T10:28:43.803Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344923663_pyvt",
-      "timestamp": "2026-09-02T10:28:43.663Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344911959_e80r",
-      "timestamp": "2026-09-02T10:28:31.960Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344911332_m71l",
-      "timestamp": "2026-09-02T10:28:31.344Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344910876_scxu",
-      "timestamp": "2026-09-02T10:28:30.876Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344908076_e0hg",
-      "timestamp": "2026-09-02T10:28:28.076Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344905117_7oz4",
-      "timestamp": "2026-09-02T10:28:25.135Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344904287_6wg0",
-      "timestamp": "2026-09-02T10:28:24.287Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344904092_o1c8",
-      "timestamp": "2026-09-02T10:28:24.092Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344894973_r2re",
-      "timestamp": "2026-09-02T10:28:14.973Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344893393_ev7i",
-      "timestamp": "2026-09-02T10:28:13.411Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344892162_yqv8",
-      "timestamp": "2026-09-02T10:28:12.162Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344888520_6qi2",
-      "timestamp": "2026-09-02T10:28:08.520Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344884961_30d4",
-      "timestamp": "2026-09-02T10:28:04.961Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344883609_kyhc",
-      "timestamp": "2026-09-02T10:28:03.610Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344883441_nhvq",
-      "timestamp": "2026-09-02T10:28:03.442Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344872097_e47f",
-      "timestamp": "2026-09-02T10:27:52.098Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344871400_9wje",
-      "timestamp": "2026-09-02T10:27:51.411Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344870801_4mav",
-      "timestamp": "2026-09-02T10:27:50.801Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344870588_68ex",
-      "timestamp": "2026-09-02T10:27:50.598Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344869754_8pzr",
-      "timestamp": "2026-09-02T10:27:49.754Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344865107_5jbi",
-      "timestamp": "2026-09-02T10:27:45.107Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344864960_r1t4",
-      "timestamp": "2026-09-02T10:27:44.960Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344856875_6h3k",
-      "timestamp": "2026-09-02T10:27:36.875Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344852011_lqkr",
-      "timestamp": "2026-09-02T10:27:32.012Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344851457_kzhh",
-      "timestamp": "2026-09-02T10:27:31.457Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344849813_3rf7",
-      "timestamp": "2026-09-02T10:27:29.814Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344845388_r08l",
-      "timestamp": "2026-09-02T10:27:25.388Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344844274_fonw",
-      "timestamp": "2026-09-02T10:27:24.274Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344844154_pcoi",
-      "timestamp": "2026-09-02T10:27:24.154Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344834612_dx9c",
-      "timestamp": "2026-09-02T10:27:14.612Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344832829_tnqy",
-      "timestamp": "2026-09-02T10:27:12.829Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344831772_wav3",
-      "timestamp": "2026-09-02T10:27:11.772Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344830366_joa5",
-      "timestamp": "2026-09-02T10:27:10.384Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344828016_3mkj",
-      "timestamp": "2026-09-02T10:27:08.016Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344821902_xr77",
-      "timestamp": "2026-09-02T10:27:01.903Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344821818_80kl",
-      "timestamp": "2026-09-02T10:27:01.818Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344819014_nc3l",
-      "timestamp": "2026-09-02T10:26:59.014Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344817498_xo9x",
-      "timestamp": "2026-09-02T10:26:57.498Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344817435_5buk",
-      "timestamp": "2026-09-02T10:26:57.435Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344817219_afq9",
-      "timestamp": "2026-09-02T10:26:57.219Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Server Boot Recovery] Auto-resuming stream \"tessss\" after server restart..."
-    },
-    {
-      "id": "log_1788344815489_edmg",
-      "timestamp": "2026-09-02T10:26:55.489Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344811137_tbfj",
-      "timestamp": "2026-09-02T10:26:51.138Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344810427_gy6l",
-      "timestamp": "2026-09-02T10:26:50.427Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344809650_krm9",
-      "timestamp": "2026-09-02T10:26:49.650Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344805677_gahn",
-      "timestamp": "2026-09-02T10:26:45.677Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788344801286_t2fr",
-      "timestamp": "2026-09-02T10:26:41.297Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344801004_lmmy",
-      "timestamp": "2026-09-02T10:26:41.004Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344789542_0ddf",
-      "timestamp": "2026-09-02T10:26:29.542Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344788892_zglc",
-      "timestamp": "2026-09-02T10:26:28.892Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788344788435_nas0",
-      "timestamp": "2026-09-02T10:26:28.435Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344788324_ohw9",
-      "timestamp": "2026-09-02T10:26:28.324Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344775674_auew",
-      "timestamp": "2026-09-02T10:26:15.674Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344774139_eqe5",
-      "timestamp": "2026-09-02T10:26:14.140Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344773979_mtco",
-      "timestamp": "2026-09-02T10:26:13.979Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344772689_p1ne",
-      "timestamp": "2026-09-02T10:26:12.689Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Server Boot Recovery] Auto-resuming stream \"tessss\" after server restart..."
-    },
-    {
-      "id": "log_1788344768006_3t70",
-      "timestamp": "2026-09-02T10:26:08.006Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788344767904_7zkd",
-      "timestamp": "2026-09-02T10:26:07.904Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788344761797_vsym",
-      "timestamp": "2026-09-02T10:26:01.797Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788344756838_ji0o",
-      "timestamp": "2026-09-02T10:25:56.838Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
-    },
-    {
-      "id": "log_1788344756692_w8n0",
-      "timestamp": "2026-09-02T10:25:56.692Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788344756556_bvgf",
-      "timestamp": "2026-09-02T10:25:56.556Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 0000019e19b6b080] [Eval @ 000000496edfed30] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 0000019e19b6b080] Unable t"
-    },
-    {
-      "id": "log_1788344756538_vnxf",
-      "timestamp": "2026-09-02T10:25:56.538Z",
+      "id": "log_1788346587395_5oo3",
+      "timestamp": "2026-09-02T10:56:27.395Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
     },
     {
-      "id": "log_1788344755986_xr13",
-      "timestamp": "2026-09-02T10:25:55.986Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null"
+      "id": "log_1788346587058_y2f5",
+      "timestamp": "2026-09-02T10:56:27.058Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
     },
     {
-      "id": "log_1788344755683_p5ub",
-      "timestamp": "2026-09-02T10:25:55.683Z",
+      "id": "log_1788346586447_haus",
+      "timestamp": "2026-09-02T10:56:26.447Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788344755649_cut3",
-      "timestamp": "2026-09-02T10:25:55.649Z",
+      "id": "log_1788346586374_bw7p",
+      "timestamp": "2026-09-02T10:56:26.374Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344751722_q143",
-      "timestamp": "2026-09-02T10:25:51.722Z",
+      "id": "log_1788346576428_adm3",
+      "timestamp": "2026-09-02T10:56:16.428Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344745520_tsbb",
-      "timestamp": "2026-09-02T10:25:45.520Z",
+      "id": "log_1788346576042_x3ps",
+      "timestamp": "2026-09-02T10:56:16.042Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
     },
     {
-      "id": "log_1788344745440_jl41",
-      "timestamp": "2026-09-02T10:25:45.440Z",
+      "id": "log_1788346575765_apbf",
+      "timestamp": "2026-09-02T10:56:15.765Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344745330_3yuc",
-      "timestamp": "2026-09-02T10:25:45.330Z",
+      "id": "log_1788346574677_67pu",
+      "timestamp": "2026-09-02T10:56:14.677Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 000001b2c12ab080] [Eval @ 00000043f81fecd0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001b2c12ab080] Unable t"
+      "message": "[tessss] [libx264 @ 000001bc9605b080] [Eval @ 000000b1599feeb0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001bc9605b080] Unable t"
     },
     {
-      "id": "log_1788344745317_xt5c",
-      "timestamp": "2026-09-02T10:25:45.317Z",
+      "id": "log_1788346574497_zvvt",
+      "timestamp": "2026-09-02T10:56:14.497Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+      "message": "[tessss] ontconfig error: Cannot load default config file: No such file"
     },
     {
-      "id": "log_1788344744805_ndrc",
-      "timestamp": "2026-09-02T10:25:44.805Z",
+      "id": "log_1788346573474_r5pd",
+      "timestamp": "2026-09-02T10:56:13.474Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (nu"
     },
     {
-      "id": "log_1788344744661_0z9q",
-      "timestamp": "2026-09-02T10:25:44.661Z",
+      "id": "log_1788346572759_2o6z",
+      "timestamp": "2026-09-02T10:56:12.759Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788344744641_rkih",
-      "timestamp": "2026-09-02T10:25:44.641Z",
+      "id": "log_1788346572716_x9jw",
+      "timestamp": "2026-09-02T10:56:12.716Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344741702_jylu",
-      "timestamp": "2026-09-02T10:25:41.702Z",
+      "id": "log_1788346566172_yvkp",
+      "timestamp": "2026-09-02T10:56:06.172Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344734536_f7i0",
-      "timestamp": "2026-09-02T10:25:34.537Z",
+      "id": "log_1788346562447_lrtl",
+      "timestamp": "2026-09-02T10:56:02.447Z",
       "level": "warn",
       "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788344734418_bg1q",
-      "timestamp": "2026-09-02T10:25:34.418Z",
+      "id": "log_1788346562122_n9qs",
+      "timestamp": "2026-09-02T10:56:02.138Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344734320_4ihv",
-      "timestamp": "2026-09-02T10:25:34.320Z",
+      "id": "log_1788346561442_k0yd",
+      "timestamp": "2026-09-02T10:56:01.442Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 00000280bfdbb080] [Eval @ 000000f8be3fed30] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000280bfdbb080] Unable t"
+      "message": "[tessss] Error while filtering: Invalid argument\r\n"
     },
     {
-      "id": "log_1788344734286_4aye",
-      "timestamp": "2026-09-02T10:25:34.286Z",
+      "id": "log_1788346561389_wr9r",
+      "timestamp": "2026-09-02T10:56:01.389Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+      "message": "[tessss]  [Eval @ 00000017d33fea90] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 0000014bf772b080] Unable to parse option value \"4000 K"
     },
     {
-      "id": "log_1788344733710_7oci",
-      "timestamp": "2026-09-02T10:25:33.710Z",
+      "id": "log_1788346561346_e8tg",
+      "timestamp": "2026-09-02T10:56:01.346Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot"
+      "message": "[tessss] Fontconfig error: Cannot load default config file: "
     },
     {
-      "id": "log_1788344733512_ol3d",
-      "timestamp": "2026-09-02T10:25:33.512Z",
+      "id": "log_1788346560739_g1v8",
+      "timestamp": "2026-09-02T10:56:00.739Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'C:\\LUPIO\\apps\\web\\uploads\\1787567678115_HOTEL_NADA_AJYAD_-_MUTAMTOUR.mp4':\r\n  Metadata:\r\n    major_brand     "
+    },
+    {
+      "id": "log_1788346560595_y1z0",
+      "timestamp": "2026-09-02T10:56:00.595Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346559813_sjke",
+      "timestamp": "2026-09-02T10:55:59.813Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788344733485_p33z",
-      "timestamp": "2026-09-02T10:25:33.485Z",
+      "id": "log_1788346559753_66hl",
+      "timestamp": "2026-09-02T10:55:59.753Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344731728_pxnv",
-      "timestamp": "2026-09-02T10:25:31.728Z",
+      "id": "log_1788346550573_rlpm",
+      "timestamp": "2026-09-02T10:55:50.573Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344723374_mztx",
-      "timestamp": "2026-09-02T10:25:23.375Z",
+      "id": "log_1788346549458_q3e8",
+      "timestamp": "2026-09-02T10:55:49.465Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
     },
     {
-      "id": "log_1788344723293_juen",
-      "timestamp": "2026-09-02T10:25:23.293Z",
+      "id": "log_1788346549212_2e2q",
+      "timestamp": "2026-09-02T10:55:49.212Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344723160_1691",
-      "timestamp": "2026-09-02T10:25:23.160Z",
+      "id": "log_1788346549030_b8lr",
+      "timestamp": "2026-09-02T10:55:49.030Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] such file: (null)\r\n[libx264 @ 000001d4ecb1b080] [Eval @ 00000014e97fec30] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001d"
+      "message": "[tessss]  file: No such file: (null)\r\n[libx264 @ 000001fc9752b080] [Eval @ 000000687c7fefe0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264"
     },
     {
-      "id": "log_1788344723138_y94n",
-      "timestamp": "2026-09-02T10:25:23.138Z",
+      "id": "log_1788346548931_43bq",
+      "timestamp": "2026-09-02T10:55:48.931Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config"
+    },
+    {
+      "id": "log_1788346548124_s5qp",
+      "timestamp": "2026-09-02T10:55:48.124Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346547908_jwit",
+      "timestamp": "2026-09-02T10:55:47.908Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346547841_leq0",
+      "timestamp": "2026-09-02T10:55:47.851Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346540544_1ri7",
+      "timestamp": "2026-09-02T10:55:40.544Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346537627_xl7f",
+      "timestamp": "2026-09-02T10:55:37.627Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346537491_hfxk",
+      "timestamp": "2026-09-02T10:55:37.491Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346537409_yd2z",
+      "timestamp": "2026-09-02T10:55:37.409Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 0000014f0297b080] [Eval @ 00000028d53fedd0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 0000014f0297b080] Unable t"
+    },
+    {
+      "id": "log_1788346537375_rcf6",
+      "timestamp": "2026-09-02T10:55:37.375Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346536773_69ak",
+      "timestamp": "2026-09-02T10:55:36.773Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346536725_1m1g",
+      "timestamp": "2026-09-02T10:55:36.725Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346536627_5hgt",
+      "timestamp": "2026-09-02T10:55:36.627Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346536590_nz1e",
+      "timestamp": "2026-09-02T10:55:36.590Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346526568_65tu",
+      "timestamp": "2026-09-02T10:55:26.569Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346526375_4nx0",
+      "timestamp": "2026-09-02T10:55:26.375Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346526241_fiij",
+      "timestamp": "2026-09-02T10:55:26.241Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346526135_4ved",
+      "timestamp": "2026-09-02T10:55:26.135Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346525820_k2q6",
+      "timestamp": "2026-09-02T10:55:25.820Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000262a3e5b080] [Eval @ 00000067dfbfe8a0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000262a3e5b080] Unable t"
+    },
+    {
+      "id": "log_1788346525795_lwn4",
+      "timestamp": "2026-09-02T10:55:25.796Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346525237_0njq",
+      "timestamp": "2026-09-02T10:55:25.237Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346525054_vtai",
+      "timestamp": "2026-09-02T10:55:25.054Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346525026_ox41",
+      "timestamp": "2026-09-02T10:55:25.026Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346516027_qhst",
+      "timestamp": "2026-09-02T10:55:16.027Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346514858_4u7o",
+      "timestamp": "2026-09-02T10:55:14.858Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
+    },
+    {
+      "id": "log_1788346514685_p260",
+      "timestamp": "2026-09-02T10:55:14.685Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346514583_cret",
+      "timestamp": "2026-09-02T10:55:14.583Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000219e0cdb080] [Eval @ 000000e35b5fee30] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000219e0cdb080] Unable t"
+    },
+    {
+      "id": "log_1788346514552_wnna",
+      "timestamp": "2026-09-02T10:55:14.552Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346513876_2jr1",
+      "timestamp": "2026-09-02T10:55:13.877Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346513700_tqy1",
+      "timestamp": "2026-09-02T10:55:13.700Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346513633_moft",
+      "timestamp": "2026-09-02T10:55:13.633Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346506006_ifo1",
+      "timestamp": "2026-09-02T10:55:06.007Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346503463_w07l",
+      "timestamp": "2026-09-02T10:55:03.463Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
+    },
+    {
+      "id": "log_1788346503295_51ah",
+      "timestamp": "2026-09-02T10:55:03.295Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346503186_055w",
+      "timestamp": "2026-09-02T10:55:03.187Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000002336556b080] [Eval @ 0000004b835fefe0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000002336556b080] Unable t"
+    },
+    {
+      "id": "log_1788346503171_fifl",
+      "timestamp": "2026-09-02T10:55:03.171Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] Fontconfig error: Cannot load default config file: No "
     },
     {
-      "id": "log_1788344722586_qvcd",
-      "timestamp": "2026-09-02T10:25:22.586Z",
+      "id": "log_1788346502632_5hu3",
+      "timestamp": "2026-09-02T10:55:02.632Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] Fontconfig error: Cannot load default co"
+      "message": "[tessss] Fontconfig error: Cannot load default "
     },
     {
-      "id": "log_1788344722433_x5t3",
-      "timestamp": "2026-09-02T10:25:22.433Z",
+      "id": "log_1788346502468_14ea",
+      "timestamp": "2026-09-02T10:55:02.468Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788344722409_y2qq",
-      "timestamp": "2026-09-02T10:25:22.409Z",
+      "id": "log_1788346502441_hjta",
+      "timestamp": "2026-09-02T10:55:02.441Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344721702_sdvw",
-      "timestamp": "2026-09-02T10:25:21.702Z",
+      "id": "log_1788346496014_xa6q",
+      "timestamp": "2026-09-02T10:54:56.014Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344712311_0g40",
-      "timestamp": "2026-09-02T10:25:12.311Z",
+      "id": "log_1788346492332_lpqf",
+      "timestamp": "2026-09-02T10:54:52.332Z",
       "level": "warn",
       "source": "watchdog",
       "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788344712245_eumy",
-      "timestamp": "2026-09-02T10:25:12.245Z",
+      "id": "log_1788346492174_yyso",
+      "timestamp": "2026-09-02T10:54:52.174Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344712144_osq9",
-      "timestamp": "2026-09-02T10:25:12.144Z",
+      "id": "log_1788346492097_2qj9",
+      "timestamp": "2026-09-02T10:54:52.097Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 0000021e0364b080] [Eval @ 0000005728ffeb80] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 0000021e0364b080] Unable t"
+      "message": "[tessss] [libx264 @ 000002abb7b0b080] [Eval @ 000000f67fbfedc0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000002abb7b0b080] Unable t"
     },
     {
-      "id": "log_1788344712125_25sl",
-      "timestamp": "2026-09-02T10:25:12.125Z",
+      "id": "log_1788346492044_z69d",
+      "timestamp": "2026-09-02T10:54:52.044Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
     },
     {
-      "id": "log_1788344711621_7doe",
-      "timestamp": "2026-09-02T10:25:11.621Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788344711562_s0hk",
-      "timestamp": "2026-09-02T10:25:11.562Z",
+      "id": "log_1788346491936_iili",
+      "timestamp": "2026-09-02T10:54:51.937Z",
       "level": "info",
       "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
     },
     {
-      "id": "log_1788344711407_5mh1",
-      "timestamp": "2026-09-02T10:25:11.407Z",
+      "id": "log_1788346491441_gvfm",
+      "timestamp": "2026-09-02T10:54:51.441Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346491274_1yfz",
+      "timestamp": "2026-09-02T10:54:51.274Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     },
     {
-      "id": "log_1788344711394_rlun",
-      "timestamp": "2026-09-02T10:25:11.394Z",
+      "id": "log_1788346491247_6unj",
+      "timestamp": "2026-09-02T10:54:51.247Z",
       "level": "info",
       "source": "stream",
       "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
     },
     {
-      "id": "log_1788344701627_tzhi",
-      "timestamp": "2026-09-02T10:25:01.627Z",
+      "id": "log_1788346481943_ulzz",
+      "timestamp": "2026-09-02T10:54:41.943Z",
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
     },
     {
-      "id": "log_1788344701286_kqzz",
-      "timestamp": "2026-09-02T10:25:01.286Z",
+      "id": "log_1788346481095_q85n",
+      "timestamp": "2026-09-02T10:54:41.095Z",
       "level": "warn",
       "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
     },
     {
-      "id": "log_1788344701213_0dcl",
-      "timestamp": "2026-09-02T10:25:01.213Z",
+      "id": "log_1788346480936_65m4",
+      "timestamp": "2026-09-02T10:54:40.936Z",
       "level": "info",
       "source": "ffmpeg",
       "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
     },
     {
-      "id": "log_1788344701130_agvm",
-      "timestamp": "2026-09-02T10:25:01.130Z",
+      "id": "log_1788346480850_sego",
+      "timestamp": "2026-09-02T10:54:40.850Z",
       "level": "warn",
       "source": "ffmpeg",
-      "message": "[tessss] [libx264 @ 00000220d46db080] [Eval @ 000000595c5fe8c0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000220d46db080] Unable t"
+      "message": "[tessss] [libx264 @ 000001870fccb080] [Eval @ 00000025b07fe9a0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001870fccb080] Unable t"
     },
     {
-      "id": "log_1788344701106_rcr0",
-      "timestamp": "2026-09-02T10:25:01.106Z",
+      "id": "log_1788346480813_qnrg",
+      "timestamp": "2026-09-02T10:54:40.813Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No su"
+    },
+    {
+      "id": "log_1788346480321_f8ko",
+      "timestamp": "2026-09-02T10:54:40.321Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788346480242_4hx6",
+      "timestamp": "2026-09-02T10:54:40.242Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
+    },
+    {
+      "id": "log_1788346480031_zuwp",
+      "timestamp": "2026-09-02T10:54:40.031Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346479988_g7y6",
+      "timestamp": "2026-09-02T10:54:39.988Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346470570_rl79",
+      "timestamp": "2026-09-02T10:54:30.570Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346469749_xjtd",
+      "timestamp": "2026-09-02T10:54:29.749Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
+    },
+    {
+      "id": "log_1788346469571_qrtr",
+      "timestamp": "2026-09-02T10:54:29.571Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346469483_fx76",
+      "timestamp": "2026-09-02T10:54:29.483Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000001e744ebb080] [Eval @ 0000008c227febb0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001e744ebb080] Unable t"
+    },
+    {
+      "id": "log_1788346469414_mcrj",
+      "timestamp": "2026-09-02T10:54:29.414Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346468740_zsw0",
+      "timestamp": "2026-09-02T10:54:28.740Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346468420_2l16",
+      "timestamp": "2026-09-02T10:54:28.421Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346468340_gbu9",
+      "timestamp": "2026-09-02T10:54:28.340Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346460457_s51u",
+      "timestamp": "2026-09-02T10:54:20.457Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346458118_p4a3",
+      "timestamp": "2026-09-02T10:54:18.118Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #2/3)..."
+    },
+    {
+      "id": "log_1788346457991_tzam",
+      "timestamp": "2026-09-02T10:54:17.991Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346457914_uh6t",
+      "timestamp": "2026-09-02T10:54:17.914Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000238ee57b080] [Eval @ 000000dce93feb40] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000238ee57b080] Unable t"
+    },
+    {
+      "id": "log_1788346457863_wtvw",
+      "timestamp": "2026-09-02T10:54:17.863Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346457277_imaj",
+      "timestamp": "2026-09-02T10:54:17.277Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788346457081_g3lp",
+      "timestamp": "2026-09-02T10:54:17.081Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788346457015_5f7b",
+      "timestamp": "2026-09-02T10:54:17.015Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788346450406_log5",
+      "timestamp": "2026-09-02T10:54:10.406Z",
+      "level": "info",
+      "source": "watchdog",
+      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
+    },
+    {
+      "id": "log_1788346446808_qpex",
+      "timestamp": "2026-09-02T10:54:06.808Z",
+      "level": "warn",
+      "source": "watchdog",
+      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
+    },
+    {
+      "id": "log_1788346446655_tnkk",
+      "timestamp": "2026-09-02T10:54:06.655Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788346446606_o371",
+      "timestamp": "2026-09-02T10:54:06.606Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 00000197909bb080] [Eval @ 0000002b80ffef50] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 00000197909bb080] Unable t"
+    },
+    {
+      "id": "log_1788346446553_h18m",
+      "timestamp": "2026-09-02T10:54:06.553Z",
       "level": "warn",
       "source": "ffmpeg",
       "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"

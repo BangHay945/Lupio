@@ -42,13 +42,20 @@ export class StreamManager {
   }
 
   /**
-   * Recovers active streams and schedules automatically after server / VPS restart
+   * Recovers active streams and schedules automatically after server / VPS restart.
+   * Streams with manualStop=true are NEVER auto-resumed.
    */
   private async initBootRecovery() {
     try {
       setTimeout(async () => {
         const streams = db.getStreams();
         for (const stream of streams) {
+          // Respect manual stop — never auto-resume a stream the user intentionally stopped
+          if (stream.manualStop) {
+            stream.status = "OFFLINE";
+            db.saveStream(stream);
+            continue;
+          }
           if (stream.status === "LIVE" || stream.status === "STARTING" || stream.status === "RESTARTING") {
             db.addLog("info", "watchdog", `[Server Boot Recovery] Auto-resuming stream "${stream.name}" after server restart...`);
             await this.startStream(stream.id, false);
@@ -77,7 +84,23 @@ export class StreamManager {
         // 1. Auto-Healing Watchdog, Auto-Stop Timer & Freeze Detector
         // -------------------------------------------------------------
         for (const stream of streams) {
-          if (this.intentionalStops.has(stream.id)) continue;
+          // CRITICAL: If user manually stopped this stream, skip ALL auto-restart logic
+          if (stream.manualStop) {
+            // Also kill any orphaned process that might still be running
+            const orphan = this.activeProcesses.get(stream.id);
+            if (orphan && orphan.process && !orphan.process.killed) {
+              try { orphan.process.kill("SIGKILL"); } catch (e) {}
+              this.activeProcesses.delete(stream.id);
+            }
+            if (stream.status !== "OFFLINE") {
+              stream.status = "OFFLINE";
+              stream.restartCount = 0;
+              db.saveStream(stream);
+            }
+            continue;
+          }
+
+          this.intentionalStops.delete(stream.id); // keep in-memory in sync
 
           const active = this.activeProcesses.get(stream.id);
 
@@ -110,7 +133,6 @@ export class StreamManager {
               if (runningSeconds >= maxSeconds) {
                 db.addLog("info", "watchdog", `[Auto-Stop Timer] Stream "${stream.name}" reached max duration limit (${stream.maxDurationHours}h). Stopping stream gracefully.`);
                 sendStreamNotification("STOP", stream.name, stream.channelName || "YouTube Live", `Stream reached max duration limit of ${stream.maxDurationHours}h.`);
-                this.intentionalStops.add(stream.id);
                 await this.stopStream(stream.id);
                 continue;
               }
@@ -121,9 +143,7 @@ export class StreamManager {
               const idleSeconds = Math.floor((now.getTime() - active.lastHeartbeat.getTime()) / 1000);
               if (idleSeconds > 45) {
                 db.addLog("warn", "watchdog", `[Watchdog Freeze Detector] Stream "${stream.name}" encoder stalled (>45s idle). Force restarting...`);
-                try {
-                  active.process.kill("SIGKILL");
-                } catch (e) {}
+                try { active.process.kill("SIGKILL"); } catch (e) {}
                 this.activeProcesses.delete(stream.id);
                 const maxRetries = settings.maxWatchdogRetries || 3;
                 const reconnectDelay = settings.reconnectDelay || 5;
@@ -157,12 +177,11 @@ export class StreamManager {
               // Explicit Stop Rule: If inside the stop window, stop the stream
               if (isCurrentWindow && stream.status === "LIVE") {
                 db.addLog("info", "scheduler", `[Schedule STOP Action] Stopping stream "${stream.name}" per rule "${rule.playlistName || 'Scheduled Stop'}" (${rule.startTime}-${rule.endTime}).`);
-                this.intentionalStops.add(stream.id);
                 await this.stopStream(stream.id);
               }
             } else if (action === "start") {
-              // Explicit Start Rule: If inside the start window and offline, start the stream
-              if (isCurrentWindow && stream.status === "OFFLINE" && !this.intentionalStops.has(stream.id)) {
+              // Explicit Start Rule: start only if not manually stopped
+              if (isCurrentWindow && stream.status === "OFFLINE" && !stream.manualStop) {
                 db.addLog("info", "scheduler", `[Schedule START Action] Starting stream "${stream.name}" per rule "${rule.playlistName || 'Scheduled Start'}" (${rule.startTime}-${rule.endTime}).`);
                 if (rule.playlistId) {
                   stream.playlistId = rule.playlistId;
@@ -172,7 +191,7 @@ export class StreamManager {
                 await this.startStream(stream.id, false);
               }
             } else {
-              // Default "switch": Auto-switch playlist while live, or auto-start if configured
+              // Default "switch": Auto-switch playlist while live, or auto-start if NOT manually stopped
               if (isCurrentWindow) {
                 if (stream.status === "LIVE") {
                   const prevPlaylist = this.currentActivePlaylistMap.get(stream.id);
@@ -183,7 +202,7 @@ export class StreamManager {
                     stream.playlistId = rule.playlistId;
                     db.saveStream(stream);
                   }
-                } else if (stream.status === "OFFLINE" && !this.intentionalStops.has(stream.id)) {
+                } else if (stream.status === "OFFLINE" && !stream.manualStop) {
                   db.addLog("info", "scheduler", `[Schedule Auto-Start] Starting stream "${stream.name}" for active rule "${rule.playlistName}" (${rule.startTime}-${rule.endTime}).`);
                   if (rule.playlistId) {
                     stream.playlistId = rule.playlistId;
@@ -305,6 +324,14 @@ export class StreamManager {
   public async startStream(streamId: string, isBackupMode: boolean = false): Promise<{ success: boolean; message: string }> {
     const stream = db.getStreamById(streamId);
     if (!stream) return { success: false, message: "Stream not found" };
+
+    // Clear manual stop lock — user explicitly wants to start this stream
+    if (stream.manualStop) {
+      stream.manualStop = false;
+      db.saveStream(stream);
+    }
+
+    this.intentionalStops.delete(streamId);
 
     const channels = db.getChannels();
     const mediaList = db.getMedia();
@@ -682,8 +709,9 @@ export class StreamManager {
     if (stream) {
       stream.status = "OFFLINE";
       stream.restartCount = 0;
+      stream.manualStop = true;  // ← Persist to db.json so auto-restart is blocked after server restart too
       db.saveStream(stream);
-      db.addLog("info", "system", `Stream "${stream.name}" stopped by user.`);
+      db.addLog("info", "system", `Stream "${stream.name}" stopped by user (manualStop=true).`);
       sendStreamNotification("STOP", stream.name, stream.channelName || "RTMP Target");
     }
 

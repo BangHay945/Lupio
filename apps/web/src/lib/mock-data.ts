@@ -21,6 +21,7 @@ export interface Stream {
   backupMediaId?: string;
   transitionEffect?: string;
   maxDurationHours?: number; // 0 or undefined for 24/7 non-stop
+  manualStop?: boolean; // true = user explicitly stopped, block all auto-restarts
 }
 
 export interface SystemMetrics {
