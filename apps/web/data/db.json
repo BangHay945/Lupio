@@ -3,7 +3,7 @@
     {
       "id": "str_1787716225406",
       "name": "tessss",
-      "status": "LIVE",
+      "status": "OFFLINE",
       "channelName": "tessss Channel",
       "playlistName": "HOTEL NADA AJYAD - MUTAMTOUR.mp4",
       "resolution": "720p",
@@ -21,7 +21,7 @@
       "backupMediaId": "",
       "maxDurationHours": 0,
       "enableOverlay": false,
-      "manualStop": false
+      "manualStop": true
     }
   ],
   "media": [
@@ -72,6 +72,62 @@
     }
   ],
   "logs": [
+    {
+      "id": "log_1788348055260_qhnd",
+      "timestamp": "2026-09-02T11:20:55.261Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 1"
+    },
+    {
+      "id": "log_1788348051133_d8k2",
+      "timestamp": "2026-09-02T11:20:51.133Z",
+      "level": "info",
+      "source": "system",
+      "message": "Stream \"tessss\" stopped by user (manualStop=true)."
+    },
+    {
+      "id": "log_1788348025768_hjlo",
+      "timestamp": "2026-09-02T11:20:25.777Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Stream mapping:\r\n  Stream #0:0 -> #0:0 (h264 (native) -> h264 (libx264))\r\n  Stream #0:1 -> #0:1 (aac (native) -> aac (native))\r\nPress [q] to stop, [?]"
+    },
+    {
+      "id": "log_1788348024687_qlny",
+      "timestamp": "2026-09-02T11:20:24.687Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] Fontconfig error: Cannot load default config file: No such file: (null)\r\n"
+    },
+    {
+      "id": "log_1788348023462_hk2e",
+      "timestamp": "2026-09-02T11:20:23.462Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788348023432_o2th",
+      "timestamp": "2026-09-02T11:20:23.432Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788347912821_xkgq",
+      "timestamp": "2026-09-02T11:18:32.821Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 1"
+    },
+    {
+      "id": "log_1788347911851_t85v",
+      "timestamp": "2026-09-02T11:18:31.855Z",
+      "level": "info",
+      "source": "system",
+      "message": "Stream \"tessss\" stopped by user (manualStop=true)."
+    },
     {
       "id": "log_1788347822283_40ci",
       "timestamp": "2026-09-02T11:17:02.284Z",
@@ -1415,62 +1471,6 @@
       "level": "info",
       "source": "watchdog",
       "message": "[Watchdog] Stream \"tessss\" is stable (>90s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788346663111_ijm0",
-      "timestamp": "2026-09-02T10:57:43.111Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
-    },
-    {
-      "id": "log_1788346663052_m1ha",
-      "timestamp": "2026-09-02T10:57:43.052Z",
-      "level": "info",
-      "source": "stream",
-      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
-    },
-    {
-      "id": "log_1788346651376_y22n",
-      "timestamp": "2026-09-02T10:57:31.376Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Synced stream \"tessss\" status to LIVE (Process is active)."
-    },
-    {
-      "id": "log_1788346648154_vyox",
-      "timestamp": "2026-09-02T10:57:28.154Z",
-      "level": "warn",
-      "source": "watchdog",
-      "message": "[Watchdog Auto-Healing] \"tessss\" (Exited with code 4294967274). Reconnecting in 10s (Attempt #1/3)..."
-    },
-    {
-      "id": "log_1788346647717_owpr",
-      "timestamp": "2026-09-02T10:57:27.717Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
-    },
-    {
-      "id": "log_1788346647045_pite",
-      "timestamp": "2026-09-02T10:57:27.045Z",
-      "level": "warn",
-      "source": "ffmpeg",
-      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
-    },
-    {
-      "id": "log_1788346643954_h3yh",
-      "timestamp": "2026-09-02T10:57:23.954Z",
-      "level": "info",
-      "source": "watchdog",
-      "message": "[Watchdog] Stream \"tessss\" is stable (>30s). Reset recovery counter to 0."
-    },
-    {
-      "id": "log_1788346643212_jcta",
-      "timestamp": "2026-09-02T10:57:23.212Z",
-      "level": "info",
-      "source": "ffmpeg",
-      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
     }
   ],
   "settings": {

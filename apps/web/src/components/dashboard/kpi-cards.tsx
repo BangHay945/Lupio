@@ -20,12 +20,12 @@ function MiniBar({ value, max, color }: { value: number; max: number; color: str
 export function KPICards({ metrics }: KPICardsProps) {
   if (!metrics) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <div className="col-span-2 sm:col-span-2 rounded-xl border border-white/10 bg-card/40 p-5 h-[110px] animate-pulse flex flex-col justify-between">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="col-span-2 lg:col-span-2 rounded-xl border border-white/10 bg-card/40 p-5 h-[110px] animate-pulse flex flex-col justify-between">
           <div className="h-3 w-20 bg-white/10 rounded" />
           <div className="h-8 w-32 bg-white/10 rounded" />
         </div>
-        {[1, 2, 3].map((i) => (
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="rounded-xl border border-white/10 bg-card/40 p-5 h-[110px] animate-pulse flex flex-col justify-between">
             <div className="h-3 w-12 bg-white/10 rounded" />
             <div className="h-7 w-20 bg-white/10 rounded" />
@@ -38,9 +38,10 @@ export function KPICards({ metrics }: KPICardsProps) {
   const cpuColor = metrics.cpuUsage > 80 ? "bg-red-500" : metrics.cpuUsage > 60 ? "bg-amber-500" : "bg-emerald-500";
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-      {/* Live Streams — spans 2 cols on all breakpoints */}
-      <div className="col-span-2 sm:col-span-2 relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-card p-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+
+      {/* Live Streams — spans 2 cols */}
+      <div className="col-span-2 relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-card p-5">
         <div className="absolute right-2 top-2 h-20 w-20 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">Live Now</span>
@@ -57,7 +58,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       </div>
 
       {/* CPU */}
-      <div className="rounded-2xl border border-white/10 bg-card p-6">
+      <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">CPU</span>
           <Cpu className="h-3.5 w-3.5 text-muted-foreground" />
@@ -67,7 +68,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       </div>
 
       {/* RAM */}
-      <div className="rounded-2xl border border-white/10 bg-card p-6">
+      <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">RAM</span>
           <Zap className="h-3.5 w-3.5 text-violet-400" />
@@ -77,7 +78,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       </div>
 
       {/* Storage */}
-      <div className="rounded-2xl border border-white/10 bg-card p-6">
+      <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Storage</span>
           <HardDrive className="h-3.5 w-3.5 text-sky-400" />
@@ -86,8 +87,8 @@ export function KPICards({ metrics }: KPICardsProps) {
         <MiniBar value={metrics.storageUsed} max={metrics.storageTotal} color="bg-sky-500" />
       </div>
 
-      {/* Upload Bandwidth */}
-      <div className="rounded-2xl border border-white/10 bg-card p-6">
+      {/* Bandwidth */}
+      <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Bandwidth</span>
           <Network className="h-3.5 w-3.5 text-emerald-400" />
@@ -95,6 +96,7 @@ export function KPICards({ metrics }: KPICardsProps) {
         <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.uploadBandwidth}<span className="text-sm font-normal text-muted-foreground"> Mbps</span></p>
         <MiniBar value={metrics.uploadBandwidth} max={50} color="bg-emerald-500" />
       </div>
+
     </div>
   );
 }
