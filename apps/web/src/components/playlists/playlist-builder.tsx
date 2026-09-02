@@ -19,13 +19,14 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Playlist, mockMedia, MediaItem } from "@/lib/mock-data";
+import { Playlist, MediaItem } from "@/lib/mock-data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Plus, GripVertical, Trash2, Save, FileVideo, Clock, ListVideo } from "lucide-react";
 import { toast } from "@/components/ui/toast";
 import { apiService } from "@/lib/services/api";
+import { CustomSelect } from "@/components/ui/select";
 
 interface PlaylistBuilderProps {
   initialPlaylist?: Playlist;
@@ -128,7 +129,9 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
   const router = useRouter();
   const [name, setName] = useState(initialPlaylist?.name || "New Playlist");
   const [playlistItems, setPlaylistItems] = useState<MediaItem[]>(initialPlaylist?.mediaItems || []);
-  const [availableMedia, setAvailableMedia] = useState<MediaItem[]>(mockMedia);
+  const [transitionEffect, setTransitionEffect] = useState<string>(initialPlaylist?.transitionEffect || "full");
+  const [availableMedia, setAvailableMedia] = useState<MediaItem[]>([]);
+  const [isLoadingMedia, setIsLoadingMedia] = useState(true);
   const [search, setSearch] = useState("");
 
   const sensors = useSensors(
@@ -145,10 +148,13 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
   useEffect(() => {
     async function loadMedia() {
       try {
+        setIsLoadingMedia(true);
         const real = await apiService.getMedia();
-        if (Array.isArray(real) && real.length > 0) setAvailableMedia(real);
+        if (Array.isArray(real)) setAvailableMedia(real);
       } catch (e) {
         console.error(e);
+      } finally {
+        setIsLoadingMedia(false);
       }
     }
     loadMedia();
@@ -195,20 +201,39 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
     }
   };
 
+  const calculateTotalDuration = (items: MediaItem[]): string => {
+    let totalSec = 0;
+    for (const item of items) {
+      if (!item.duration) continue;
+      const parts = item.duration.split(":").map((p) => parseInt(p, 10));
+      if (parts.some(isNaN)) continue;
+      if (parts.length === 3) totalSec += parts[0] * 3600 + parts[1] * 60 + parts[2];
+      else if (parts.length === 2) totalSec += parts[0] * 60 + parts[1];
+    }
+    if (totalSec <= 0) return "00:00:00";
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = Math.floor(totalSec % 60);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `00:${pad(m)}:${pad(s)}`;
+  };
+
   const handleSave = async () => {
     try {
+      const computedDuration = calculateTotalDuration(playlistItems);
       await apiService.savePlaylist({
         id: initialPlaylist?.id,
         name,
         mediaItems: playlistItems,
         itemCount: playlistItems.length,
-        totalDuration: `${playlistItems.length * 15}m`,
+        totalDuration: computedDuration,
+        transitionEffect,
         createdAt: new Date().toISOString().split("T")[0],
       });
 
       (toast as any)({
         title: "Playlist Saved",
-        description: `"${name}" saved to database.`,
+        description: `"${name}" (${playlistItems.length} tracks, ${computedDuration}) saved with ${transitionEffect} transition.`,
         type: "success",
       });
       router.push("/playlists");
@@ -236,8 +261,14 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto p-0 px-4 pb-4">
           <div className="space-y-2">
-            {filteredMedia.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-4">No available media found.</p>
+            {isLoadingMedia ? (
+              <p className="text-sm text-muted-foreground text-center py-6 animate-pulse">Loading media library...</p>
+            ) : filteredMedia.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-6">
+                {availableMedia.length === 0
+                  ? "No media uploaded yet. Go to Media Library to upload files."
+                  : "No media found matching your search."}
+              </p>
             ) : (
               filteredMedia.map((item) => (
                 <div
@@ -282,11 +313,28 @@ export function PlaylistBuilder({ initialPlaylist }: PlaylistBuilderProps) {
               onChange={(e) => setName(e.target.value)}
               className="text-lg font-semibold bg-transparent border-t-0 border-x-0 border-b-2 rounded-none px-0 focus-visible:ring-0 focus-visible:border-primary"
             />
-            <CardDescription className="flex items-center gap-2 mt-2">
-              <span>{playlistItems.length} items</span>
-              <span>•</span>
-              <span>Total Duration: ~{playlistItems.length * 45} mins</span>
-            </CardDescription>
+            <div className="flex flex-wrap items-center gap-3 mt-2">
+              <CardDescription className="flex items-center gap-2">
+                <span>{playlistItems.length} items</span>
+                <span>•</span>
+                <span>Total Duration: {calculateTotalDuration(playlistItems)}</span>
+              </CardDescription>
+
+              <div className="flex items-center gap-2 ml-auto min-w-[220px]">
+                <span className="text-[11px] font-semibold text-muted-foreground uppercase shrink-0">Transition:</span>
+                <CustomSelect
+                  value={transitionEffect}
+                  onChange={setTransitionEffect}
+                  triggerClassName="h-9 px-3 text-xs rounded-xl"
+                  options={[
+                    { value: "full", label: "🌟 Smooth Blend (Video & Audio Fade)" },
+                    { value: "fade", label: "🎬 Video Black Fade (1.0s)" },
+                    { value: "crossfade", label: "🎵 Soft Audio Crossfade" },
+                    { value: "none", label: "⚡ Direct Cut (Instant)" },
+                  ]}
+                />
+              </div>
+            </div>
           </div>
           <Button onClick={handleSave} className="shrink-0 bg-primary text-primary-foreground">
             <Save className="mr-2 h-4 w-4" /> Save Playlist

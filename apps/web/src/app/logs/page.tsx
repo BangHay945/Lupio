@@ -108,24 +108,24 @@ export default function LogsPage() {
 
   return (
     <div className="flex flex-col gap-4 h-[calc(100vh-6rem)] w-full">
-      <div className="flex items-center justify-end gap-2 shrink-0">
+      <div className="flex items-center justify-end gap-3 shrink-0">
         <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-lg text-xs font-semibold transition-colors border border-white/10 bg-transparent px-3 py-1.5 text-foreground hover:bg-black/5 dark:hover:bg-white/10">
+          <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-xs font-bold transition-colors border border-white/10 bg-transparent h-10 px-5 text-foreground hover:bg-black/5 dark:hover:bg-white/10">
             <Filter className="mr-2 h-3.5 w-3.5 text-emerald-400" />
             {filter === "all" ? "All Logs" : filter === "error" ? "Errors Only" : "Warnings Only"}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950">
-            <DropdownMenuItem onClick={() => setFilter("all")} className="cursor-pointer text-xs">All Logs</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter("error")} className="cursor-pointer text-xs">Errors Only</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter("warn")} className="cursor-pointer text-xs">Warnings Only</DropdownMenuItem>
+          <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 rounded-2xl p-1.5">
+            <DropdownMenuItem onClick={() => setFilter("all")} className="cursor-pointer text-xs rounded-xl">All Logs</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilter("error")} className="cursor-pointer text-xs rounded-xl">Errors Only</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilter("warn")} className="cursor-pointer text-xs rounded-xl">Warnings Only</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="outline" size="sm" onClick={handleDownload} className="h-8 border-white/10 bg-transparent text-xs text-foreground hover:bg-black/5 dark:hover:bg-white/10 rounded-lg">
-          <Download className="mr-1.5 h-3.5 w-3.5 text-emerald-400" /> Download
+        <Button variant="outline" onClick={handleDownload} className="h-10 px-5 border-white/10 bg-transparent text-xs font-bold text-foreground hover:bg-black/5 dark:hover:bg-white/10 rounded-full">
+          <Download className="mr-2 h-3.5 w-3.5 text-emerald-400" /> Download
         </Button>
-        <Button variant="destructive" size="sm" onClick={handleClear} className="h-8 text-xs rounded-lg font-semibold">
-          <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Clear
+        <Button variant="destructive" onClick={handleClear} className="h-10 px-5 text-xs rounded-full font-bold">
+          <Trash2 className="mr-2 h-3.5 w-3.5" /> Clear
         </Button>
       </div>
 

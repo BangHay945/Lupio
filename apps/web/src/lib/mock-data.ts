@@ -54,6 +54,7 @@ export interface Playlist {
   totalDuration: string;
   createdAt?: string;
   mediaItems?: MediaItem[];
+  transitionEffect?: string;
 }
 
 export interface Channel {

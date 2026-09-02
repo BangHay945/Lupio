@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
 import fs from "fs";
+import path from "path";
 
 export async function DELETE(
   req: Request,
@@ -15,6 +16,16 @@ export async function DELETE(
       fs.unlinkSync(item.filepath);
     } catch (e) {
       console.error("Failed to delete media file from disk:", e);
+    }
+  }
+
+  // Delete thumbnail file if present
+  const thumbPath = path.join(process.cwd(), "uploads", "thumbnails", `${id}.jpg`);
+  if (fs.existsSync(thumbPath)) {
+    try {
+      fs.unlinkSync(thumbPath);
+    } catch (e) {
+      // ignore
     }
   }
 

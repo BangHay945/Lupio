@@ -107,6 +107,13 @@ export function Topbar({
     if (saved) {
       setTheme(saved);
       document.documentElement.setAttribute("data-theme", saved);
+      if (saved === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
+      }
     }
   }, []);
 
@@ -115,6 +122,13 @@ export function Topbar({
     setTheme(nextTheme);
     localStorage.setItem("lupio_theme", nextTheme);
     document.documentElement.setAttribute("data-theme", nextTheme);
+    if (nextTheme === "light") {
+      document.documentElement.classList.add("light");
+      document.documentElement.classList.remove("dark");
+    } else {
+      document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
+    }
     (toast as any)({
       title: `${nextTheme === "dark" ? "Dark Mode 🌙" : "Light Mode ☀️"}`,
       description: `Switched app theme to ${nextTheme}.`,
@@ -156,25 +170,25 @@ export function Topbar({
 
   return (
     <>
-      <header className="flex h-11 shrink-0 items-center justify-between gap-4 px-4 border-b border-white/10 bg-transparent">
+      <header className="flex h-14 shrink-0 items-center justify-between gap-4 px-6 border-b border-white/10 bg-transparent">
         {/* Left — Panel Toggle + Separator + Title */}
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-3.5 min-w-0">
           <button
             onClick={onToggleSidebar}
             title="Toggle Sidebar"
-            className="flex h-7 w-7 items-center justify-center rounded-lg hover:bg-white/10 text-white/70 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-full hover:bg-white/10 text-white/70 transition-colors"
           >
             <PanelLeft className="h-4 w-4" />
           </button>
 
-          <div className="h-4 w-px bg-white/10 shrink-0" />
+          <div className="h-5 w-px bg-white/10 shrink-0" />
 
-          <div className="flex items-baseline gap-2 min-w-0">
-            <h1 className="text-xs font-bold text-foreground leading-none tracking-tight truncate">
+          <div className="flex items-baseline gap-2.5 min-w-0">
+            <h1 className="text-sm font-bold text-foreground leading-none tracking-tight truncate">
               {meta.title}
             </h1>
             {meta.sub && (
-              <span className="hidden sm:inline text-[11px] text-white/30 truncate">— {meta.sub}</span>
+              <span className="hidden sm:inline text-xs text-white/40 truncate">— {meta.sub}</span>
             )}
           </div>
         </div>
@@ -184,48 +198,48 @@ export function Topbar({
           {/* Network Bandwidth Indicator */}
           <div
             title="Dynamic Live Upload Throughput"
-            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-white/10 bg-transparent px-2.5 py-1"
+            className="hidden sm:flex items-center gap-2 rounded-full border border-white/10 bg-transparent px-3.5 py-1.5"
           >
-            <Wifi className="h-3 w-3 text-emerald-400" />
-            <span className="text-[11px] font-semibold text-foreground font-mono">{bandwidth} Mbps</span>
+            <Wifi className="h-3.5 w-3.5 text-emerald-400" />
+            <span className="text-xs font-semibold text-foreground font-mono">{bandwidth} Mbps</span>
           </div>
 
           {/* Theme Dark/Light Toggle */}
           <button
             onClick={toggleTheme}
             title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
-            className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-transparent text-foreground transition-colors hover:bg-white/10"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-transparent text-foreground transition-colors hover:bg-white/10"
           >
-            {theme === "dark" ? <Sun className="h-3.5 w-3.5 text-amber-400" /> : <Moon className="h-3.5 w-3.5 text-blue-500" />}
+            {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-blue-500" />}
           </button>
 
           {/* Notifications Dropdown */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="relative flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-transparent text-foreground transition-colors hover:bg-white/10">
-              <Bell className="h-3.5 w-3.5" />
+            <DropdownMenuTrigger className="relative flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-transparent text-foreground transition-colors hover:bg-white/10">
+              <Bell className="h-4 w-4" />
               {recentLogs.length > 0 && (
-                <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               )}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 border-white/10 bg-zinc-950 p-2">
+            <DropdownMenuContent align="end" className="w-80 border-white/10 bg-zinc-950 p-2 rounded-2xl">
               <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground flex items-center justify-between">
                 <span>Notification Center</span>
-                <div className="flex items-center gap-1 bg-white/5 p-0.5 rounded-md border border-white/10 text-[10px]">
+                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 text-[10px]">
                   <button
                     onClick={(e) => { e.stopPropagation(); setLogFilter("all"); }}
-                    className={`px-1.5 py-0.5 rounded font-medium ${logFilter === "all" ? "bg-emerald-500/20 text-emerald-400" : "text-muted-foreground"}`}
+                    className={`px-2.5 py-0.5 rounded-full font-medium ${logFilter === "all" ? "bg-emerald-500/20 text-emerald-400" : "text-muted-foreground"}`}
                   >
                     All
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setLogFilter("warn"); }}
-                    className={`px-1.5 py-0.5 rounded font-medium ${logFilter === "warn" ? "bg-amber-500/20 text-amber-400" : "text-muted-foreground"}`}
+                    className={`px-2.5 py-0.5 rounded-full font-medium ${logFilter === "warn" ? "bg-amber-500/20 text-amber-400" : "text-muted-foreground"}`}
                   >
                     Warn
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); setLogFilter("error"); }}
-                    className={`px-1.5 py-0.5 rounded font-medium ${logFilter === "error" ? "bg-red-500/20 text-red-400" : "text-muted-foreground"}`}
+                    className={`px-2.5 py-0.5 rounded-full font-medium ${logFilter === "error" ? "bg-red-500/20 text-red-400" : "text-muted-foreground"}`}
                   >
                     Err
                   </button>
@@ -240,7 +254,7 @@ export function Topbar({
                   recentLogs
                     .filter(l => logFilter === "all" || l.level === logFilter)
                     .map((log, idx) => (
-                      <div key={log.id || idx} className="p-2 rounded-lg bg-white/[0.02] border border-white/5 space-y-1">
+                      <div key={log.id || idx} className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-1">
                         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
                           <span className={`font-semibold uppercase ${log.level === "error" ? "text-red-400" : log.level === "warn" ? "text-amber-400" : "text-emerald-400"}`}>
                             {log.source || "System"}
@@ -265,7 +279,7 @@ export function Topbar({
 
           {/* Admin Avatar Profile Dropdown */}
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400 text-[11px] font-bold transition-colors hover:bg-emerald-500/25 border border-emerald-500/20">
+            <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold transition-colors hover:bg-emerald-500/25 border border-emerald-500/20">
               {userInitials}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-60 border-white/10 bg-zinc-950 p-1.5">
@@ -305,7 +319,7 @@ export function Topbar({
 
       {/* Quick Edit Profile Modal Dialog */}
       <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-zinc-950 border border-white/10 p-6 rounded-2xl">
+        <DialogContent className="sm:max-w-[420px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
           <DialogHeader>
             <DialogTitle className="text-base font-bold flex items-center gap-2">
               <UserCheck className="h-4 w-4 text-emerald-400" /> Edit Admin Profile

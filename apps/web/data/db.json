@@ -3,14 +3,14 @@
     {
       "id": "str_1787716225406",
       "name": "tessss",
-      "status": "OFFLINE",
+      "status": "ERROR",
       "channelName": "agent@avachat.id",
       "playlistName": "Single File",
       "resolution": "720p",
       "fps": 30,
       "bitrate": "4000 Kbps",
       "uptime": "0m",
-      "restartCount": 2,
+      "restartCount": 4,
       "currentVideo": "Initializing...",
       "channelId": "ch_1787720713885"
     }
@@ -81,6 +81,111 @@
     }
   ],
   "logs": [
+    {
+      "id": "log_1788259439094_p2u9",
+      "timestamp": "2026-09-01T10:43:59.094Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788259438880_rs4d",
+      "timestamp": "2026-09-01T10:43:58.880Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788259438676_cpnq",
+      "timestamp": "2026-09-01T10:43:58.676Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788259438596_6t36",
+      "timestamp": "2026-09-01T10:43:58.596Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "FFmpeg process for \"tessss\" exited with code 4294967274"
+    },
+    {
+      "id": "log_1788259437539_2vjt",
+      "timestamp": "2026-09-01T10:43:57.539Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss]  [Eval @ 00000018777fe8d0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001b921f66040] Unable to parse option value \"4000 K"
+    },
+    {
+      "id": "log_1788259437331_qbxa",
+      "timestamp": "2026-09-01T10:43:57.331Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] [libx264 @ 000001fdc11e6040] [Eval @ 000000eb165fe8d0] Invalid chars 'bps' at the end of expression '4000 Kbps'\r\n[libx264 @ 000001fdc11e6040] Unable t"
+    },
+    {
+      "id": "log_1788259436658_uqcx",
+      "timestamp": "2026-09-01T10:43:56.658Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ontconfig error: Cannot load default config "
+    },
+    {
+      "id": "log_1788259436569_gokm",
+      "timestamp": "2026-09-01T10:43:56.570Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ontconfig error: Cannot"
+    },
+    {
+      "id": "log_1788259356195_81xq",
+      "timestamp": "2026-09-01T10:42:36.196Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788259356038_oaay",
+      "timestamp": "2026-09-01T10:42:36.038Z",
+      "level": "warn",
+      "source": "ffmpeg",
+      "message": "[tessss] ffmpeg version 6.1.1-essentials_build-www.gyan.dev Copyright (c) 2000-2023 the FFmpeg developers\r\n  built with gcc 12.2.0 (Rev10, Built by MSYS2 proje"
+    },
+    {
+      "id": "log_1788259354421_4yga",
+      "timestamp": "2026-09-01T10:42:34.421Z",
+      "level": "error",
+      "source": "watchdog",
+      "message": "[Watchdog Critical] Stream \"tessss\" exceeded maximum recovery attempts (3). Marking ERROR."
+    },
+    {
+      "id": "log_1788259354118_c0y0",
+      "timestamp": "2026-09-01T10:42:34.118Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788259354100_k2au",
+      "timestamp": "2026-09-01T10:42:34.100Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
+    {
+      "id": "log_1788259339595_mmp3",
+      "timestamp": "2026-09-01T10:42:19.595Z",
+      "level": "info",
+      "source": "ffmpeg",
+      "message": "Initiating FFmpeg process (C:\\LUPIO\\apps\\web\\node_modules\\ffmpeg-static\\ffmpeg.exe) for \"tessss\" [EBU R128: ON]"
+    },
+    {
+      "id": "log_1788259339579_5bww",
+      "timestamp": "2026-09-01T10:42:19.579Z",
+      "level": "info",
+      "source": "stream",
+      "message": "[Transition Engine] Stream \"tessss\" activated with \"full\" smooth broadcast transition."
+    },
     {
       "id": "log_1787917922801_y5nr",
       "timestamp": "2026-08-28T11:52:02.801Z",

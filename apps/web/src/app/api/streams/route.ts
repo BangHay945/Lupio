@@ -15,13 +15,20 @@ export async function POST(req: Request) {
       name: body.name || "New Stream",
       status: body.scheduleType === "now" ? ("STARTING" as const) : ("SCHEDULED" as const),
       channelName: body.channelName || "YouTube Live",
+      channelId: body.channelId,
       playlistName: body.playlistName || "Default Playlist",
+      playlistId: body.playlistId,
       resolution: body.resolution || "1080p",
       fps: parseInt(body.fps) || 30,
-      bitrate: `${body.videoBitrate || 8000} Kbps`,
+      bitrate: `${body.videoBitrate || body.bitrate || 8000} Kbps`,
       uptime: "0m",
       restartCount: 0,
       currentVideo: "Initializing...",
+      transitionEffect: body.transitionEffect || "none",
+      multiChannelIds: body.multiChannelIds,
+      watermarkText: body.watermarkText,
+      tickerText: body.tickerText,
+      backupMediaId: body.backupMediaId,
     };
 
     db.saveStream(newStream);

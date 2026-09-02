@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="flex h-screen w-screen overflow-hidden bg-background p-2 pb-0 gap-2">
+      <div className="flex h-screen w-screen overflow-hidden bg-background p-3 pb-0 gap-3">
         {/* Left Floating Card Sidebar */}
         <Sidebar collapsed={collapsed} />
 
@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             onToggleSidebar={() => setCollapsed(!collapsed)} 
             sidebarCollapsed={collapsed} 
           />
-          <main className="flex-1 overflow-y-auto p-6 bg-black">
+          <main className="flex-1 overflow-y-auto py-6 px-4 md:px-6 bg-black">
             {children}
           </main>
         </div>

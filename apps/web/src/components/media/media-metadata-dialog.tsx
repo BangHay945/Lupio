@@ -106,7 +106,7 @@ export function MediaMetadataDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !saving && onOpenChange(val)}>
-      <DialogContent className="sm:max-w-[540px] bg-zinc-950 border border-white/10 p-6 rounded-2xl shadow-2xl">
+      <DialogContent className="sm:max-w-[540px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
         <form onSubmit={handleSave} className="flex flex-col gap-5">
           <DialogHeader className="gap-1">
             <DialogTitle className="text-xl font-bold flex items-center gap-2">

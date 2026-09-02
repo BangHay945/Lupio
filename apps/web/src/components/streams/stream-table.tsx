@@ -6,11 +6,15 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Stream } from "@/lib/mock-data";
+import { Stream, ScheduleRule, Playlist } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
-import { Search, Settings, Play, Square, RotateCcw, MoreHorizontal, Radio, Trash2, Plus, Pencil, LayoutGrid, List, ListFilter } from "lucide-react";
+import { 
+  Search, Settings, Play, Square, RotateCcw, MoreHorizontal, Radio, 
+  Trash2, Plus, Pencil, LayoutGrid, List, ListFilter, Clock, Calendar, 
+  RotateCw, ShieldCheck, Film, CheckCircle2 
+} from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -18,6 +22,8 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { toast } from "@/components/ui/toast";
 import { CreateStreamDialog } from "@/components/streams/create-stream-dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { CustomSelect } from "@/components/ui/select";
 import { apiService } from "@/lib/services/api";
 
 interface StreamTableProps {
@@ -26,12 +32,26 @@ interface StreamTableProps {
 
 export function StreamTable({ streams }: StreamTableProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "schedule" ? "schedule" : "streams";
+
+  const [mainTab, setMainTab] = useState<"streams" | "schedule">(initialTab);
   const [search, setSearch] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "table">("table");
   const [localStreams, setLocalStreams] = useState<Stream[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [scheduleRules, setScheduleRules] = useState<ScheduleRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingStream, setEditingStream] = useState<Stream | null>(null);
+
+  // Time Rule Modal State
+  const [ruleModalOpen, setRuleModalOpen] = useState(false);
+  const [ruleStartTime, setRuleStartTime] = useState("08:00");
+  const [ruleEndTime, setRuleEndTime] = useState("18:00");
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState("");
+  const [savingRule, setSavingRule] = useState(false);
+
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     type: "stop" | "restart" | "delete" | null;
@@ -39,11 +59,20 @@ export function StreamTable({ streams }: StreamTableProps) {
     streamName: string;
   }>({ open: false, type: null, streamId: null, streamName: "" });
 
-  const loadStreams = async () => {
+  const loadData = async () => {
     if (typeof document !== "undefined" && document.hidden) return;
     try {
-      const real = await apiService.getStreams();
-      if (Array.isArray(real)) setLocalStreams(real);
+      const [stData, plData, ruleData] = await Promise.all([
+        apiService.getStreams(),
+        apiService.getPlaylists(),
+        apiService.getScheduleRules(),
+      ]);
+      if (Array.isArray(stData)) setLocalStreams(stData);
+      if (Array.isArray(plData)) {
+        setPlaylists(plData);
+        if (plData.length > 0 && !selectedPlaylistId) setSelectedPlaylistId(plData[0].id);
+      }
+      if (Array.isArray(ruleData)) setScheduleRules(ruleData);
     } catch (e) {
       console.error(e);
     } finally {
@@ -52,10 +81,10 @@ export function StreamTable({ streams }: StreamTableProps) {
   };
 
   useEffect(() => {
-    loadStreams();
+    loadData();
     const hasLive = localStreams.some(s => s.status === "LIVE" || s.status === "STARTING" || s.status === "RESTARTING");
     const intervalTime = hasLive ? 3000 : 8000;
-    const interval = setInterval(loadStreams, intervalTime);
+    const interval = setInterval(loadData, intervalTime);
     return () => clearInterval(interval);
   }, [localStreams.map(s => s.status).join(",")]);
 
@@ -87,6 +116,48 @@ export function StreamTable({ streams }: StreamTableProps) {
     }
   };
 
+  const handleCreateRule = async () => {
+    if (!selectedPlaylistId) {
+      (toast as any)({ title: "Validation Error", description: "Please select a target playlist.", type: "error" });
+      return;
+    }
+
+    setSavingRule(true);
+    try {
+      const pl = playlists.find((p) => p.id === selectedPlaylistId);
+      const newRule = await apiService.saveScheduleRule({
+        streamName: "All Streams",
+        startTime: ruleStartTime,
+        endTime: ruleEndTime,
+        playlistId: selectedPlaylistId,
+        playlistName: pl?.name || "Target Playlist",
+        active: true,
+      });
+
+      setScheduleRules((prev) => [...prev, newRule]);
+      (toast as any)({
+        title: "Rule Created! ⏰",
+        description: `Auto-switch to "${pl?.name}" at ${ruleStartTime}-${ruleEndTime}.`,
+        type: "success",
+      });
+      setRuleModalOpen(false);
+    } catch (err: any) {
+      (toast as any)({ title: "Error", description: err.message, type: "error" });
+    } finally {
+      setSavingRule(false);
+    }
+  };
+
+  const handleDeleteRule = async (id: string) => {
+    try {
+      await apiService.deleteScheduleRule(id);
+      setScheduleRules((prev) => prev.filter((r) => r.id !== id));
+      (toast as any)({ title: "Rule Deleted", description: "Schedule rule removed.", type: "info" });
+    } catch (err: any) {
+      (toast as any)({ title: "Error", description: err.message, type: "error" });
+    }
+  };
+
   const confirmConfig: Record<"stop" | "restart" | "delete", { title: string; description: string; label: string; variant: "destructive" | "default" }> = {
     stop: {
       title: "Stop Stream",
@@ -111,50 +182,85 @@ export function StreamTable({ streams }: StreamTableProps) {
   const cfg = confirmDialog.type ? confirmConfig[confirmDialog.type] : null;
 
   return (
-    <div className="space-y-4 w-full">
-      {/* Search + View Toggle + Create */}
-      <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2">
-          <div className="relative w-64">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search streams..."
-              className="pl-8 text-xs"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
-
-          {/* Grid / Table View Switcher (Matches Schedule Page Tab Bar 100%) */}
-          <div className="pill-tab-switcher flex items-center p-1 rounded-xl border border-slate-300 dark:border-white/10 bg-transparent text-xs">
-            <button
-              onClick={() => setViewMode("table")}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all text-xs",
-                viewMode === "table" ? "bg-emerald-500/20 text-emerald-400 font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <ListFilter className="h-3.5 w-3.5" /> Table View
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all text-xs",
-                viewMode === "grid" ? "bg-emerald-500/20 text-emerald-400 font-bold shadow-xs" : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" /> Grid View
-            </button>
-          </div>
+    <div className="space-y-6 w-full pb-12">
+      {/* Top Main Mode Tab Switcher — Streams vs 24/7 Schedule */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="pill-tab-switcher flex items-center p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs">
+          <button
+            onClick={() => setMainTab("streams")}
+            className={cn(
+              "flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all text-xs",
+              mainTab === "streams" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
+            )}
+          >
+            <Radio className="h-4 w-4" /> Live & Broadcasts ({localStreams.length})
+          </button>
+          <button
+            onClick={() => setMainTab("schedule")}
+            className={cn(
+              "flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all text-xs",
+              mainTab === "schedule" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
+            )}
+          >
+            <Clock className="h-4 w-4" /> 24/7 Schedule & Planner ({scheduleRules.length})
+          </button>
         </div>
 
-        <Button
-          onClick={() => setIsCreateOpen(true)}
-          className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold gap-1.5 rounded-lg px-4 shadow-lg shadow-emerald-500/10 text-xs"
-        >
-          <Plus className="h-4 w-4" /> Create Stream
-        </Button>
+        <div className="flex items-center gap-3">
+          {mainTab === "schedule" && (
+            <Button
+              onClick={() => setRuleModalOpen(true)}
+              variant="outline"
+              className="font-bold gap-2 text-xs border-white/15 bg-white/5 hover:bg-white/10 rounded-full h-10 px-5"
+            >
+              <Clock className="h-4 w-4 text-emerald-400" /> Add Time Rule
+            </Button>
+          )}
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
+          >
+            <Plus className="h-4 w-4 fill-black" /> Create Stream
+          </Button>
+        </div>
       </div>
+
+      {/* TAB 1: ALL STREAMS VIEW */}
+      {mainTab === "streams" && (
+        <div className="space-y-4">
+          {/* Sub-controls: Search + Table/Grid View Switcher */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="relative w-64">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search streams or channels..."
+                className="pl-9 pr-4 bg-card/60 border-white/10 rounded-full h-10.5 text-xs"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+
+            <div className="pill-tab-switcher flex items-center p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs">
+              <button
+                onClick={() => setViewMode("table")}
+                className={cn(
+                  "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all text-xs",
+                  viewMode === "table" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
+                )}
+              >
+                <List className="h-3.5 w-3.5" /> Table View
+              </button>
+              <button
+                onClick={() => setViewMode("grid")}
+                className={cn(
+                  "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all text-xs",
+                  viewMode === "grid" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
+                )}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" /> Grid View
+              </button>
+            </div>
+          </div>
 
       {/* Main Content Area */}
       {loading ? (
@@ -285,7 +391,7 @@ export function StreamTable({ streams }: StreamTableProps) {
                     setLocalStreams(prev => prev.map(s => s.id === stream.id ? { ...s, status: "STARTING" as const } : s));
                     (toast as any)({ title: "Stream Starting", description: `"${stream.name}" is starting…`, type: "success" });
                   }}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-xl text-xs"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 text-xs shadow-md shadow-emerald-500/10"
                 >
                   <Play className="h-3.5 w-3.5 fill-black" /> Start Stream Now
                 </Button>
@@ -293,7 +399,7 @@ export function StreamTable({ streams }: StreamTableProps) {
                 <Button
                   onClick={() => router.push(`/streams/${stream.id}`)}
                   variant="outline"
-                  className="w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold gap-2 rounded-xl text-xs"
+                  className="w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold gap-2 rounded-full h-10 text-xs"
                 >
                   <Settings className="h-3.5 w-3.5" /> Manage Live Stream
                 </Button>
@@ -303,7 +409,7 @@ export function StreamTable({ streams }: StreamTableProps) {
         </div>
       ) : (
         /* TABLE VIEW LAYOUT */
-        <div className="rounded-xl border border-white/10 bg-card overflow-hidden">
+        <div className="rounded-2xl border border-white/10 bg-card overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow className="border-white/[0.07] hover:bg-transparent">
@@ -329,7 +435,7 @@ export function StreamTable({ streams }: StreamTableProps) {
                   <TableCell className="text-muted-foreground text-sm">{stream.uptime}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="inline-flex items-center justify-center h-8 w-8 rounded-lg border border-white/[0.07] bg-white/[0.03] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground transition-colors">
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center h-8.5 w-8.5 rounded-full border border-white/[0.07] bg-white/[0.03] text-muted-foreground hover:bg-white/[0.08] hover:text-foreground transition-colors">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
@@ -390,32 +496,276 @@ export function StreamTable({ streams }: StreamTableProps) {
           </Table>
         </div>
       )}
-
-      {/* Confirm Dialog */}
-      {cfg && (
-        <ConfirmDialog
-          open={confirmDialog.open}
-          onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, open }))}
-          title={cfg.title}
-          description={cfg.description}
-          confirmLabel={cfg.label}
-          variant={cfg.variant}
-          onConfirm={handleConfirm}
-        />
-      )}
-
-      {/* Create / Edit Stream Modal Popup */}
-      <CreateStreamDialog
-        open={isCreateOpen}
-        onOpenChange={(open) => {
-          setIsCreateOpen(open);
-          if (!open) setEditingStream(null);
-        }}
-        stream={editingStream}
-        onSuccess={loadStreams}
-      />
     </div>
-  );
+  )}
+
+  {/* TAB 2: 24/7 SCHEDULE & TIMELINE PLANNER VIEW */}
+  {mainTab === "schedule" && (
+    <div className="space-y-6">
+      {/* Summary Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-5 rounded-2xl border border-white/10 bg-card/60 backdrop-blur flex items-center gap-3.5">
+          <div className="p-3 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <Calendar className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-2xl font-black">{localStreams.length}</div>
+            <div className="text-xs text-muted-foreground font-semibold">Configured Streams</div>
+          </div>
+        </div>
+
+        <div className="p-5 rounded-2xl border border-white/10 bg-card/60 backdrop-blur flex items-center gap-3.5">
+          <div className="p-3 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            <RotateCw className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-2xl font-black">{scheduleRules.length} Active</div>
+            <div className="text-xs text-muted-foreground font-semibold">Auto-Switcher Rules</div>
+          </div>
+        </div>
+
+        <div className="p-5 rounded-2xl border border-white/10 bg-card/60 backdrop-blur flex items-center gap-3.5">
+          <div className="p-3 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+            <ShieldCheck className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="text-2xl font-black">100%</div>
+            <div className="text-xs text-muted-foreground font-semibold">Watchdog Auto-Healing</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Smart Time-Based Playlist Auto-Switcher Rules Section */}
+      <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-emerald-400" />
+            <h3 className="text-sm font-bold text-foreground">Smart Time-Based Playlist Auto-Switcher Rules</h3>
+            <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold">
+              Live Engine Active
+            </span>
+          </div>
+          <button
+            onClick={() => setRuleModalOpen(true)}
+            className="text-xs font-bold text-emerald-400 hover:underline flex items-center gap-1"
+          >
+            <Plus className="h-3.5 w-3.5" /> New Time Rule
+          </button>
+        </div>
+
+        {scheduleRules.length === 0 ? (
+          <div className="text-center py-6 text-xs text-muted-foreground">
+            No time rules configured. Click &quot;+ New Time Rule&quot; to automate playlist switching by hour.
+          </div>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 pt-1">
+            {scheduleRules.map((rule) => (
+              <div key={rule.id} className="p-4 rounded-2xl border border-white/10 bg-black/40 flex items-center justify-between">
+                <div className="space-y-1 min-w-0 pr-2">
+                  <div className="flex items-center gap-2 text-xs font-bold text-foreground truncate">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-[11px]">
+                      {rule.startTime} – {rule.endTime}
+                    </span>
+                    <span className="truncate">{rule.playlistName}</span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Applies to: <span className="text-white/80 font-semibold">{rule.streamName || "All Streams"}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleDeleteRule(rule.id)}
+                  title="Delete Rule"
+                  className="text-muted-foreground hover:text-red-400 p-1.5 transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 24-Hour Visual Timeline */}
+      <div className="p-6 rounded-2xl border border-white/10 bg-card/60 backdrop-blur space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-emerald-400" />
+            <h3 className="text-sm font-bold text-foreground">24-Hour Broadcast Timeline Visualizer</h3>
+          </div>
+          <span className="text-xs text-muted-foreground font-mono">00:00 — 23:59 (WIB)</span>
+        </div>
+
+        {/* Timeline hour marks */}
+        <div className="space-y-2">
+          <div className="grid grid-cols-12 gap-1 text-[10px] text-muted-foreground text-center font-mono font-semibold">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i}>{String(i * 2).padStart(2, "0")}:00</div>
+            ))}
+          </div>
+
+          <div className="h-10 w-full bg-black/50 rounded-xl border border-white/10 overflow-hidden flex relative p-1 gap-1">
+            {scheduleRules.length === 0 ? (
+              <div className="w-full h-full bg-emerald-500/20 rounded-lg flex items-center justify-center text-xs font-semibold text-emerald-400">
+                Default 24/7 Continuous Loop Active
+              </div>
+            ) : (
+              scheduleRules.map((rule, idx) => (
+                <div
+                  key={rule.id}
+                  className="flex-1 h-full rounded-lg bg-emerald-500/25 border border-emerald-500/40 flex items-center justify-center text-[10px] font-bold text-emerald-300 truncate px-2"
+                >
+                  {rule.startTime}-{rule.endTime}: {rule.playlistName}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Scheduled Stream Cards List */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-bold text-foreground">Configured Streams Ready For Broadcast</h3>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {localStreams.map((stream) => (
+            <div key={stream.id} className="p-5 rounded-2xl border border-white/10 bg-card/60 backdrop-blur space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-sm text-foreground">{stream.name}</h4>
+                  <p className="text-xs text-muted-foreground mt-0.5">{stream.channelName || "RTMP Stream Target"}</p>
+                </div>
+                <StatusBadge status={stream.status} />
+              </div>
+
+              <div className="space-y-1.5 text-xs text-muted-foreground bg-black/30 p-3 rounded-xl border border-white/10">
+                <div className="flex items-center justify-between">
+                  <span>Active Playlist:</span>
+                  <span className="font-semibold text-foreground truncate max-w-[150px]">{stream.playlistName || "Default"}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Output Specs:</span>
+                  <span className="font-semibold text-foreground">{stream.resolution} @ {stream.fps || 30}FPS</span>
+                </div>
+              </div>
+
+              {stream.status === "OFFLINE" || stream.status === "ERROR" ? (
+                <Button
+                  onClick={async () => {
+                    await apiService.controlStream(stream.id, "start");
+                    setLocalStreams(prev => prev.map(s => s.id === stream.id ? { ...s, status: "STARTING" as const } : s));
+                    (toast as any)({ title: "Stream Starting", description: `"${stream.name}" is starting…`, type: "success" });
+                  }}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 text-xs shadow-md shadow-emerald-500/10"
+                >
+                  <Play className="h-3.5 w-3.5 fill-black" /> Start Stream Now
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => router.push(`/streams/${stream.id}`)}
+                  variant="outline"
+                  className="w-full border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 font-bold gap-2 rounded-full h-10 text-xs"
+                >
+                  <Settings className="h-3.5 w-3.5" /> Manage Live Stream
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
+
+  {/* Confirm Dialog */}
+  {cfg && (
+    <ConfirmDialog
+      open={confirmDialog.open}
+      onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, open }))}
+      title={cfg.title}
+      description={cfg.description}
+      confirmLabel={cfg.label}
+      variant={cfg.variant}
+      onConfirm={handleConfirm}
+    />
+  )}
+
+  {/* Create / Edit Stream Modal Popup */}
+  <CreateStreamDialog
+    open={isCreateOpen}
+    onOpenChange={(open) => {
+      setIsCreateOpen(open);
+      if (!open) setEditingStream(null);
+    }}
+    stream={editingStream}
+    onSuccess={loadData}
+  />
+
+  {/* Time-Based Playlist Rule Modal Dialog */}
+  <Dialog open={ruleModalOpen} onOpenChange={setRuleModalOpen}>
+    <DialogContent className="border border-slate-200 dark:border-white/10 bg-white/98 dark:bg-zinc-950/98 text-foreground sm:max-w-md rounded-2xl shadow-2xl p-6">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2 text-base font-bold">
+          <Clock className="h-4 w-4 text-emerald-400" /> Add Time-Based Playlist Switcher Rule
+        </DialogTitle>
+      </DialogHeader>
+
+      <div className="space-y-4 py-3">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">Start Time</label>
+            <Input
+              type="time"
+              value={ruleStartTime}
+              onChange={(e) => setRuleStartTime(e.target.value)}
+              className="h-10 bg-white/5 border-white/10 font-mono text-xs rounded-xl"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-xs font-semibold text-muted-foreground">End Time</label>
+            <Input
+              type="time"
+              value={ruleEndTime}
+              onChange={(e) => setRuleEndTime(e.target.value)}
+              className="h-10 bg-white/5 border-white/10 font-mono text-xs rounded-xl"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-muted-foreground">Target Playlist to Play</label>
+          <CustomSelect
+            value={selectedPlaylistId}
+            onChange={setSelectedPlaylistId}
+            placeholder="Select target playlist..."
+            options={playlists.map((pl) => ({
+              value: pl.id,
+              label: `${pl.name} (${pl.itemCount} videos, ${pl.totalDuration})`,
+            }))}
+          />
+        </div>
+      </div>
+
+      <DialogFooter className="gap-2 sm:gap-0">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setRuleModalOpen(false)}
+          className="rounded-full h-10 px-5 text-xs font-bold border-white/10"
+        >
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={handleCreateRule}
+          disabled={savingRule}
+          className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold rounded-full h-10 px-5 text-xs shadow-lg shadow-emerald-500/10"
+        >
+          {savingRule ? "Saving..." : "Save Rule"}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+</div>
+);
 }
 
 function StatusBadge({ status }: { status: Stream["status"] }) {

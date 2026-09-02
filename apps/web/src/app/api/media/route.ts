@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
 import { MediaItem } from "@/lib/mock-data";
+import { probeMedia } from "@/lib/server/media-probe";
 import fs from "fs";
 import path from "path";
 
@@ -37,12 +38,17 @@ export async function POST(req: Request) {
     fs.writeFileSync(filePath, buffer);
 
     const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + " MB";
+    const mediaId = `med_${Date.now()}`;
+
+    // Extract real metadata (duration, resolution) & generate thumbnail with FFmpeg
+    const probe = await probeMedia(filePath, mediaId);
 
     const newItem: MediaItem = {
-      id: `med_${Date.now()}`,
+      id: mediaId,
       filename: filename,
-      duration: "03:45",
-      resolution: "1080p",
+      duration: probe.duration || "00:00:00",
+      resolution: probe.resolution || "1080p",
+      thumbnail: probe.thumbnail,
       size: sizeInMB,
       filepath: filePath,
       type: "video",
@@ -53,9 +59,10 @@ export async function POST(req: Request) {
     mediaList.unshift(newItem);
     db.saveMedia(mediaList);
 
-    db.addLog("info", "media", `Uploaded new media file "${filename}" (${sizeInMB})`);
+    db.addLog("info", "media", `Uploaded new media file "${filename}" (${sizeInMB}, ${newItem.duration}, ${newItem.resolution})`);
     return NextResponse.json(newItem, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+

@@ -38,9 +38,9 @@ export function KPICards({ metrics }: KPICardsProps) {
   const cpuColor = metrics.cpuUsage > 80 ? "bg-red-500" : metrics.cpuUsage > 60 ? "bg-amber-500" : "bg-emerald-500";
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
       {/* Live Streams — spans 2 cols on all breakpoints */}
-      <div className="col-span-2 sm:col-span-2 relative overflow-hidden rounded-xl border border-emerald-500/20 bg-card p-5">
+      <div className="col-span-2 sm:col-span-2 relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-card p-6">
         <div className="absolute right-2 top-2 h-20 w-20 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">Live Now</span>
@@ -57,7 +57,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       </div>
 
       {/* CPU */}
-      <div className="rounded-xl border border-white/10 bg-card p-5">
+      <div className="rounded-2xl border border-white/10 bg-card p-6">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">CPU</span>
           <Cpu className="h-3.5 w-3.5 text-muted-foreground" />
@@ -67,7 +67,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       </div>
 
       {/* RAM */}
-      <div className="rounded-xl border border-white/10 bg-card p-5">
+      <div className="rounded-2xl border border-white/10 bg-card p-6">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">RAM</span>
           <Zap className="h-3.5 w-3.5 text-violet-400" />
@@ -77,7 +77,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       </div>
 
       {/* Storage */}
-      <div className="rounded-xl border border-white/10 bg-card p-5">
+      <div className="rounded-2xl border border-white/10 bg-card p-6">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Storage</span>
           <HardDrive className="h-3.5 w-3.5 text-sky-400" />

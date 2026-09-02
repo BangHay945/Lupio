@@ -1,5 +1,6 @@
 import { spawn, ChildProcess } from "child_process";
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { db } from "./db";
 import { Stream, Channel, MediaItem } from "../mock-data";
@@ -32,13 +33,15 @@ export class StreamManager {
   private statsHistoryMap: Map<string, Array<{ time: string; bitrate: number; fps: number; cpu: number }>> = new Map();
   private watchdogTimer: NodeJS.Timeout | null = null;
   private currentActivePlaylistMap: Map<string, string> = new Map();
+  private intentionalStops: Set<string> = new Set();
+  private reconnectingStreams: Set<string> = new Set();
 
   constructor() {
     this.startWatchdogDaemon();
   }
 
   /**
-   * Feature 2 & Feature 1: Background Watchdog & Auto-Switcher Loop (Runs every 10 seconds)
+   * Background Watchdog & Auto-Switcher Loop (Runs every 10 seconds)
    */
   private startWatchdogDaemon() {
     if (this.watchdogTimer) clearInterval(this.watchdogTimer);
@@ -51,49 +54,79 @@ export class StreamManager {
         const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
 
         // -------------------------------------------------------------
-        // 1. Auto-Healing Watchdog (Feature 2)
+        // 1. Auto-Healing Watchdog & Encoder Stall / Freeze Detector
         // -------------------------------------------------------------
         if (settings.enableAutoHealing !== false) {
           const maxRetries = settings.maxWatchdogRetries || 3;
+          const reconnectDelay = settings.reconnectDelay || 5;
 
           for (const stream of streams) {
-            if (stream.status === "LIVE" || stream.status === "RESTARTING") {
+            if (this.intentionalStops.has(stream.id)) continue;
+
+            if (stream.status === "LIVE") {
               const active = this.activeProcesses.get(stream.id);
               
-              // Process crashed or missing unexpected
+              // Case A: Missing or dead process while stream marked LIVE
               if (!active || !active.process || active.process.killed || active.process.exitCode !== null) {
-                const currentRetries = stream.restartCount || 0;
-                if (currentRetries < maxRetries) {
-                  db.addLog("warn", "watchdog", `[Watchdog Auto-Healing] Stream "${stream.name}" process died. Auto-recovery attempt #${currentRetries + 1}/${maxRetries}...`);
-                  sendStreamNotification("RECONNECT", stream.name, stream.channelName || "RTMP Target", `Watchdog Auto-Recovery Attempt #${currentRetries + 1}`);
-                  await this.startStream(stream.id, false);
-                } else {
-                  db.addLog("error", "watchdog", `[Watchdog Max Retries] Stream "${stream.name}" failed after ${maxRetries} recovery attempts.`);
-                  stream.status = "ERROR";
-                  db.saveStream(stream);
-                  sendStreamNotification("ERROR", stream.name, stream.channelName || "RTMP Target", `Exceeded max watchdog retries (${maxRetries}).`);
+                if (!this.reconnectingStreams.has(stream.id)) {
+                  this.triggerAutoRecovery(stream.id, "Process terminated unexpectedly", maxRetries, reconnectDelay);
                 }
+                continue;
+              }
+
+              // Case B: Encoder Stall / Freeze Detection (>30s no heartbeat after initial warmup)
+              const runningSeconds = Math.floor((now.getTime() - active.startedAt.getTime()) / 1000);
+              if (runningSeconds > 25 && active.lastHeartbeat) {
+                const idleSeconds = Math.floor((now.getTime() - active.lastHeartbeat.getTime()) / 1000);
+                if (idleSeconds > 35) {
+                  db.addLog("warn", "watchdog", `[Watchdog Freeze Detector] Stream "${stream.name}" encoder stalled (>35s idle). Force restarting...`);
+                  try {
+                    active.process.kill("SIGKILL");
+                  } catch (e) {}
+                  this.activeProcesses.delete(stream.id);
+                  this.triggerAutoRecovery(stream.id, "Encoder stalled (>35s idle)", maxRetries, reconnectDelay);
+                  continue;
+                }
+              }
+
+              // Case C: Stable Uptime Reset (Reset retry count after 90 seconds of stable broadcasting)
+              if (runningSeconds > 90 && (stream.restartCount || 0) > 0) {
+                stream.restartCount = 0;
+                db.saveStream(stream);
+                db.addLog("info", "watchdog", `[Watchdog] Stream "${stream.name}" is stable (>90s). Reset recovery counter to 0.`);
               }
             }
           }
         }
 
         // -------------------------------------------------------------
-        // 2. Time-Based Playlist Auto-Switcher (Feature 1)
+        // 2. Time-Based Playlist Auto-Switcher & Scheduled Stream Trigger
         // -------------------------------------------------------------
         const rules = db.getScheduleRules().filter((r) => r.active);
         for (const rule of rules) {
           const isCurrentWindow = this.isTimeInWindow(timeStr, rule.startTime, rule.endTime);
           if (isCurrentWindow) {
             for (const stream of streams) {
-              if (stream.status === "LIVE" && (!rule.streamName || rule.streamName === stream.name || rule.streamName === "All Streams")) {
-                const prevPlaylist = this.currentActivePlaylistMap.get(stream.id);
-                if (rule.playlistId && prevPlaylist !== rule.playlistId) {
-                  db.addLog("info", "scheduler", `[Auto-Switcher] Triggering scheduled playlist "${rule.playlistName}" (${rule.startTime}-${rule.endTime}) for stream "${stream.name}"`);
-                  this.currentActivePlaylistMap.set(stream.id, rule.playlistId);
-                  stream.playlistName = rule.playlistName;
-                  stream.playlistId = rule.playlistId;
-                  db.saveStream(stream);
+              const matchesStream = !rule.streamName || rule.streamName === stream.name || rule.streamName === "All Streams" || rule.streamId === stream.id;
+              if (matchesStream) {
+                if (stream.status === "LIVE") {
+                  const prevPlaylist = this.currentActivePlaylistMap.get(stream.id);
+                  if (rule.playlistId && prevPlaylist !== rule.playlistId) {
+                    db.addLog("info", "scheduler", `[Auto-Switcher] Triggering scheduled playlist "${rule.playlistName}" (${rule.startTime}-${rule.endTime}) for stream "${stream.name}"`);
+                    this.currentActivePlaylistMap.set(stream.id, rule.playlistId);
+                    stream.playlistName = rule.playlistName;
+                    stream.playlistId = rule.playlistId;
+                    db.saveStream(stream);
+                  }
+                } else if (stream.status === "OFFLINE" && !this.intentionalStops.has(stream.id)) {
+                  // Auto-start stream if within active schedule window
+                  db.addLog("info", "scheduler", `[Schedule Auto-Start] Starting stream "${stream.name}" for active rule "${rule.playlistName}" (${rule.startTime}-${rule.endTime}).`);
+                  if (rule.playlistId) {
+                    stream.playlistId = rule.playlistId;
+                    stream.playlistName = rule.playlistName;
+                    db.saveStream(stream);
+                  }
+                  await this.startStream(stream.id, false);
                 }
               }
             }
@@ -103,6 +136,47 @@ export class StreamManager {
         console.error("Watchdog daemon error:", err);
       }
     }, 10000);
+  }
+
+  /**
+   * Triggers an automatic auto-recovery restart for dropped / crashed streams
+   */
+  private async triggerAutoRecovery(streamId: string, reason: string, maxRetries: number, delaySeconds: number) {
+    if (this.reconnectingStreams.has(streamId)) return;
+    this.reconnectingStreams.add(streamId);
+
+    const stream = db.getStreamById(streamId);
+    if (!stream) {
+      this.reconnectingStreams.delete(streamId);
+      return;
+    }
+
+    const currentRetries = stream.restartCount || 0;
+    if (currentRetries < maxRetries) {
+      const nextAttempt = currentRetries + 1;
+      stream.status = "STARTING";
+      stream.restartCount = nextAttempt;
+      db.saveStream(stream);
+
+      db.addLog("warn", "watchdog", `[Watchdog Auto-Healing] "${stream.name}" (${reason}). Reconnecting in ${delaySeconds}s (Attempt #${nextAttempt}/${maxRetries})...`);
+      sendStreamNotification("RECONNECT", stream.name, stream.channelName || "YouTube Live", `Auto-recovery attempt #${nextAttempt}/${maxRetries} (${reason})`);
+
+      setTimeout(async () => {
+        try {
+          if (!this.intentionalStops.has(streamId)) {
+            await this.startStream(streamId, false);
+          }
+        } finally {
+          this.reconnectingStreams.delete(streamId);
+        }
+      }, delaySeconds * 1000);
+    } else {
+      db.addLog("error", "watchdog", `[Watchdog Critical] Stream "${stream.name}" exceeded maximum recovery attempts (${maxRetries}). Marking ERROR.`);
+      stream.status = "ERROR";
+      db.saveStream(stream);
+      sendStreamNotification("ERROR", stream.name, stream.channelName || "YouTube Live", `Stream failed after ${maxRetries} consecutive auto-recovery attempts.`);
+      this.reconnectingStreams.delete(streamId);
+    }
   }
 
   private isTimeInWindow(current: string, start: string, end: string): boolean {
@@ -128,11 +202,18 @@ export class StreamManager {
     
     const now = new Date();
     const uptimeSeconds = active ? Math.floor((now.getTime() - active.startedAt.getTime()) / 1000) : 0;
-    
-    // Parsed or synthetic realistic live stats
-    const fps = active?.fps || (isLive ? 29.8 + Math.random() * 0.4 : 0);
-    const bitrateKbps = active?.bitrateKbps || (isLive ? 7800 + Math.floor(Math.random() * 400) : 0);
-    const cpuPercent = isLive ? Number((12 + Math.random() * 8).toFixed(1)) : 0;
+
+    // Real CPU from os.loadavg() — divide by active stream count to estimate per-stream share
+    const loadAvg = os.loadavg()[0] || 0;
+    const cpuCount = os.cpus().length || 1;
+    const activeStreamCount = Math.max(this.activeProcesses.size, 1);
+    const systemCpuPercent = Math.min(Math.round((loadAvg / cpuCount) * 100), 99);
+    // Estimate per-stream CPU as an even share of total load
+    const cpuPercent = isLive ? Math.round(systemCpuPercent / activeStreamCount) : 0;
+
+    // FPS and bitrate: use parsed values from stderr if available, else use last known or estimated
+    const fps = active?.fps ?? (isLive ? 29.97 : 0);
+    const bitrateKbps = active?.bitrateKbps ?? (isLive ? 8000 : 0);
     const droppedFrames = active?.droppedFrames || 0;
 
     let history = this.statsHistoryMap.get(streamId) || [];
@@ -162,6 +243,7 @@ export class StreamManager {
 
     const channels = db.getChannels();
     const mediaList = db.getMedia();
+    const playlists = db.getPlaylists();
     const settings = db.getSettings();
 
     const targetChannels: Channel[] = [];
@@ -189,18 +271,77 @@ export class StreamManager {
       return { success: false, message: "No valid RTMP channel destination configured." };
     }
 
-    // Emergency Backup Video Check
-    let selectedMedia = mediaList.find((m) => m.id === stream.playlistId || m.filename === stream.playlistName);
-    let inputFilePath = selectedMedia?.filepath;
+    // ---------------------------------------------------------------
+    // Resolve input: playlist (multi-track) or single media file
+    // ---------------------------------------------------------------
+    let inputFilePath: string | undefined;
+    let concatManifestPath: string | undefined;
     let isBackup = false;
+    let isPlaylist = false;
 
-    if ((!inputFilePath || !fs.existsSync(inputFilePath)) && (stream.backupMediaId || settings.backupMediaId)) {
+    // 1. Try to find a matching playlist by playlistId
+    const playlist = playlists.find((p) => p.id === stream.playlistId);
+    if (playlist && Array.isArray(playlist.mediaItems) && playlist.mediaItems.length > 0) {
+      // Resolve all media items that have a valid file on disk
+      const validItems = playlist.mediaItems
+        .map((item) => {
+          // item stored in playlist may have partial data — cross-reference full mediaList for filepath
+          const fullMedia = mediaList.find((m) => m.id === item.id) || item;
+          return fullMedia;
+        })
+        .filter((m) => m.filepath && fs.existsSync(m.filepath));
+
+      if (validItems.length > 0) {
+        // Write ffconcat manifest to temp directory
+        const concatDir = path.join(process.cwd(), "data", "concat");
+        if (!fs.existsSync(concatDir)) fs.mkdirSync(concatDir, { recursive: true });
+
+        concatManifestPath = path.join(concatDir, `${streamId}.txt`);
+
+        // ffconcat format — paths must use forward slashes and be absolute
+        const lines = ["ffconcat version 1.0"];
+        for (const m of validItems) {
+          // Escape backslashes for Windows paths in ffconcat
+          const safePath = m.filepath!.replace(/\\/g, "/");
+          lines.push(`file '${safePath}'`);
+        }
+        fs.writeFileSync(concatManifestPath, lines.join("\n"), "utf-8");
+
+        inputFilePath = concatManifestPath;
+        isPlaylist = true;
+
+        db.addLog(
+          "info",
+          "stream",
+          `[Playlist] "${playlist.name}" — ${validItems.length} track(s) loaded into ffconcat manifest for stream "${stream.name}".`
+        );
+      } else {
+        db.addLog("warn", "stream", `[Playlist] "${playlist.name}" has no valid files on disk. Falling back to single media lookup.`);
+      }
+    }
+
+    // 2. Fallback: try single media file (matched by playlistId = mediaId, or by filename)
+    if (!inputFilePath) {
+      const selectedMedia = mediaList.find(
+        (m) => m.id === stream.playlistId || m.filename === stream.playlistName
+      );
+      if (selectedMedia?.filepath && fs.existsSync(selectedMedia.filepath)) {
+        inputFilePath = selectedMedia.filepath;
+      }
+    }
+
+    // 3. Last resort: emergency backup video
+    if (!inputFilePath && (stream.backupMediaId || settings.backupMediaId)) {
       const backupId = stream.backupMediaId || settings.backupMediaId;
       const backupMedia = mediaList.find((m) => m.id === backupId);
       if (backupMedia && backupMedia.filepath && fs.existsSync(backupMedia.filepath)) {
         inputFilePath = backupMedia.filepath;
         isBackup = true;
-        db.addLog("warn", "stream", `Primary media file missing for "${stream.name}". Switched to Emergency Backup Video (${backupMedia.filename}).`);
+        db.addLog(
+          "warn",
+          "stream",
+          `Primary media missing for "${stream.name}". Switched to Emergency Backup Video (${backupMedia.filename}).`
+        );
       }
     }
 
@@ -219,10 +360,23 @@ export class StreamManager {
       filterParts.push(`drawtext=text='${cleanT}':x=w-mod(t*110\\,w+tw):y=h-50:fontsize=22:fontcolor=yellow@0.9:box=1:boxcolor=black@0.6:boxborderw=8`);
     }
 
+    // Playlist & Stream Transition Effects (Anti-Drop Smooth Fades)
+    const effectiveTransition = stream.transitionEffect || playlist?.transitionEffect || "full";
+    if (effectiveTransition === "fade" || effectiveTransition === "full") {
+      filterParts.push("fade=t=in:st=0:d=1.0:color=black");
+    }
+
+    if (effectiveTransition !== "none") {
+      db.addLog("info", "stream", `[Transition Engine] Stream "${stream.name}" activated with "${effectiveTransition}" smooth broadcast transition.`);
+    }
+
     const filterArgs = filterParts.length > 0 ? ["-vf", filterParts.join(",")] : [];
 
-    // Feature 4: Audio Normalizer Filter Chain (EBU R128)
+    // Feature 4: Audio Normalizer (EBU R128) & Soft Transition Filter Chain
     const audioFilters: string[] = [];
+    if (effectiveTransition === "crossfade" || effectiveTransition === "full") {
+      audioFilters.push("afade=t=in:ss=0:d=1.5");
+    }
     if (settings.enableAudioNormalizer !== false) {
       audioFilters.push("loudnorm=I=-16:TP=-1.5:LRA=11");
     }
@@ -238,7 +392,7 @@ export class StreamManager {
     if (targetChannels.length > 1) {
       const teeOutputs = targetChannels.map((c) => {
         const url = c.rtmpUrl.endsWith("/") ? c.rtmpUrl : `${c.rtmpUrl}/`;
-        return `[f=flv]${url}${c.streamKey}`;
+        return `[f=flv:onfail=ignore]${url}${c.streamKey.trim()}`;
       }).join("|");
 
       outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", teeOutputs];
@@ -252,26 +406,71 @@ export class StreamManager {
       outputArgs = ["-f", isMockKey ? "null" : "flv", destination];
     }
 
+    // Hardware Acceleration & Encoder selection
+    const hwSetting = (settings.hardwareAccel || "").toLowerCase();
+    let videoCodec = "libx264";
+    let presetArg = ["-preset", "veryfast"];
+    const threadsArg = settings.threadCount ? ["-threads", String(settings.threadCount)] : [];
+
+    if (hwSetting.includes("nvenc")) {
+      videoCodec = "h264_nvenc";
+      presetArg = ["-preset", "p4"];
+    } else if (hwSetting.includes("vaapi")) {
+      videoCodec = "h264_vaapi";
+      presetArg = [];
+    } else if (hwSetting.includes("qsv") || hwSetting.includes("quicksync")) {
+      videoCodec = "h264_qsv";
+      presetArg = ["-preset", "veryfast"];
+    }
+
     let ffmpegArgs: string[] = [];
-    if (inputFilePath && fs.existsSync(inputFilePath)) {
-      ffmpegArgs = [
-        "-re",
-        "-stream_loop", "-1",
-        "-i", inputFilePath,
-        ...filterArgs,
-        ...audioFilterArgs,
-        "-c:v", "libx264",
-        "-preset", "veryfast",
-        "-b:v", cleanBitrate,
-        "-maxrate", cleanBitrate,
-        "-bufsize", "16000k",
-        "-pix_fmt", "yuv420p",
-        "-c:a", "aac",
-        "-b:a", "128k",
-        "-ar", "44100",
-        ...outputArgs,
-      ];
+    if (inputFilePath && fs.existsSync(/*turbopackIgnore: true*/ inputFilePath)) {
+      if (isPlaylist) {
+        // Playlist mode: use ffconcat demuxer with -safe 0 for absolute paths
+        // -stream_loop -1 loops the entire concat list infinitely
+        ffmpegArgs = [
+          "-re",
+          "-stream_loop", "-1",
+          "-f", "concat",
+          "-safe", "0",
+          "-i", inputFilePath,
+          ...filterArgs,
+          ...audioFilterArgs,
+          "-c:v", videoCodec,
+          ...presetArg,
+          ...threadsArg,
+          "-b:v", cleanBitrate,
+          "-maxrate", cleanBitrate,
+          "-bufsize", "16000k",
+          "-pix_fmt", "yuv420p",
+          "-c:a", "aac",
+          "-b:a", "128k",
+          "-ar", "44100",
+          ...outputArgs,
+        ];
+      } else {
+        // Single file mode: stream_loop -1 loops the file directly
+        ffmpegArgs = [
+          "-re",
+          "-stream_loop", "-1",
+          "-i", inputFilePath,
+          ...filterArgs,
+          ...audioFilterArgs,
+          "-c:v", videoCodec,
+          ...presetArg,
+          ...threadsArg,
+          "-b:v", cleanBitrate,
+          "-maxrate", cleanBitrate,
+          "-bufsize", "16000k",
+          "-pix_fmt", "yuv420p",
+          "-c:a", "aac",
+          "-b:a", "128k",
+          "-ar", "44100",
+          ...outputArgs,
+        ];
+      }
     } else {
+      // No file found — stream test pattern so the channel stays alive
       ffmpegArgs = [
         "-re",
         "-f", "lavfi", "-i", "testsrc=size=1920x1080:rate=30",
@@ -321,6 +520,7 @@ export class StreamManager {
         restartCount: (stream.restartCount || 0) + 1,
       };
 
+      this.intentionalStops.delete(streamId);
       this.activeProcesses.set(streamId, activeProc);
 
       stream.status = "LIVE";
@@ -332,6 +532,18 @@ export class StreamManager {
       child.stderr?.on("data", (chunk: Buffer) => {
         const str = chunk.toString();
         activeProc.lastHeartbeat = new Date();
+
+        // Parse real stats from FFmpeg progress output
+        // FFmpeg writes lines like: frame=  120 fps= 30 q=28.0 size=    4096kB time=00:00:04.00 bitrate=8389.0kbits/s drop=0 speed=1.00x
+        const fpsMatch = str.match(/fps=\s*([\d.]+)/);
+        if (fpsMatch) activeProc.fps = parseFloat(fpsMatch[1]);
+
+        const bitrateMatch = str.match(/bitrate=\s*([\d.]+)kbits\/s/);
+        if (bitrateMatch) activeProc.bitrateKbps = parseFloat(bitrateMatch[1]);
+
+        const dropMatch = str.match(/drop=\s*(\d+)/);
+        if (dropMatch) activeProc.droppedFrames = parseInt(dropMatch[1]);
+
         if (str.toLowerCase().includes("error") || str.toLowerCase().includes("fatal")) {
           db.addLog("warn", "ffmpeg", `[${stream.name}] ${str.slice(0, 150)}`);
         }
@@ -341,11 +553,21 @@ export class StreamManager {
         db.addLog("info", "ffmpeg", `FFmpeg process for "${stream.name}" exited with code ${code}`);
         this.activeProcesses.delete(streamId);
 
-        const currentStream = (db as any).getStreams().find((s: Stream) => s.id === streamId);
-        if (currentStream && currentStream.status === "LIVE") {
-          currentStream.status = "OFFLINE";
-          db.saveStream(currentStream);
-          sendStreamNotification("STOP", stream.name, targetChannels.map((c) => c.name).join(", "), `Process closed (code ${code})`);
+        const currentStream = db.getStreamById(streamId);
+        if (currentStream) {
+          if (this.intentionalStops.has(streamId)) {
+            // User intentionally stopped the stream
+            this.intentionalStops.delete(streamId);
+            currentStream.status = "OFFLINE";
+            currentStream.restartCount = 0;
+            db.saveStream(currentStream);
+            sendStreamNotification("STOP", stream.name, targetChannels.map((c) => c.name).join(", "), `User stopped stream.`);
+          } else {
+            // Unexpected crash / disconnect — trigger auto-healing
+            const maxRetries = settings.maxWatchdogRetries || 3;
+            const reconnectDelay = settings.reconnectDelay || 5;
+            this.triggerAutoRecovery(streamId, `Exited with code ${code}`, maxRetries, reconnectDelay);
+          }
         }
       });
 
@@ -353,11 +575,10 @@ export class StreamManager {
         db.addLog("error", "ffmpeg", `Failed to spawn FFmpeg process for "${stream.name}": ${err.message}`);
         this.activeProcesses.delete(streamId);
 
-        const currentStream = (db as any).getStreams().find((s: Stream) => s.id === streamId);
-        if (currentStream) {
-          currentStream.status = "ERROR";
-          db.saveStream(currentStream);
-          sendStreamNotification("ERROR", stream.name, targetChannels.map((c) => c.name).join(", "), err.message);
+        if (!this.intentionalStops.has(streamId)) {
+          const maxRetries = settings.maxWatchdogRetries || 3;
+          const reconnectDelay = settings.reconnectDelay || 5;
+          this.triggerAutoRecovery(streamId, `Spawn error: ${err.message}`, maxRetries, reconnectDelay);
         }
       });
 
@@ -372,6 +593,9 @@ export class StreamManager {
   }
 
   public async stopStream(streamId: string): Promise<{ success: boolean; message: string }> {
+    this.intentionalStops.add(streamId);
+    this.reconnectingStreams.delete(streamId);
+
     const stream = (db as any).getStreams().find((s: Stream) => s.id === streamId);
     const procObj = this.activeProcesses.get(streamId);
 
@@ -391,8 +615,19 @@ export class StreamManager {
 
     this.activeProcesses.delete(streamId);
 
+    // Clean up ffconcat manifest if it exists
+    const concatManifestPath = path.join(process.cwd(), "data", "concat", `${streamId}.txt`);
+    if (fs.existsSync(concatManifestPath)) {
+      try {
+        fs.unlinkSync(concatManifestPath);
+      } catch (e) {
+        // Non-critical — ignore cleanup errors
+      }
+    }
+
     if (stream) {
       stream.status = "OFFLINE";
+      stream.restartCount = 0;
       db.saveStream(stream);
       db.addLog("info", "system", `Stream "${stream.name}" stopped by user.`);
       sendStreamNotification("STOP", stream.name, stream.channelName || "RTMP Target");

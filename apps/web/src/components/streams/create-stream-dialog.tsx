@@ -8,6 +8,7 @@ import { apiService } from "@/lib/services/api";
 import { Channel, MediaItem, Playlist, Stream } from "@/lib/mock-data";
 import { toast } from "@/components/ui/toast";
 import { Tv, Film, Video, Key, Play, Plus, Pencil, Layers, Type, ShieldAlert, Share2 } from "lucide-react";
+import { CustomSelect } from "@/components/ui/select";
 
 interface CreateStreamDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
   const [watermarkText, setWatermarkText] = useState("");
   const [tickerText, setTickerText] = useState("");
   const [backupMediaId, setBackupMediaId] = useState("");
+  const [transitionEffect, setTransitionEffect] = useState("full");
   
   // Custom Channel Inline State
   const [showAddChannel, setShowAddChannel] = useState(false);
@@ -63,14 +65,13 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         setWatermarkText(stream.watermarkText || "");
         setTickerText(stream.tickerText || "");
         setBackupMediaId(stream.backupMediaId || "");
-        setSelectedMultiChannelIds(stream.multiChannelIds || []);
+        setTransitionEffect(stream.transitionEffect || "full");
+        if (stream.channelId) setSelectedChannelId(stream.channelId);
+        if (stream.multiChannelIds) setSelectedMultiChannelIds(stream.multiChannelIds);
 
         if (stream.resolution === "720p") setPreset("720p30");
         else if (stream.resolution === "4K") setPreset("4k60");
         else setPreset("1080p30");
-
-        const matchingChannel = (Array.isArray(chData) ? chData : []).find(c => c.name === stream.channelName || c.id === stream.channelId);
-        if (matchingChannel) setSelectedChannelId(matchingChannel.id);
       } else {
         setStreamName("");
         setWatermarkText("");
@@ -135,10 +136,13 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
       }
 
       let playlistName = "Single File";
+      let playlistId = "";
       if (contentType === "playlist") {
         playlistName = playlists.find((p) => p.id === selectedPlaylistId)?.name || "Custom Playlist";
+        playlistId = selectedPlaylistId;
       } else {
         playlistName = mediaItems.find((m) => m.id === selectedMediaId)?.filename || "Single File";
+        playlistId = selectedMediaId;
       }
 
       const payload = {
@@ -146,9 +150,11 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         channelName: finalChannelName,
         channelId: finalChannelId,
         playlistName,
+        playlistId,
         resolution: res,
         fps,
         bitrate,
+        transitionEffect,
         multiChannelIds: selectedMultiChannelIds,
         watermarkText: watermarkText.trim(),
         tickerText: tickerText.trim(),
@@ -203,7 +209,7 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[620px] bg-zinc-950 border border-white/10 p-6 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[620px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto text-foreground">
         <DialogHeader className="gap-1">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             {stream ? (
@@ -273,18 +279,19 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
                 </div>
               </div>
             ) : (
-              <select
+              <CustomSelect
                 value={selectedChannelId}
-                onChange={(e) => setSelectedChannelId(e.target.value)}
-                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                {channels.length === 0 && <option value="">No channels available (Click Add New Key)</option>}
-                {channels.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.platform})
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedChannelId}
+                placeholder="Select broadcast channel..."
+                options={
+                  channels.length === 0
+                    ? [{ value: "", label: "No channels available (Click Add New Key)" }]
+                    : channels.map((c) => ({
+                        value: c.id,
+                        label: `${c.name} (${c.platform})`,
+                      }))
+                }
+              />
             )}
           </div>
 
@@ -352,18 +359,18 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
             <label className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
               <ShieldAlert className="h-3.5 w-3.5 text-amber-400" /> Emergency Backup Video (Anti-Drop 24/7)
             </label>
-            <select
+            <CustomSelect
               value={backupMediaId}
-              onChange={(e) => setBackupMediaId(e.target.value)}
-              className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="">None (Use Synthetic Test Pattern)</option>
-              {mediaItems.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.filename} ({m.duration})
-                </option>
-              ))}
-            </select>
+              onChange={setBackupMediaId}
+              placeholder="None (Use Synthetic Test Pattern)"
+              options={[
+                { value: "", label: "None (Use Synthetic Test Pattern)" },
+                ...mediaItems.map((m) => ({
+                  value: m.id,
+                  label: `${m.filename} (${m.duration})`,
+                })),
+              ]}
+            />
           </div>
 
           {/* Content Source */}
@@ -395,32 +402,52 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
             </div>
 
             {contentType === "media" ? (
-              <select
+              <CustomSelect
                 value={selectedMediaId}
-                onChange={(e) => setSelectedMediaId(e.target.value)}
-                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                {mediaItems.length === 0 && <option value="">No media files uploaded</option>}
-                {mediaItems.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.filename} ({m.duration})
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedMediaId}
+                placeholder="Select media file..."
+                options={
+                  mediaItems.length === 0
+                    ? [{ value: "", label: "No media files uploaded" }]
+                    : mediaItems.map((m) => ({
+                        value: m.id,
+                        label: `${m.filename} (${m.duration})`,
+                      }))
+                }
+              />
             ) : (
-              <select
+              <CustomSelect
                 value={selectedPlaylistId}
-                onChange={(e) => setSelectedPlaylistId(e.target.value)}
-                className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                {playlists.length === 0 && <option value="">No playlists created</option>}
-                {playlists.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} ({p.itemCount} items, {p.totalDuration})
-                  </option>
-                ))}
-              </select>
+                onChange={setSelectedPlaylistId}
+                placeholder="Select playlist..."
+                options={
+                  playlists.length === 0
+                    ? [{ value: "", label: "No playlists created" }]
+                    : playlists.map((p) => ({
+                        value: p.id,
+                        label: `${p.name} (${p.itemCount} items, ${p.totalDuration})`,
+                      }))
+                }
+              />
             )}
+          </div>
+
+          {/* Track Transition Effect */}
+          <div className="space-y-1.5">
+            <label className="font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+              <span>Track Transition Style (Anti-Drop)</span>
+              <span className="text-[10px] text-emerald-400 font-normal">Broadcast Grade</span>
+            </label>
+            <CustomSelect
+              value={transitionEffect}
+              onChange={setTransitionEffect}
+              options={[
+                { value: "full", label: "🌟 Smooth Blend (Video & Audio Fade In/Out)" },
+                { value: "fade", label: "🎬 Video Black Fade (1.0s)" },
+                { value: "crossfade", label: "🎵 Soft Audio Crossfade (1.5s)" },
+                { value: "none", label: "⚡ Direct Cut (Instant Loop)" },
+              ]}
+            />
           </div>
 
           {/* Stream Preset */}

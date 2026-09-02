@@ -8,6 +8,7 @@ import { Channel } from "@/lib/mock-data";
 import { apiService } from "@/lib/services/api";
 import { toast } from "@/components/ui/toast";
 import { Tv, Key, Globe, Video, Eye, EyeOff } from "lucide-react";
+import { CustomSelect } from "@/components/ui/select";
 
 interface ChannelDialogProps {
   open: boolean;
@@ -81,7 +82,7 @@ export function ChannelDialog({ open, onOpenChange, channel, onSuccess }: Channe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] bg-zinc-950 border border-white/10 p-6 rounded-2xl shadow-2xl">
+      <DialogContent className="sm:max-w-[480px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
         <DialogHeader className="gap-1">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <Tv className="h-5 w-5 text-emerald-400" /> {channel ? "Edit Channel" : "Add New Channel"}
@@ -95,21 +96,21 @@ export function ChannelDialog({ open, onOpenChange, channel, onSuccess }: Channe
           {/* Platform Selection */}
           <div className="space-y-1.5">
             <label className="font-semibold uppercase tracking-wider text-muted-foreground">Platform</label>
-            <select
+            <CustomSelect
               value={platform}
-              onChange={(e) => {
-                setPlatform(e.target.value);
-                if (e.target.value === "YouTube" && !rtmpUrl) {
+              onChange={(val) => {
+                setPlatform(val);
+                if (val === "YouTube" && !rtmpUrl) {
                   setRtmpUrl("rtmp://a.rtmp.youtube.com/live2");
                 }
               }}
-              className="w-full h-10 rounded-lg border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
-            >
-              <option value="YouTube">YouTube Live</option>
-              <option value="Twitch">Twitch</option>
-              <option value="Facebook">Facebook Live</option>
-              <option value="Custom">Custom RTMP Server</option>
-            </select>
+              options={[
+                { value: "YouTube", label: "YouTube Live" },
+                { value: "Twitch", label: "Twitch" },
+                { value: "Facebook", label: "Facebook Live" },
+                { value: "Custom", label: "Custom RTMP Server" },
+              ]}
+            />
           </div>
 
           {/* Channel Name */}

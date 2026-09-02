@@ -22,6 +22,7 @@ import {
   Rocket,
   ShieldCheck,
 } from "lucide-react";
+import { CustomSelect } from "@/components/ui/select";
 import Link from "next/link";
 
 const STEPS = [
@@ -553,15 +554,15 @@ export function CreateStreamWizard() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Recurrence</label>
-                    <select
+                    <CustomSelect
                       value={formData.repeatRule}
-                      onChange={(e) => updateForm({ repeatRule: e.target.value as any })}
-                      className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none"
-                    >
-                      <option value="never">One-time Event</option>
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                    </select>
+                      onChange={(val) => updateForm({ repeatRule: val as any })}
+                      options={[
+                        { value: "never", label: "One-time Event" },
+                        { value: "daily", label: "Daily" },
+                        { value: "weekly", label: "Weekly" },
+                      ]}
+                    />
                   </div>
                 </div>
               )}

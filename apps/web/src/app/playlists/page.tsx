@@ -63,14 +63,14 @@ export default function PlaylistsPage() {
           href={`/playlists/new`}
           className={cn(
             buttonVariants({ variant: "default" }),
-            "bg-emerald-500 hover:bg-emerald-600 text-black font-semibold gap-1.5 rounded-lg px-4 shadow-lg shadow-emerald-500/10"
+            "bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
           )}
         >
           <Plus className="h-4 w-4" /> Create Playlist
         </Link>
       </div>
 
-      <div className="rounded-xl border border-white/[0.07] bg-card overflow-hidden">
+      <div className="rounded-2xl border border-white/[0.07] bg-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -111,7 +111,7 @@ export default function PlaylistsPage() {
                   <TableCell>{playlist.createdAt}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0">
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10 h-8.5 w-8.5 p-0">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>

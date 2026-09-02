@@ -35,7 +35,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="max-w-sm border border-white/10 bg-zinc-950/90 backdrop-blur-xl">
+      <DialogContent showCloseButton={false} className="max-w-sm border border-slate-200 dark:border-white/10 bg-white/98 dark:bg-zinc-950/98 text-foreground rounded-2xl shadow-2xl p-6">
         <DialogHeader>
           <div className={cn(
             "flex h-10 w-10 items-center justify-center rounded-full mb-2",

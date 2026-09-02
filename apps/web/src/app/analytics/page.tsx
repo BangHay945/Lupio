@@ -333,9 +333,9 @@ export default function AnalyticsPage() {
   return (
     <div className="flex flex-col gap-6 w-full pb-12">
       {/* Action Controls Bar — Timeframe Filter, Refresh, Export CSV */}
-      <div className="flex items-center justify-end gap-2.5 flex-wrap">
+      <div className="flex items-center justify-end gap-3 flex-wrap">
         <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-transparent px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+          <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-full border border-white/10 bg-transparent h-10 px-5 text-xs font-bold text-foreground hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
             <Filter className="mr-2 h-3.5 w-3.5 text-emerald-400" />
             {timeRange === "24h"
               ? "Last 24 Hours"
@@ -345,17 +345,17 @@ export default function AnalyticsPage() {
               ? "Last 30 Days"
               : "All Time"}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950">
-            <DropdownMenuItem onClick={() => setTimeRange("24h")} className="cursor-pointer text-xs">
+          <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 rounded-2xl p-1.5">
+            <DropdownMenuItem onClick={() => setTimeRange("24h")} className="cursor-pointer text-xs rounded-xl">
               Last 24 Hours
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTimeRange("7d")} className="cursor-pointer text-xs">
+            <DropdownMenuItem onClick={() => setTimeRange("7d")} className="cursor-pointer text-xs rounded-xl">
               Last 7 Days
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTimeRange("30d")} className="cursor-pointer text-xs">
+            <DropdownMenuItem onClick={() => setTimeRange("30d")} className="cursor-pointer text-xs rounded-xl">
               Last 30 Days
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setTimeRange("all")} className="cursor-pointer text-xs">
+            <DropdownMenuItem onClick={() => setTimeRange("all")} className="cursor-pointer text-xs rounded-xl">
               All Time (Lifetime)
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -363,10 +363,9 @@ export default function AnalyticsPage() {
 
         <Button
           variant="outline"
-          size="sm"
           onClick={loadData}
           disabled={refreshing}
-          className="h-8 border-white/10 bg-transparent text-xs text-foreground hover:bg-white/10 hover:text-white gap-1.5"
+          className="h-10 px-5 rounded-full border-white/10 bg-transparent text-xs font-bold text-foreground hover:bg-white/10 hover:text-white gap-2"
         >
           <RefreshCw className={cn("h-3.5 w-3.5 text-emerald-400", refreshing && "animate-spin")} />
           <span>Refresh</span>
@@ -374,8 +373,7 @@ export default function AnalyticsPage() {
 
         <Button
           onClick={handleExportCSV}
-          size="sm"
-          className="h-8 font-semibold bg-emerald-500 hover:bg-emerald-600 text-black gap-1.5 shadow-lg shadow-emerald-500/10"
+          className="h-10 px-5 rounded-full font-bold bg-emerald-500 hover:bg-emerald-600 text-black gap-2 shadow-lg shadow-emerald-500/10 text-xs"
         >
           <Download className="h-3.5 w-3.5" />
           <span>Export CSV</span>
@@ -687,10 +685,10 @@ export default function AnalyticsPage() {
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
               placeholder="Filter report..."
-              className="h-8 pl-8 text-xs bg-black/40 border-white/10"
+              className="h-10.5 pl-9 pr-4 text-xs bg-black/40 border-white/10 rounded-full"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

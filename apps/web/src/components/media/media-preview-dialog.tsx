@@ -15,7 +15,7 @@ export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[720px] bg-zinc-950 border border-white/10 p-6 rounded-2xl shadow-2xl overflow-hidden">
+      <DialogContent className="sm:max-w-[720px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl overflow-hidden text-foreground">
         <DialogHeader className="gap-1">
           <DialogTitle className="text-lg font-bold flex items-center gap-2 truncate">
             <Film className="h-5 w-5 text-emerald-400 shrink-0" /> {media.filename}

@@ -230,7 +230,7 @@ export function UploadMediaDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !uploading && onOpenChange(val)}>
-      <DialogContent className="sm:max-w-[620px] bg-zinc-950 border border-white/10 p-6 rounded-2xl shadow-2xl">
+      <DialogContent className="sm:max-w-[620px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
         <DialogHeader className="gap-1">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             <UploadCloud className="h-5 w-5 text-emerald-400" /> Upload Media Assets

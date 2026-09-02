@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { apiService } from "@/lib/services/api";
 import { MediaItem, UserAccount, ApiKey } from "@/lib/mock-data";
+import { CustomSelect } from "@/components/ui/select";
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<"general" | "profile" | "ffmpeg" | "streaming" | "webhooks" | "security">("general");
@@ -38,6 +39,7 @@ export default function SettingsPage() {
 
   // API Key Add Form
   const [newKeyName, setNewKeyName] = useState("");
+  const [testingWebhook, setTestingWebhook] = useState(false);
 
   const [settings, setSettings] = useState({
     serverName: "Lupio Production Node 1",
@@ -237,6 +239,31 @@ export default function SettingsPage() {
     }
   };
 
+  const handleTestWebhook = async () => {
+    setTestingWebhook(true);
+    try {
+      const res = await fetch("/api/settings/test-webhook", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        (toast as any)({
+          title: "Test Alert Sent! 🚀",
+          description: "Telegram/Discord notification was dispatched successfully.",
+          type: "success",
+        });
+      } else {
+        (toast as any)({
+          title: "Webhook Failed",
+          description: data.message || "Failed to send test alert.",
+          type: "error",
+        });
+      }
+    } catch (err: any) {
+      (toast as any)({ title: "Error", description: err.message, type: "error" });
+    } finally {
+      setTestingWebhook(false);
+    }
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     (toast as any)({ title: "Copied! 📋", description: "API Key copied to clipboard.", type: "success" });
@@ -252,12 +279,12 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-6 w-full pb-16">
-      {/* Horizontal Nav Tabs - Schedule Page Pill Style */}
-      <div className="pill-tab-switcher flex flex-wrap items-center gap-1 p-1 rounded-xl border border-slate-300 dark:border-white/10 bg-transparent text-xs w-fit">
+      {/* Horizontal Nav Tabs - Rounded-Full Pill Style */}
+      <div className="pill-tab-switcher flex flex-wrap items-center gap-1.5 p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs w-fit">
         <button
           onClick={() => setActiveTab("general")}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
             activeTab === "general"
               ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
               : "text-muted-foreground hover:text-white"
@@ -269,7 +296,7 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("profile")}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
             activeTab === "profile"
               ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
               : "text-muted-foreground hover:text-white"
@@ -281,7 +308,7 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("ffmpeg")}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
             activeTab === "ffmpeg"
               ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
               : "text-muted-foreground hover:text-white"
@@ -293,7 +320,7 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("streaming")}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
             activeTab === "streaming"
               ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
               : "text-muted-foreground hover:text-white"
@@ -305,7 +332,7 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("webhooks")}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
             activeTab === "webhooks"
               ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
               : "text-muted-foreground hover:text-white"
@@ -317,7 +344,7 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("security")}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
             activeTab === "security"
               ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
               : "text-muted-foreground hover:text-white"
@@ -583,18 +610,18 @@ export default function SettingsPage() {
               <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <ShieldAlert className="h-4 w-4 text-amber-400" /> Default Emergency Backup Video
               </label>
-              <select
+              <CustomSelect
                 value={settings.backupMediaId}
-                onChange={(e) => setSettings({ ...settings, backupMediaId: e.target.value })}
-                className="w-full h-11 rounded-xl border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
-              >
-                <option value="">None (Synthetic Test Pattern)</option>
-                {mediaList.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.filename} ({m.duration})
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setSettings({ ...settings, backupMediaId: val })}
+                placeholder="None (Synthetic Test Pattern)"
+                options={[
+                  { value: "", label: "None (Synthetic Test Pattern)" },
+                  ...mediaList.map((m) => ({
+                    value: m.id,
+                    label: `${m.filename} (${m.duration})`,
+                  })),
+                ]}
+              />
             </div>
           </div>
         )}
@@ -636,6 +663,19 @@ export default function SettingsPage() {
                   onChange={(e) => setSettings({ ...settings, discordWebhookUrl: e.target.value })}
                   className="bg-white/5 border-white/10 text-xs h-11 font-mono"
                 />
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleTestWebhook}
+                  disabled={testingWebhook || (!settings.telegramBotToken && !settings.discordWebhookUrl)}
+                  className="rounded-full h-10 px-5 font-bold border-white/10 bg-transparent text-xs text-foreground hover:bg-white/10 gap-2"
+                >
+                  <BellRing className={cn("h-4 w-4 text-emerald-400", testingWebhook && "animate-pulse")} />
+                  {testingWebhook ? "Sending Test Alert..." : "Send Test Webhook Alert"}
+                </Button>
               </div>
             </div>
           </div>
@@ -711,14 +751,16 @@ export default function SettingsPage() {
                   onChange={(e) => setNewUserEmail(e.target.value)}
                   className="bg-white/5 border-white/10 text-xs h-11 w-64"
                 />
-                <select
-                  value={newUserRole}
-                  onChange={(e) => setNewUserRole(e.target.value as any)}
-                  className="h-11 rounded-xl border border-white/10 bg-zinc-900 px-4 text-xs text-foreground focus:outline-none"
-                >
-                  <option value="Operator">Operator</option>
-                  <option value="Admin">Admin</option>
-                </select>
+                <div className="w-36">
+                  <CustomSelect
+                    value={newUserRole}
+                    onChange={(val) => setNewUserRole(val as any)}
+                    options={[
+                      { value: "Operator", label: "Operator" },
+                      { value: "Admin", label: "Admin" },
+                    ]}
+                  />
+                </div>
                 <Button onClick={handleCreateUser} variant="outline" className="text-xs h-11 px-5 border-white/10">
                   <Plus className="h-4 w-4" /> Add User Account
                 </Button>

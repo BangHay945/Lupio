@@ -96,13 +96,13 @@ export default function ChannelsPage() {
       <div className="flex items-center justify-end">
         <Button
           onClick={handleOpenAdd}
-          className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold gap-1.5 rounded-lg px-4 shadow-lg shadow-emerald-500/10"
+          className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
         >
           <Plus className="h-4 w-4" /> Add Channel
         </Button>
       </div>
 
-      <div className="rounded-xl border border-white/[0.07] bg-card overflow-hidden">
+      <div className="rounded-2xl border border-white/[0.07] bg-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -137,25 +137,18 @@ export default function ChannelsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="font-semibold">{channel.name}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <span className="truncate max-w-[200px] text-muted-foreground">{channel.rtmpUrl}</span>
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboard(channel.rtmpUrl, "RTMP URL")}>
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  <TableCell className="font-mono text-muted-foreground">{channel.rtmpUrl}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-muted-foreground">{maskStreamKey(channel.streamKey)}</span>
-                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboard(channel.streamKey, "Stream Key")}>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={() => copyToClipboard(channel.streamKey, "Stream Key")}>
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
                   </TableCell>
                   <TableCell>
                     <span className={cn(
-                      "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border",
+                      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border",
                       channel.status === "Active" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : 
                       channel.status === "Error" ? "bg-red-500/10 text-red-400 border-red-500/20" :
                       "bg-white/5 text-muted-foreground border-white/10"
@@ -165,7 +158,7 @@ export default function ChannelsPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-8 w-8 p-0">
+                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10 h-8.5 w-8.5 p-0">
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>

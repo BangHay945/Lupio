@@ -21,7 +21,7 @@ const actions = [
     border: "hover:border-sky-500/25 hover:bg-sky-500/[0.04]",
   },
   {
-    href: "/schedule",
+    href: "/streams?tab=schedule",
     icon: CalendarClock,
     label: "Schedule",
     description: "Plan a stream",
@@ -42,18 +42,18 @@ export function QuickActions() {
             key={href}
             href={href}
             className={cn(
-              "group flex items-center gap-3 rounded-xl border border-white/10 bg-card p-3.5 transition-all",
+              "group flex items-center gap-3.5 rounded-2xl border border-white/10 bg-card p-4 transition-all",
               border
             )}
           >
-            <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", iconBg)}>
-              <Icon className="h-3.5 w-3.5" />
+            <div className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full", iconBg)}>
+              <Icon className="h-4 w-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground leading-none">{label}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+              <p className="text-sm font-bold text-foreground leading-none">{label}</p>
+              <p className="text-xs text-muted-foreground mt-1">{description}</p>
             </div>
-            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all shrink-0" />
+            <ArrowRight className="h-4 w-4 text-muted-foreground/40 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all shrink-0" />
           </Link>
         ))}
       </div>

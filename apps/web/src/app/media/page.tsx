@@ -128,15 +128,15 @@ export default function MediaPage() {
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative w-full md:w-80">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search by title, filename..."
-              className="pl-8 bg-card/60 border-white/10"
+              className="pl-9 pr-4 bg-card/60 border-white/10 rounded-full h-10.5 text-xs"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
             {mediaList.length} items
           </span>
         </div>
@@ -146,7 +146,7 @@ export default function MediaPage() {
             setInitialFiles([]);
             setUploadOpen(true);
           }}
-          className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-black font-semibold gap-1.5 shadow-lg shadow-emerald-500/10"
+          className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
         >
           <Plus className="h-4 w-4" /> Upload Media
         </Button>

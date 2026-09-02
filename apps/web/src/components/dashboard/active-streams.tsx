@@ -105,18 +105,18 @@ export function ActiveStreams({ streams }: ActiveStreamsProps) {
                   </span>
 
                   {/* Hover actions */}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     {stream.status === "OFFLINE" || stream.status === "ERROR" ? (
-                      <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors">
-                        <Play className="h-3 w-3" />
+                      <button className="flex h-8.5 w-8.5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors">
+                        <Play className="h-3.5 w-3.5" />
                       </button>
                     ) : (
                       <>
-                        <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/8 text-white/40 hover:bg-white/12 hover:text-white/70 transition-colors">
-                          <RotateCcw className="h-3 w-3" />
+                        <button className="flex h-8.5 w-8.5 items-center justify-center rounded-full bg-white/8 text-white/60 hover:bg-white/15 hover:text-white transition-colors">
+                          <RotateCcw className="h-3.5 w-3.5" />
                         </button>
-                        <button className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors">
-                          <Square className="h-3 w-3" />
+                        <button className="flex h-8.5 w-8.5 items-center justify-center rounded-full bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors">
+                          <Square className="h-3.5 w-3.5" />
                         </button>
                       </>
                     )}
