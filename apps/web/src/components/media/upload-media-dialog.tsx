@@ -285,7 +285,7 @@ export function UploadMediaDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => !uploading && !importing && onOpenChange(val)}>
-      <DialogContent className="sm:max-w-[620px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
+      <DialogContent className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
         <DialogHeader className="gap-1">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
             {activeTab === "file" ? (
@@ -306,7 +306,7 @@ export function UploadMediaDialog({
         </DialogHeader>
 
         {/* Tab Selection Switcher */}
-        <div className="pill-tab-switcher flex items-center p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs w-full">
+        <div className="pill-tab-switcher flex items-center p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs w-full min-w-0">
           <button
             type="button"
             disabled={uploading || importing}
@@ -430,7 +430,7 @@ export function UploadMediaDialog({
             </div>
           </div>
         ) : (
-          <div className="py-2 space-y-4">
+          <div className="py-2 space-y-4 w-full min-w-0">
             {/* Dropzone Area */}
             <div
               onDragOver={(e) => {
@@ -440,12 +440,12 @@ export function UploadMediaDialog({
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               onClick={() => !uploading && fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${
+              className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none w-full min-w-0 ${
                 dragOver
                   ? "border-emerald-500 bg-emerald-500/10 scale-[0.99]"
                   : fileQueue.length > 0
-                  ? "border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20"
-                  : "border-white/15 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/25"
+                  ? "border-slate-300 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/60 dark:hover:bg-white/[0.04] hover:border-slate-400 dark:hover:border-white/20"
+                  : "border-slate-300 dark:border-white/15 bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/60 dark:hover:bg-white/[0.05] hover:border-slate-400 dark:hover:border-white/25"
               }`}
             >
               <UploadCloud
@@ -467,7 +467,7 @@ export function UploadMediaDialog({
 
             {/* Overall Progress Bar (visible during or after upload) */}
             {(uploading || (totalCount > 0 && (completedCount > 0 || errorCount > 0))) && (
-              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
+              <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-white/[0.03] p-3 space-y-2 w-full min-w-0">
                 <div className="flex items-center justify-between text-xs">
                   <span className="font-semibold text-foreground flex items-center gap-1.5">
                     {uploading && <Loader2 className="h-3.5 w-3.5 text-emerald-400 animate-spin" />}
@@ -479,7 +479,7 @@ export function UploadMediaDialog({
                   </span>
                   <span className="font-mono text-emerald-400 font-bold">{overallPercentage}%</span>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden relative">
+                <div className="w-full bg-slate-200 dark:bg-white/10 rounded-full h-2 overflow-hidden relative">
                   <div
                     className={`h-full transition-all duration-300 ${
                       errorCount > 0 && !uploading ? "bg-amber-500" : "bg-emerald-500"
@@ -492,7 +492,7 @@ export function UploadMediaDialog({
 
             {/* File Queue List */}
             {fileQueue.length > 0 && (
-              <div className="space-y-2">
+              <div className="space-y-2 w-full min-w-0">
                 <div className="flex items-center justify-between text-xs px-1 text-muted-foreground">
                   <span>
                     Queued Files ({fileQueue.length})
@@ -503,21 +503,21 @@ export function UploadMediaDialog({
                     <button
                       type="button"
                       onClick={() => setFileQueue([])}
-                      className="text-[11px] text-zinc-400 hover:text-white transition-colors"
+                      className="text-[11px] text-zinc-400 hover:text-foreground transition-colors"
                     >
                       Clear list
                     </button>
                   )}
                 </div>
 
-                <div className="max-h-[210px] overflow-y-auto space-y-2 pr-1 rounded-xl">
+                <div className="max-h-[210px] overflow-y-auto overflow-x-hidden space-y-2 pr-1 rounded-xl w-full min-w-0">
                   {fileQueue.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-white/10 bg-white/[0.02] text-xs"
+                      className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-white/[0.02] text-xs w-full min-w-0"
                     >
-                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div className="h-7 w-7 rounded-md bg-white/5 flex items-center justify-center shrink-0">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+                        <div className="h-7 w-7 rounded-md bg-slate-200/60 dark:bg-white/5 flex items-center justify-center shrink-0">
                           {item.status === "completed" ? (
                             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                           ) : item.status === "uploading" ? (
@@ -529,8 +529,10 @@ export function UploadMediaDialog({
                           )}
                         </div>
 
-                        <div className="min-w-0 flex-1">
-                          <p className="font-medium text-foreground truncate">{item.file.name}</p>
+                        <div className="min-w-0 flex-1 overflow-hidden">
+                          <p className="font-medium text-foreground truncate block w-full" title={item.file.name}>
+                            {item.file.name}
+                          </p>
                           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                             <span>{(item.file.size / (1024 * 1024)).toFixed(1)} MB</span>
                             {item.status === "uploading" && (
@@ -552,7 +554,7 @@ export function UploadMediaDialog({
                         <button
                           type="button"
                           onClick={() => handleRemoveFile(item.id)}
-                          className="p-1 rounded-md hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
+                          className="p-1 rounded-md hover:bg-slate-200/60 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors shrink-0"
                           title="Remove file"
                         >
                           <X className="h-3.5 w-3.5" />
@@ -566,7 +568,7 @@ export function UploadMediaDialog({
           </div>
         )}
 
-        <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-white/10 flex items-center justify-between">
+        <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between w-full min-w-0">
           <div className="flex items-center gap-2">
             {activeTab === "file" && !uploading && (
               <Button
@@ -574,7 +576,7 @@ export function UploadMediaDialog({
                 variant="outline"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                className="border-white/10 text-xs gap-1.5"
+                className="border-slate-300 dark:border-white/10 text-xs gap-1.5"
               >
                 <Plus className="h-3.5 w-3.5" /> Add More
               </Button>
@@ -587,7 +589,7 @@ export function UploadMediaDialog({
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={uploading || importing}
-              className="border-white/10"
+              className="border-slate-300 dark:border-white/10"
             >
               {activeTab === "file" && allSuccessful ? "Done" : "Cancel"}
             </Button>
