@@ -10,11 +10,15 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({ success: true });
 
+  const isHttps =
+    req.headers.get("x-forwarded-proto") === "https" ||
+    req.nextUrl.protocol === "https:";
+
   // Clear the cookie
   res.cookies.set("lupio_session", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: isHttps,
+    sameSite: "lax",
     maxAge: 0,
     path: "/",
   });

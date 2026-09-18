@@ -42,7 +42,7 @@ export default function LoginPage() {
         description: "Authenticated successfully. Loading dashboard...",
         type: "success",
       });
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } else {
       setError(res.message);
     }

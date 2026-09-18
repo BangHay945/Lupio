@@ -161,7 +161,7 @@ export function Topbar({
       description: "Your session has ended successfully.",
       type: "info",
     });
-    router.push("/login");
+    window.location.href = "/login";
   };
 
   const loadData = async () => {

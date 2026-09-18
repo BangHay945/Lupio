@@ -64,11 +64,16 @@ export async function POST(req: NextRequest) {
     // Create cryptographic session token with role
     const token = createSession(adminEmail, userRole);
 
+    // Only enforce secure cookies over HTTPS (so HTTP IP access works)
+    const isHttps =
+      req.headers.get("x-forwarded-proto") === "https" ||
+      req.nextUrl.protocol === "https:";
+
     const res = NextResponse.json({ success: true });
     res.cookies.set("lupio_session", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: isHttps,
+      sameSite: "lax",
       maxAge: 60 * 60 * 24, // 24h
       path: "/",
     });
