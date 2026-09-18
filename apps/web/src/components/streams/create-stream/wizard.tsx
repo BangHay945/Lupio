@@ -547,7 +547,7 @@ export function CreateStreamWizard() {
               </div>
 
               {/* Presets */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => updateForm({ preset: "1080p30", resolution: "1080p", fps: "30", videoBitrate: "8000" })}
@@ -556,8 +556,8 @@ export function CreateStreamWizard() {
                     formData.preset === "1080p30" ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400" : "border-white/10 bg-white/5"
                   )}
                 >
-                  <p className="text-sm font-bold">1080p Full HD (Recommended)</p>
-                  <p className="text-xs text-muted-foreground mt-1">1920x1080 @ 30fps · 8 Mbps Bitrate</p>
+                  <p className="text-sm font-bold">1080p Full HD</p>
+                  <p className="text-xs text-muted-foreground mt-1">1920x1080 @ 30fps · 8 Mbps</p>
                 </button>
 
                 <button
@@ -569,7 +569,19 @@ export function CreateStreamWizard() {
                   )}
                 >
                   <p className="text-sm font-bold">720p HD Standard</p>
-                  <p className="text-xs text-muted-foreground mt-1">1280x720 @ 30fps · 4 Mbps Bitrate</p>
+                  <p className="text-xs text-muted-foreground mt-1">1280x720 @ 30fps · 4 Mbps</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => updateForm({ preset: "4k60", resolution: "4K", fps: "60", videoBitrate: "15000" })}
+                  className={cn(
+                    "p-4 rounded-xl border text-left transition-all",
+                    formData.preset === "4k60" ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400" : "border-white/10 bg-white/5"
+                  )}
+                >
+                  <p className="text-sm font-bold">4K Ultra HD</p>
+                  <p className="text-xs text-muted-foreground mt-1">3840x2160 @ 60fps · 15 Mbps</p>
                 </button>
               </div>
 
