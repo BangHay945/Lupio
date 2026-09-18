@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -391,8 +392,40 @@ export function UploadMediaDialog({
           if (!uploading && !importing) onOpenChange(val);
         }}
       >
-        <DialogContent className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
-          <div className="flex items-start justify-between gap-3">
+        <DialogContent
+          showCloseButton={false}
+          className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground relative"
+        >
+          {/* Top-Right Window Controls (Strip Minimize & Close Aligned) */}
+          <div className="absolute top-3.5 right-3.5 flex items-center gap-1 z-20">
+            {(uploading || fileQueue.length > 0) && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setIsMinimized(true)}
+                className="text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                title="Perkecil ke pojok kanan bawah"
+              >
+                <Minus className="h-4 w-4 stroke-[2.5]" />
+                <span className="sr-only">Minimize</span>
+              </Button>
+            )}
+            <DialogClose
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  className="text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
+                />
+              }
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </div>
+
+          <div className="flex items-start justify-between gap-3 pr-20">
             <DialogHeader className="gap-1 flex-1 min-w-0">
               <DialogTitle className="text-xl font-bold flex items-center gap-2">
                 {activeTab === "file" ? (
@@ -411,17 +444,6 @@ export function UploadMediaDialog({
                   : t("media.cloudDesc")}
               </DialogDescription>
             </DialogHeader>
-
-            {uploading && (
-              <button
-                type="button"
-                onClick={() => setIsMinimized(true)}
-                className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors flex items-center gap-1.5 mr-6 shrink-0"
-                title="Perkecil ke pojok kanan bawah agar bisa navigasi ke menu lain"
-              >
-                <Minus className="h-3.5 w-3.5" /> Minimize
-              </button>
-            )}
           </div>
 
         {/* Tab Selection Switcher */}
