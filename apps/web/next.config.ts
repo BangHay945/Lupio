@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "5gb",
     },
+    cpus: 1,
   },
 };
 

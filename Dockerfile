@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # ==============================================================================
 # Stage 1: Base image with Node.js 20 & Native System FFmpeg
 # ==============================================================================
@@ -19,7 +20,8 @@ WORKDIR /app
 FROM base AS deps
 WORKDIR /app
 COPY apps/web/package.json apps/web/package-lock.json* ./
-RUN npm ci || npm install
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci || npm install
 
 # ==============================================================================
 # Stage 3: Build Next.js standalone application
@@ -32,9 +34,11 @@ COPY apps/web ./
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ENV NODE_OPTIONS="--max-old-space-size=2048"
+ENV NODE_OPTIONS="--max-old-space-size=1280"
 
-RUN npm run build
+# Mount persistent Next.js compiler cache for blazing fast incremental rebuilds
+RUN --mount=type=cache,target=/app/.next/cache \
+    npm run build
 
 # ==============================================================================
 # Stage 4: Production Runner (Minimal & Lightweight)
