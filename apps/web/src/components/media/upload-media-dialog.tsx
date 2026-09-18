@@ -394,7 +394,7 @@ export function UploadMediaDialog({
       >
         <DialogContent
           showCloseButton={false}
-          className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground relative"
+          className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground"
         >
           {/* Top-Right Window Controls (Strip Minimize & Close Aligned) */}
           <div className="absolute top-3.5 right-3.5 flex items-center gap-1 z-20">
