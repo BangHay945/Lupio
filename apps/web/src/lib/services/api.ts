@@ -74,11 +74,7 @@ export const apiService = {
   },
 
   uploadMedia: async (file: File): Promise<MediaItem> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/media", { method: "POST", body: formData });
-    if (!res.ok) throw new Error("Failed to upload media");
-    return await res.json();
+    return apiService.uploadMediaWithProgress(file);
   },
 
   uploadMediaWithProgress: (
@@ -93,8 +89,6 @@ export const apiService = {
   ): Promise<MediaItem> => {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      const formData = new FormData();
-      formData.append("file", file);
 
       let lastLoaded = 0;
       let lastTime = Date.now();
@@ -148,8 +142,11 @@ export const apiService = {
       xhr.addEventListener("error", () => reject(new Error("Network connection error during upload")));
       xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
 
-      xhr.open("POST", "/api/media");
-      xhr.send(formData);
+      // Stream file directly as octet-stream to bypass Next.js FormData parsing memory limits
+      xhr.open("POST", `/api/media?filename=${encodeURIComponent(file.name)}`);
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+      xhr.setRequestHeader("x-filename", encodeURIComponent(file.name));
+      xhr.send(file);
     });
   },
 
