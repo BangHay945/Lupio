@@ -56,7 +56,9 @@ export async function POST(req: NextRequest) {
 
     fs.writeFileSync(filePath, buffer);
 
-    const sizeInMB = (file.size / (1024 * 1024)).toFixed(1) + " MB";
+    const sizeFormatted = file.size >= 1024 * 1024 * 1024
+      ? (file.size / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+      : (file.size / (1024 * 1024)).toFixed(1) + " MB";
     const mediaId = `med_${Date.now()}`;
 
     // Extract real metadata (duration, resolution) & generate thumbnail with FFmpeg
@@ -68,7 +70,7 @@ export async function POST(req: NextRequest) {
       duration: probe.duration || "00:00:00",
       resolution: probe.resolution || "1080p",
       thumbnail: probe.thumbnail,
-      size: sizeInMB,
+      size: sizeFormatted,
       filepath: filePath,
       type: "video",
       uploadDate: new Date().toISOString().split("T")[0],
@@ -78,7 +80,7 @@ export async function POST(req: NextRequest) {
     mediaList.unshift(newItem);
     db.saveMedia(mediaList);
 
-    db.addLog("info", "media", `Uploaded new media file "${filename}" (${sizeInMB}, ${newItem.duration}, ${newItem.resolution})`);
+    db.addLog("info", "media", `Uploaded new media file "${filename}" (${sizeFormatted}, ${newItem.duration}, ${newItem.resolution})`);
     return NextResponse.json(newItem, { status: 201 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

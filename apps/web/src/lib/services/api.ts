@@ -81,6 +81,96 @@ export const apiService = {
     return await res.json();
   },
 
+  uploadMediaWithProgress: (
+    file: File,
+    onProgress?: (progress: {
+      loaded: number;
+      total: number;
+      percentage: number;
+      speedBps: number;
+      etaSeconds: number;
+    }) => void
+  ): Promise<MediaItem> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const formData = new FormData();
+      formData.append("file", file);
+
+      let lastLoaded = 0;
+      let lastTime = Date.now();
+      let smoothedSpeed = 0;
+
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable && onProgress) {
+          const now = Date.now();
+          const timeDelta = (now - lastTime) / 1000;
+          const bytesDelta = e.loaded - lastLoaded;
+
+          if (timeDelta > 0.25) {
+            const currentSpeed = bytesDelta / timeDelta;
+            smoothedSpeed = smoothedSpeed === 0 ? currentSpeed : smoothedSpeed * 0.7 + currentSpeed * 0.3;
+            lastLoaded = e.loaded;
+            lastTime = now;
+          }
+
+          const remainingBytes = e.total - e.loaded;
+          const eta = smoothedSpeed > 0 ? Math.ceil(remainingBytes / smoothedSpeed) : 0;
+          const percentage = Math.round((e.loaded / e.total) * 100);
+
+          onProgress({
+            loaded: e.loaded,
+            total: e.total,
+            percentage,
+            speedBps: smoothedSpeed,
+            etaSeconds: eta,
+          });
+        }
+      });
+
+      xhr.addEventListener("load", () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve(data);
+          } catch {
+            reject(new Error("Invalid server response"));
+          }
+        } else {
+          try {
+            const err = JSON.parse(xhr.responseText);
+            reject(new Error(err.error || `Upload failed with status ${xhr.status}`));
+          } catch {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        }
+      });
+
+      xhr.addEventListener("error", () => reject(new Error("Network connection error during upload")));
+      xhr.addEventListener("abort", () => reject(new Error("Upload aborted")));
+
+      xhr.open("POST", "/api/media");
+      xhr.send(formData);
+    });
+  },
+
+  scanMediaFolder: async (): Promise<{
+    success: boolean;
+    scannedCount: number;
+    addedCount: number;
+    addedItems: MediaItem[];
+    message: string;
+  }> => {
+    const res = await fetch("/api/media/scan-folder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to scan media folder");
+    }
+    return data;
+  },
+
   importMediaFromUrl: async (url: string, filename?: string): Promise<MediaItem> => {
     const res = await fetch("/api/media/import-url", {
       method: "POST",

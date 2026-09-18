@@ -55,6 +55,8 @@ export const translations = {
     "action.startUpload": "Mulai Unggah",
     "action.addMore": "Tambah File",
     "action.clearList": "Bersihkan Daftar",
+    "action.scanFolder": "Pindai Berkas Server",
+    "action.scanning": "Memindai Folder...",
 
     // Status
     "status.live": "SIARAN AKTIF",
@@ -285,6 +287,8 @@ export const translations = {
     "action.startUpload": "Start Upload",
     "action.addMore": "Add More",
     "action.clearList": "Clear List",
+    "action.scanFolder": "Scan Server Folder",
+    "action.scanning": "Scanning Folder...",
 
     // Status
     "status.live": "LIVE",

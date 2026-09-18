@@ -25,6 +25,10 @@ import {
   Globe,
   Link2,
   DownloadCloud,
+  Minus,
+  Maximize2,
+  Zap,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -35,8 +39,72 @@ export interface QueuedUploadFile {
   file: File;
   status: "pending" | "uploading" | "completed" | "error";
   progress: number;
+  loaded?: number;
+  total?: number;
+  speedBps?: number;
+  etaSeconds?: number;
   errorMessage?: string;
   result?: MediaItem;
+}
+
+function formatBytes(bytes: number): string {
+  if (!bytes || bytes <= 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+}
+
+function formatSpeed(bps: number): string {
+  if (!bps || bps <= 0) return "0 KB/s";
+  if (bps >= 1024 * 1024) {
+    return `${(bps / (1024 * 1024)).toFixed(1)} MB/s`;
+  }
+  return `${(bps / 1024).toFixed(0)} KB/s`;
+}
+
+function formatEta(seconds: number): string {
+  if (!seconds || seconds <= 0 || !isFinite(seconds)) return "...";
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  if (mins >= 60) {
+    const hrs = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    return `${hrs}h ${remMins}m`;
+  }
+  return `${mins}m ${secs}s`;
+}
+
+function playSuccessChime() {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const now = ctx.currentTime;
+
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(659.25, now);
+    gain1.gain.setValueAtTime(0.12, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.6);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(830.61, now + 0.15);
+    gain2.gain.setValueAtTime(0.12, now + 0.15);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.15);
+    osc2.stop(now + 0.9);
+  } catch {}
 }
 
 interface UploadMediaDialogProps {
@@ -57,6 +125,7 @@ export function UploadMediaDialog({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [fileQueue, setFileQueue] = useState<QueuedUploadFile[]>([]);
+  const [isMinimized, setIsMinimized] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // URL import state
@@ -64,6 +133,13 @@ export function UploadMediaDialog({
   const [customFilename, setCustomFilename] = useState("");
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+
+  // Reset minimized on modal open
+  useEffect(() => {
+    if (open) {
+      setIsMinimized(false);
+    }
+  }, [open]);
 
   // Sync initialFiles when dialog opens with pre-selected files
   useEffect(() => {
@@ -165,34 +241,47 @@ export function UploadMediaDialog({
       const currentItem = fileQueue[i];
       if (currentItem.status === "completed") continue;
 
-      // Mark uploading & simulate progress start
+      // Mark uploading
       setFileQueue((prev) =>
         prev.map((item) =>
           item.id === currentItem.id
-            ? { ...item, status: "uploading", progress: 35 }
+            ? { ...item, status: "uploading", progress: 0, loaded: 0, total: currentItem.file.size }
             : item
         )
       );
 
       try {
-        // Progress ticker simulation
-        const progressTimer = setInterval(() => {
-          setFileQueue((prev) =>
-            prev.map((item) =>
-              item.id === currentItem.id && item.status === "uploading"
-                ? { ...item, progress: Math.min(item.progress + 20, 90) }
-                : item
-            )
-          );
-        }, 300);
-
-        const uploadedItem = await apiService.uploadMedia(currentItem.file);
-        clearInterval(progressTimer);
+        const uploadedItem = await apiService.uploadMediaWithProgress(
+          currentItem.file,
+          ({ loaded, total, percentage, speedBps, etaSeconds }) => {
+            setFileQueue((prev) =>
+              prev.map((item) =>
+                item.id === currentItem.id
+                  ? {
+                      ...item,
+                      progress: percentage,
+                      loaded,
+                      total,
+                      speedBps,
+                      etaSeconds,
+                    }
+                  : item
+              )
+            );
+          }
+        );
 
         setFileQueue((prev) =>
           prev.map((item) =>
             item.id === currentItem.id
-              ? { ...item, status: "completed", progress: 100, result: uploadedItem }
+              ? {
+                  ...item,
+                  status: "completed",
+                  progress: 100,
+                  speedBps: 0,
+                  etaSeconds: 0,
+                  result: uploadedItem,
+                }
               : item
           )
         );
@@ -208,6 +297,8 @@ export function UploadMediaDialog({
                   ...item,
                   status: "error",
                   progress: 0,
+                  speedBps: 0,
+                  etaSeconds: 0,
                   errorMessage: err.message || "Upload failed",
                 }
               : item
@@ -217,6 +308,10 @@ export function UploadMediaDialog({
     }
 
     setUploading(false);
+
+    if (successCount > 0) {
+      playSuccessChime();
+    }
 
     if (successCount > 0 && failCount === 0) {
       (toast as any)({
@@ -241,6 +336,7 @@ export function UploadMediaDialog({
     totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const isAllFinished = totalCount > 0 && completedCount + errorCount === totalCount;
   const allSuccessful = totalCount > 0 && completedCount === totalCount;
+  const currentUploadingItem = fileQueue.find((f) => f.status === "uploading");
 
   const handleImportUrl = async () => {
     if (!importUrl.trim()) {
@@ -284,26 +380,49 @@ export function UploadMediaDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(val) => !uploading && !importing && onOpenChange(val)}>
-      <DialogContent className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
-        <DialogHeader className="gap-1">
-          <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            {activeTab === "file" ? (
-              <>
-                <UploadCloud className="h-5 w-5 text-emerald-400" /> {t("media.uploadTitle")}
-              </>
-            ) : (
-              <>
-                <Globe className="h-5 w-5 text-emerald-400" /> {t("media.cloudTitle")}
-              </>
+    <>
+      <Dialog
+        open={open && !isMinimized}
+        onOpenChange={(val) => {
+          if (!val && uploading) {
+            setIsMinimized(true);
+            return;
+          }
+          if (!uploading && !importing) onOpenChange(val);
+        }}
+      >
+        <DialogContent className="sm:max-w-[620px] w-full min-w-0 overflow-hidden bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
+          <div className="flex items-start justify-between gap-3">
+            <DialogHeader className="gap-1 flex-1 min-w-0">
+              <DialogTitle className="text-xl font-bold flex items-center gap-2">
+                {activeTab === "file" ? (
+                  <>
+                    <UploadCloud className="h-5 w-5 text-emerald-400" /> {t("media.uploadTitle")}
+                  </>
+                ) : (
+                  <>
+                    <Globe className="h-5 w-5 text-emerald-400" /> {t("media.cloudTitle")}
+                  </>
+                )}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
+                {activeTab === "file"
+                  ? t("media.fileDesc")
+                  : t("media.cloudDesc")}
+              </DialogDescription>
+            </DialogHeader>
+
+            {uploading && (
+              <button
+                type="button"
+                onClick={() => setIsMinimized(true)}
+                className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors flex items-center gap-1.5 mr-6 shrink-0"
+                title="Perkecil ke pojok kanan bawah agar bisa navigasi ke menu lain"
+              >
+                <Minus className="h-3.5 w-3.5" /> Minimize
+              </button>
             )}
-          </DialogTitle>
-          <DialogDescription className="text-xs text-muted-foreground">
-            {activeTab === "file"
-              ? t("media.fileDesc")
-              : t("media.cloudDesc")}
-          </DialogDescription>
-        </DialogHeader>
+          </div>
 
         {/* Tab Selection Switcher */}
         <div className="pill-tab-switcher flex items-center p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs w-full min-w-0">
@@ -533,13 +652,28 @@ export function UploadMediaDialog({
                           <p className="font-medium text-foreground truncate block w-full" title={item.file.name}>
                             {item.file.name}
                           </p>
-                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground flex-wrap">
                             <span>{(item.file.size / (1024 * 1024)).toFixed(1)} MB</span>
                             {item.status === "uploading" && (
-                              <span className="text-emerald-400">Uploading... {item.progress}%</span>
+                              <>
+                                <span>•</span>
+                                <span className="text-emerald-500 font-semibold">{item.progress}%</span>
+                                <span>•</span>
+                                <span className="flex items-center gap-0.5 text-emerald-500 font-medium">
+                                  <Zap className="h-3 w-3" /> {formatSpeed(item.speedBps || 0)}
+                                </span>
+                                <span>•</span>
+                                <span className="flex items-center gap-0.5">
+                                  <Clock className="h-3 w-3" /> Sisa {formatEta(item.etaSeconds || 0)}
+                                </span>
+                                <span>•</span>
+                                <span>{formatBytes(item.loaded || 0)} / {formatBytes(item.total || item.file.size)}</span>
+                              </>
                             )}
                             {item.status === "completed" && (
-                              <span className="text-emerald-400">Uploaded</span>
+                              <span className="text-emerald-500 font-semibold flex items-center gap-1">
+                                <CheckCircle2 className="h-3 w-3" /> Uploaded
+                              </span>
                             )}
                             {item.status === "error" && (
                               <span className="text-red-400 truncate max-w-[200px]">
@@ -640,5 +774,85 @@ export function UploadMediaDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+
+    {/* Floating Bottom-Right Dock Widget when Minimized */}
+    {isMinimized && (uploading || fileQueue.length > 0) && (
+      <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 dark:border-white/15 bg-white/98 dark:bg-zinc-900/98 backdrop-blur-xl p-4 shadow-2xl space-y-3 animate-in fade-in slide-in-from-bottom-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            {uploading ? (
+              <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            ) : allSuccessful ? (
+              <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-amber-500 shrink-0" />
+            )}
+            <span className="text-xs font-bold text-foreground truncate">
+              {uploading
+                ? `Mengunggah (${completedCount}/${totalCount} berkas)...`
+                : allSuccessful
+                ? "Unggahan Selesai 🎉"
+                : "Unggahan Terhenti"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsMinimized(false)}
+              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+              title="Buka Jendela Penuh"
+            >
+              <Maximize2 className="h-3.5 w-3.5" />
+            </button>
+            {!uploading && (
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMinimized(false);
+                  onOpenChange(false);
+                  setFileQueue([]);
+                }}
+                className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                title="Tutup"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Active File Summary */}
+        {uploading && currentUploadingItem && (
+          <div className="text-[11px] space-y-1">
+            <div className="flex items-center justify-between text-muted-foreground">
+              <span className="truncate max-w-[210px] font-medium text-foreground">{currentUploadingItem.file.name}</span>
+              <span className="font-mono text-emerald-500 font-bold">{currentUploadingItem.progress}%</span>
+            </div>
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+              <span className="flex items-center gap-1 text-emerald-500 font-medium">
+                <Zap className="h-3 w-3" /> {formatSpeed(currentUploadingItem.speedBps || 0)}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3 w-3" /> Sisa {formatEta(currentUploadingItem.etaSeconds || 0)}
+              </span>
+              <span>
+                {formatBytes(currentUploadingItem.loaded || 0)} / {formatBytes(currentUploadingItem.total || currentUploadingItem.file.size)}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Mini Progress Bar */}
+        <div className="w-full bg-slate-200 dark:bg-white/10 rounded-full h-1.5 overflow-hidden">
+          <div
+            className={`h-full transition-all duration-300 ${
+              errorCount > 0 && !uploading ? "bg-amber-500" : "bg-emerald-500"
+            }`}
+            style={{ width: `${overallPercentage}%` }}
+          />
+        </div>
+      </div>
+    )}
+  </>
   );
 }

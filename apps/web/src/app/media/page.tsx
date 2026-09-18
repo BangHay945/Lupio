@@ -19,6 +19,7 @@ import {
   FileEdit,
   FolderUp,
   Tag,
+  FolderSync,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,6 +40,7 @@ export default function MediaPage() {
   const [search, setSearch] = useState("");
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scanning, setScanning] = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [initialFiles, setInitialFiles] = useState<File[]>([]);
   const [pageDragOver, setPageDragOver] = useState(false);
@@ -63,6 +65,35 @@ export default function MediaPage() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleScanFolder = async () => {
+    try {
+      setScanning(true);
+      const res = await apiService.scanMediaFolder();
+      if (res.addedCount > 0) {
+        toast({
+          title: "Pindai Selesai",
+          description: `Berhasil mendaftarkan ${res.addedCount} file baru ke Media Library.`,
+          type: "success",
+        });
+        await loadMedia();
+      } else {
+        toast({
+          title: "Pindai Folder",
+          description: res.message || "Tidak ada file video baru di folder server.",
+          type: "info",
+        });
+      }
+    } catch (err: any) {
+      toast({
+        title: "Pindai Gagal",
+        description: err.message || "Gagal memindai folder server.",
+        type: "error",
+      });
+    } finally {
+      setScanning(false);
     }
   };
 
@@ -164,15 +195,28 @@ export default function MediaPage() {
           </div>
         </div>
 
-        <Button
-          onClick={() => {
-            setInitialFiles([]);
-            setUploadOpen(true);
-          }}
-          className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
-        >
-          <Plus className="h-4 w-4" /> {t("action.uploadMedia")}
-        </Button>
+        <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+          <Button
+            variant="outline"
+            disabled={scanning}
+            onClick={handleScanFolder}
+            className="border-white/10 hover:bg-white/5 text-foreground rounded-full h-10 px-4 text-xs font-semibold gap-2 transition-all cursor-pointer"
+            title="Pindai folder uploads di server (untuk file yang diunggah via SFTP/FileZilla)"
+          >
+            <FolderSync className={`h-4 w-4 text-sky-400 ${scanning ? "animate-spin" : ""}`} />
+            {scanning ? t("action.scanning") : t("action.scanFolder")}
+          </Button>
+
+          <Button
+            onClick={() => {
+              setInitialFiles([]);
+              setUploadOpen(true);
+            }}
+            className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs cursor-pointer"
+          >
+            <Plus className="h-4 w-4" /> {t("action.uploadMedia")}
+          </Button>
+        </div>
       </div>
 
       {/* Grid of Media Assets */}
