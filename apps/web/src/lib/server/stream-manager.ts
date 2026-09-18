@@ -37,8 +37,35 @@ export class StreamManager {
   private reconnectingStreams: Set<string> = new Set();
 
   constructor() {
+    this.setupProcessLifecycle();
     this.startWatchdogDaemon();
     this.initBootRecovery();
+  }
+
+  /**
+   * Graceful Shutdown: Terminate all spawned FFmpeg processes cleanly when server stops/restarts
+   */
+  private setupProcessLifecycle() {
+    const cleanup = (signal: string) => {
+      console.log(`[StreamManager] Received ${signal}. Terminating all active FFmpeg processes gracefully...`);
+      for (const [streamId, active] of this.activeProcesses) {
+        try {
+          if (active && active.process && !active.process.killed) {
+            const pid = active.process.pid;
+            if (process.platform === "win32" && pid) {
+              exec(`taskkill /pid ${pid} /T /F`, () => {});
+            } else {
+              active.process.kill("SIGKILL");
+            }
+          }
+        } catch (e) {}
+      }
+      this.activeProcesses.clear();
+    };
+
+    process.once("SIGTERM", () => cleanup("SIGTERM"));
+    process.once("SIGINT", () => cleanup("SIGINT"));
+    process.once("beforeExit", () => cleanup("beforeExit"));
   }
 
   /**
@@ -462,14 +489,65 @@ export class StreamManager {
     const watermarkText = stream.watermarkText || settings.globalWatermarkText || "";
     const tickerText = stream.tickerText || "";
 
+    const sanitizeFfmpegDrawtext = (text: string) => {
+      return text
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "")
+        .replace(/:/g, "\\:")
+        .replace(/%/g, "\\%")
+        .replace(/\[/g, "\\[")
+        .replace(/\]/g, "\\]");
+    };
+
     if (watermarkText) {
-      const cleanW = watermarkText.replace(/'/g, "").replace(/:/g, "\\:");
+      const cleanW = sanitizeFfmpegDrawtext(watermarkText);
       filterParts.push(`drawtext=text='${cleanW}':x=w-tw-30:y=30:fontsize=24:fontcolor=white@0.8:shadowcolor=black@0.6:shadowx=2:shadowy=2`);
     }
 
     if (tickerText) {
-      const cleanT = tickerText.replace(/'/g, "").replace(/:/g, "\\:");
+      const cleanT = sanitizeFfmpegDrawtext(tickerText);
       filterParts.push(`drawtext=text='${cleanT}':x=w-mod(t*110\\,w+tw):y=h-50:fontsize=22:fontcolor=yellow@0.9:box=1:boxcolor=black@0.6:boxborderw=8`);
+    }
+
+    // Feature: Realtime Digital Clock Overlay (with Timezone & Country support)
+    if (stream.enableDigitalClock) {
+      const pos = stream.clockPosition || "top-right";
+      let clockX = "w-tw-30";
+      let clockY = "30";
+      if (pos === "top-left") { clockX = "30"; clockY = "30"; }
+      else if (pos === "bottom-left") { clockX = "30"; clockY = "h-th-30"; }
+      else if (pos === "bottom-right") { clockX = "w-tw-30"; clockY = "h-th-30"; }
+
+      const tzLabels: Record<string, string> = {
+        "Asia/Jakarta": "WIB",
+        "Asia/Makassar": "WITA",
+        "Asia/Jayapura": "WIT",
+        "Asia/Singapore": "SGT",
+        "Asia/Riyadh": "KSA",
+        "Asia/Tokyo": "JST",
+        "Europe/London": "GMT",
+        "America/New_York": "EST",
+        "America/Los_Angeles": "PST",
+        "UTC": "UTC",
+      };
+
+      const tzSuffix = (stream.clockShowLabel !== false && stream.clockTimezone && tzLabels[stream.clockTimezone])
+        ? ` ${tzLabels[stream.clockTimezone]}`
+        : "";
+
+      filterParts.push(`drawtext=fontcolor=white:fontsize=22:box=1:boxcolor=black@0.6:boxborderw=6:x=${clockX}:y=${clockY}:text='%{localtime\\:%T}${tzSuffix}'`);
+    }
+
+    // Feature: PNG Logo Watermark Overlay
+    if (stream.logoWatermarkPath && fs.existsSync(stream.logoWatermarkPath)) {
+      const safeLogo = stream.logoWatermarkPath.replace(/\\/g, "/");
+      const pos = stream.logoPosition || "top-left";
+      let overlayCoord = "30:30";
+      if (pos === "top-right") overlayCoord = "W-w-30:30";
+      else if (pos === "bottom-left") overlayCoord = "30:H-h-30";
+      else if (pos === "bottom-right") overlayCoord = "W-w-30:H-h-30";
+
+      filterParts.push(`movie='${safeLogo}',scale=160:-1[logo];[in][logo]overlay=${overlayCoord}`);
     }
 
     // Playlist & Stream Transition Effects (Anti-Drop Smooth Fades)
@@ -501,14 +579,21 @@ export class StreamManager {
     const fps = stream.fps || 30;
     const gop = fps * 2; // YouTube recommends 2-second GOP
 
+    // Ensure local HLS preview folder exists
+    const hlsDir = path.join(process.cwd(), "data", "hls", streamId);
+    if (!fs.existsSync(hlsDir)) {
+      fs.mkdirSync(hlsDir, { recursive: true });
+    }
+    const hlsMuxer = `[f=hls:hls_time=2:hls_list_size=4:hls_flags=delete_segments]data/hls/${streamId}/index.m3u8`;
+
     let outputArgs: string[] = [];
     if (targetChannels.length > 1) {
-      const teeOutputs = targetChannels.map((c) => {
+      const rtmpOutputs = targetChannels.map((c) => {
         const url = c.rtmpUrl.endsWith("/") ? c.rtmpUrl : `${c.rtmpUrl}/`;
         return `[f=flv:flvflags=no_duration_filesize:onfail=ignore]${url}${c.streamKey.trim()}`;
-      }).join("|");
-
-      outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", teeOutputs];
+      });
+      const allOutputs = [...rtmpOutputs, hlsMuxer].join("|");
+      outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", allOutputs];
     } else {
       const ch = targetChannels[0];
       const rtmpBase = ch.rtmpUrl.endsWith("/") ? ch.rtmpUrl : `${ch.rtmpUrl}/`;
@@ -516,7 +601,12 @@ export class StreamManager {
       const destination = `${rtmpBase}${streamKey}`;
       const isMockKey = streamKey.includes("test_mock") || streamKey === "mock";
 
-      outputArgs = ["-flvflags", "no_duration_filesize", "-f", isMockKey ? "null" : "flv", destination];
+      const flvOutput = isMockKey
+        ? `[f=null]pipe:`
+        : `[f=flv:flvflags=no_duration_filesize:onfail=ignore]${destination}`;
+
+      const allOutputs = `${flvOutput}|${hlsMuxer}`;
+      outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", allOutputs];
     }
 
     // Hardware Acceleration & Encoder selection
@@ -603,7 +693,9 @@ export class StreamManager {
       process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"
     );
 
-    if (fs.existsSync(bundledStaticPath)) {
+    if (settings.ffmpegPath && settings.ffmpegPath !== "ffmpeg" && fs.existsSync(settings.ffmpegPath)) {
+      ffmpegPath = settings.ffmpegPath;
+    } else if (fs.existsSync(bundledStaticPath)) {
       ffmpegPath = bundledStaticPath;
     } else {
       try {
@@ -617,9 +709,29 @@ export class StreamManager {
     try {
       db.addLog("info", "ffmpeg", `Initiating FFmpeg process (${ffmpegPath}) for "${stream.name}" [EBU R128: ${settings.enableAudioNormalizer !== false ? "ON" : "OFF"}]`);
 
+      // Prepare timezone environment if digital clock is enabled
+      const env = { ...process.env };
+      if (stream.enableDigitalClock && stream.clockTimezone && stream.clockTimezone !== "server") {
+        const isWin = process.platform === "win32";
+        const posixTzMap: Record<string, string> = {
+          "Asia/Jakarta": "WIB-7",
+          "Asia/Makassar": "WITA-8",
+          "Asia/Jayapura": "WIT-9",
+          "Asia/Singapore": "SGT-8",
+          "Asia/Riyadh": "AST-3",
+          "Asia/Tokyo": "JST-9",
+          "Europe/London": "GMT0",
+          "America/New_York": "EST5EDT",
+          "America/Los_Angeles": "PST8PDT",
+          "UTC": "UTC0",
+        };
+        env.TZ = isWin ? (posixTzMap[stream.clockTimezone] || stream.clockTimezone) : stream.clockTimezone;
+      }
+
       const child = spawn(/*turbopackIgnore: true*/ ffmpegPath, ffmpegArgs, {
         detached: false,
         stdio: ["ignore", "pipe", "pipe"],
+        env,
       });
 
       const activeProc: ActiveProcess = {
@@ -717,6 +829,7 @@ export class StreamManager {
 
     const procObj = this.activeProcesses.get(streamId);
     this.activeProcesses.delete(streamId);
+    this.statsHistoryMap.delete(streamId);
 
     if (procObj && procObj.process) {
       const pid = procObj.process.pid;
@@ -740,6 +853,14 @@ export class StreamManager {
       } catch (e) {
         // Non-critical — ignore cleanup errors
       }
+    }
+
+    // Clean up HLS preview files if they exist
+    const hlsDir = path.join(process.cwd(), "data", "hls", streamId);
+    if (fs.existsSync(hlsDir)) {
+      try {
+        fs.rmSync(hlsDir, { recursive: true, force: true });
+      } catch (e) {}
     }
 
     return { success: true, message: `Stream stopped.` };

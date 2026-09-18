@@ -1,4 +1,4 @@
-node_modules/
+﻿node_modules/
 **/node_modules/
 .next/
 **/.next/
@@ -13,3 +13,7 @@ Thumbs.db
 .env*.local
 uploads/
 **/uploads/*
+data/
+**/data/*
+*.tmp
+*.corrupted.*

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, Wifi, LogOut, Settings, ShieldCheck, PanelLeft, ExternalLink, Sun, Moon, User, UserCheck } from "lucide-react";
+import { Bell, Wifi, LogOut, Settings, ShieldCheck, PanelLeft, ExternalLink, Sun, Moon, User, UserCheck, Check } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,18 +16,9 @@ import { Button } from "@/components/ui/button";
 import { apiService } from "@/lib/services/api";
 import { logoutUser } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
-
-const pageMeta: Record<string, { title: string; sub: string }> = {
-  "/dashboard": { title: "Overview", sub: "System & streams at a glance" },
-  "/analytics": { title: "Analytics", sub: "Uptime, data transmission & reports" },
-  "/streams": { title: "Streams", sub: "Manage active broadcasts" },
-  "/media": { title: "Media", sub: "Video & audio library" },
-  "/playlists": { title: "Playlists", sub: "Build your stream queues" },
-  "/schedule": { title: "Schedule", sub: "Plan upcoming broadcasts" },
-  "/channels": { title: "Channels", sub: "RTMP destinations" },
-  "/logs": { title: "Logs", sub: "System & FFmpeg output" },
-  "/settings": { title: "Settings", sub: "Configuration" },
-};
+import { useLanguage, LANGUAGE_OPTIONS } from "@/lib/i18n/language-context";
+import { FlagIcon } from "@/components/ui/flag-icons";
+import { cn } from "@/lib/utils";
 
 export function Topbar({ 
   onToggleSidebar, 
@@ -39,7 +30,34 @@ export function Topbar({
   const pathname = usePathname();
   const router = useRouter();
   const segment = "/" + pathname.split("/")[1];
-  const meta = pageMeta[segment] ?? { title: segment.replace("/", ""), sub: "" };
+  const { language, setLanguage, t, currentOption } = useLanguage();
+
+  const getMeta = (seg: string) => {
+    switch (seg) {
+      case "/dashboard":
+        return { title: t("meta.dashboard.title"), sub: t("meta.dashboard.sub") };
+      case "/analytics":
+        return { title: t("meta.analytics.title"), sub: t("meta.analytics.sub") };
+      case "/streams":
+        return { title: t("meta.streams.title"), sub: t("meta.streams.sub") };
+      case "/media":
+        return { title: t("meta.media.title"), sub: t("meta.media.sub") };
+      case "/playlists":
+        return { title: t("meta.playlists.title"), sub: t("meta.playlists.sub") };
+      case "/schedule":
+        return { title: t("meta.schedule.title"), sub: t("meta.schedule.sub") };
+      case "/channels":
+        return { title: t("meta.channels.title"), sub: t("meta.channels.sub") };
+      case "/logs":
+        return { title: t("meta.logs.title"), sub: t("meta.logs.sub") };
+      case "/settings":
+        return { title: t("meta.settings.title"), sub: t("meta.settings.sub") };
+      default:
+        return { title: seg.replace("/", "") || "Lupio", sub: "" };
+    }
+  };
+
+  const meta = getMeta(segment);
 
   const [bandwidth, setBandwidth] = useState<number>(0);
   const [recentLogs, setRecentLogs] = useState<any[]>([]);
@@ -136,8 +154,8 @@ export function Topbar({
     });
   };
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    await logoutUser();
     (toast as any)({
       title: "Logged Out 👋",
       description: "Your session has ended successfully.",
@@ -204,10 +222,54 @@ export function Topbar({
             <span className="text-xs font-semibold text-foreground font-mono">{bandwidth} Mbps</span>
           </div>
 
+          {/* Country Flag Language Selector (Round Flag Only) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              title={language === "id" ? "Ganti Bahasa (Indonesia / English)" : "Change Language (Indonesian / English)"}
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-transparent transition-colors hover:bg-white/10 cursor-pointer overflow-hidden p-0"
+            >
+              <FlagIcon lang={language} className="h-4.5 w-4.5 rounded-full" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 border-white/10 bg-zinc-950 p-2.5 rounded-2xl shadow-2xl">
+              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                {language === "id" ? "Pilih Bahasa" : "Select Language"}
+              </div>
+              <DropdownMenuSeparator className="bg-white/10 my-2" />
+              <div className="flex flex-col gap-2">
+                {LANGUAGE_OPTIONS.map((opt) => {
+                  const active = language === opt.code;
+                  return (
+                    <DropdownMenuItem
+                      key={opt.code}
+                      onClick={() => {
+                        setLanguage(opt.code);
+                        (toast as any)({
+                          title: `${opt.code === "id" ? "🇮🇩" : "🇬🇧"} ${opt.label}`,
+                          description: opt.code === "id" ? "Bahasa berhasil diubah ke Bahasa Indonesia." : "Language switched to English.",
+                          type: "info",
+                        });
+                      }}
+                      className={cn(
+                        "menu-pill-item justify-between cursor-pointer",
+                        active && "active"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <FlagIcon lang={opt.code} className="h-5 w-5 rounded-full shrink-0" />
+                        <span>{opt.label}</span>
+                      </div>
+                      {active && <Check className="h-4 w-4 text-emerald-400 shrink-0 ml-2" />}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           {/* Theme Dark/Light Toggle */}
           <button
             onClick={toggleTheme}
-            title={`Switch to ${theme === "dark" ? "Light" : "Dark"} Mode`}
+            title={theme === "dark" ? t("topbar.themeLight") : t("topbar.themeDark")}
             className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-transparent text-foreground transition-colors hover:bg-white/10"
           >
             {theme === "dark" ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-blue-500" />}
@@ -221,8 +283,8 @@ export function Topbar({
                 <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               )}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 border-white/10 bg-zinc-950 p-2 rounded-2xl">
-              <div className="px-2 py-1.5 text-xs font-bold text-muted-foreground flex items-center justify-between">
+            <DropdownMenuContent align="end" className="w-80 border-white/10 bg-zinc-950 p-2.5 rounded-2xl shadow-2xl">
+              <div className="px-2.5 py-1 text-xs font-bold text-muted-foreground flex items-center justify-between">
                 <span>Notification Center</span>
                 <div className="flex items-center gap-1 bg-white/5 p-1 rounded-full border border-white/10 text-[10px]">
                   <button
@@ -245,7 +307,7 @@ export function Topbar({
                   </button>
                 </div>
               </div>
-              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuSeparator className="bg-white/10 my-1.5" />
 
               <div className="space-y-1.5 py-1 max-h-60 overflow-y-auto">
                 {recentLogs.filter(l => logFilter === "all" || l.level === logFilter).length === 0 ? (
@@ -267,10 +329,10 @@ export function Topbar({
                 )}
               </div>
 
-              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuSeparator className="bg-white/10 my-2" />
               <DropdownMenuItem
                 onClick={() => router.push("/logs")}
-                className="text-xs text-center justify-center text-emerald-400 cursor-pointer font-medium"
+                className="menu-pill-item justify-center text-emerald-400 hover:text-emerald-300 active cursor-pointer"
               >
                 View Full System Logs →
               </DropdownMenuItem>
@@ -282,8 +344,8 @@ export function Topbar({
             <DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 text-xs font-bold transition-colors hover:bg-emerald-500/25 border border-emerald-500/20">
               {userInitials}
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60 border-white/10 bg-zinc-950 p-1.5">
-              <div className="font-normal p-2">
+            <DropdownMenuContent align="end" className="w-64 border-white/10 bg-zinc-950 p-2.5 rounded-2xl shadow-2xl">
+              <div className="font-normal p-3 rounded-xl bg-white/[0.03] border border-white/5 mb-1.5">
                 <div className="flex flex-col space-y-1">
                   <p className="text-xs font-bold text-foreground flex items-center gap-1.5 truncate">
                     <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" /> {userName}
@@ -291,27 +353,29 @@ export function Topbar({
                   <p className="text-[11px] text-muted-foreground truncate">{userEmail}</p>
                 </div>
               </div>
-              <DropdownMenuSeparator className="bg-white/10" />
+              <DropdownMenuSeparator className="bg-white/10 my-2" />
 
-              <DropdownMenuItem
-                onClick={() => {
-                  setEditName(userName);
-                  setEditEmail(userEmail);
-                  setIsEditProfileOpen(true);
-                }}
-                className="cursor-pointer text-xs"
-              >
-                <User className="mr-2 h-3.5 w-3.5 text-emerald-400" /> Edit Profile
-              </DropdownMenuItem>
+              <div className="flex flex-col gap-1.5">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setEditName(userName);
+                    setEditEmail(userEmail);
+                    setIsEditProfileOpen(true);
+                  }}
+                  className="menu-pill-item cursor-pointer"
+                >
+                  <User className="mr-2.5 h-4 w-4 text-emerald-400 shrink-0" /> {t("topbar.editProfile")}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem onClick={() => router.push("/settings")} className="cursor-pointer text-xs">
-                <Settings className="mr-2 h-3.5 w-3.5 text-muted-foreground" /> Settings & System
-              </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push("/settings")} className="menu-pill-item cursor-pointer">
+                  <Settings className="mr-2.5 h-4 w-4 text-zinc-400 shrink-0" /> {t("nav.settings")}
+                </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-xs text-red-400 focus:text-red-400">
-                <LogOut className="mr-2 h-3.5 w-3.5" /> Log Out
-              </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10 my-1" />
+                <DropdownMenuItem onClick={handleLogout} className="menu-pill-item text-red-400 hover:text-red-300 hover:bg-red-500/10 focus:text-red-300 focus:bg-red-500/10 cursor-pointer">
+                  <LogOut className="mr-2.5 h-4 w-4 shrink-0" /> {t("topbar.logout")}
+                </DropdownMenuItem>
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -322,7 +386,7 @@ export function Topbar({
         <DialogContent className="sm:max-w-[420px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
           <DialogHeader>
             <DialogTitle className="text-base font-bold flex items-center gap-2">
-              <UserCheck className="h-4 w-4 text-emerald-400" /> Edit Admin Profile
+              <UserCheck className="h-4 w-4 text-emerald-400" /> {t("topbar.editProfile")}
             </DialogTitle>
           </DialogHeader>
 
@@ -350,10 +414,10 @@ export function Topbar({
 
             <DialogFooter className="pt-3 border-t border-white/10">
               <Button type="button" variant="outline" onClick={() => setIsEditProfileOpen(false)} className="text-xs">
-                Cancel
+                {t("action.cancel")}
               </Button>
               <Button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold text-xs">
-                Save Profile
+                {t("action.save")}
               </Button>
             </DialogFooter>
           </form>

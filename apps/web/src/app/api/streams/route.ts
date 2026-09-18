@@ -1,13 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
 import { streamManager } from "@/lib/server/stream-manager";
+import { requireAuth } from "@/lib/server/session";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   const streams = db.getStreams();
   return NextResponse.json(streams);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
     const newStream = {
@@ -29,6 +36,12 @@ export async function POST(req: Request) {
       watermarkText: body.watermarkText,
       tickerText: body.tickerText,
       backupMediaId: body.backupMediaId,
+      logoWatermarkPath: body.logoWatermarkPath,
+      logoPosition: body.logoPosition,
+      enableDigitalClock: Boolean(body.enableDigitalClock),
+      clockPosition: body.clockPosition,
+      clockTimezone: body.clockTimezone || "Asia/Jakarta",
+      clockShowLabel: body.clockShowLabel !== false,
     };
 
     db.saveStream(newStream);

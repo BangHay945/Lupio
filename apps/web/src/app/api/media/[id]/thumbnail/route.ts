@@ -1,14 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/lib/server/session";
 import fs from "fs";
 import path from "path";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await params;
-    const thumbFilePath = path.join(process.cwd(), "uploads", "thumbnails", `${id}.jpg`);
+    const cleanId = id.replace(/[^a-zA-Z0-9_-]/g, "");
+    const thumbFilePath = path.join(process.cwd(), "uploads", "thumbnails", `${cleanId}.jpg`);
 
     if (!fs.existsSync(thumbFilePath)) {
       return new NextResponse("Thumbnail not found", { status: 404 });

@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { apiService } from "@/lib/services/api";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 interface LogEntry {
   id: string;
@@ -21,40 +22,8 @@ interface LogEntry {
   source: string;
 }
 
-const generateMockLogs = (): LogEntry[] => {
-  const logs: LogEntry[] = [];
-  const sources = ["system", "ffmpeg", "rtmp", "scheduler"];
-  const now = new Date();
-  
-  for (let i = 0; i < 50; i++) {
-    const time = new Date(now.getTime() - (50 - i) * 15000);
-    const rand = Math.random();
-    let level: "info" | "warn" | "error" = "info";
-    let message = "System heartbeat check OK.";
-    
-    if (rand > 0.9) {
-      level = "error";
-      message = "FFmpeg process crashed unexpectedly. Exit code 137.";
-    } else if (rand > 0.7) {
-      level = "warn";
-      message = "High CPU usage detected on transcode thread.";
-    } else if (rand > 0.5) {
-      message = "Client connected to RTMP stream.";
-    }
-
-    logs.push({
-      id: `log_${i}`,
-      timestamp: time.toISOString(),
-      level,
-      source: sources[Math.floor(Math.random() * sources.length)],
-      message
-    });
-  }
-  
-  return logs;
-};
-
 export default function LogsPage() {
+  const { t } = useLanguage();
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [filter, setFilter] = useState<"all" | "error" | "warn">("all");
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -62,13 +31,13 @@ export default function LogsPage() {
   const fetchLogs = async () => {
     try {
       const realLogs = await apiService.getLogs();
-      if (realLogs && realLogs.length > 0) {
+      if (Array.isArray(realLogs)) {
         setLogs(realLogs);
       } else {
-        setLogs(generateMockLogs());
+        setLogs([]);
       }
     } catch {
-      setLogs(generateMockLogs());
+      setLogs([]);
     }
   };
 
@@ -107,44 +76,54 @@ export default function LogsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 h-[calc(100vh-6rem)] w-full">
+    <div className="flex flex-col gap-4 h-[calc(100vh-9rem)] w-full">
       <div className="flex items-center justify-end gap-3 shrink-0">
         <DropdownMenu>
-          <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-xs font-bold transition-colors border border-white/10 bg-transparent h-10 px-5 text-foreground hover:bg-black/5 dark:hover:bg-white/10">
+          <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-xs font-bold transition-colors border border-slate-300 dark:border-white/10 bg-transparent h-10 px-5 text-foreground hover:bg-black/5 dark:hover:bg-white/10">
             <Filter className="mr-2 h-3.5 w-3.5 text-emerald-400" />
-            {filter === "all" ? "All Logs" : filter === "error" ? "Errors Only" : "Warnings Only"}
+            {filter === "all" ? t("logs.filterAll") : filter === "error" ? t("logs.filterError") : t("logs.filterWarn")}
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 rounded-2xl p-1.5">
-            <DropdownMenuItem onClick={() => setFilter("all")} className="cursor-pointer text-xs rounded-xl">All Logs</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter("error")} className="cursor-pointer text-xs rounded-xl">Errors Only</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setFilter("warn")} className="cursor-pointer text-xs rounded-xl">Warnings Only</DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-44 border-slate-200 dark:border-white/10 bg-white/95 dark:bg-zinc-950/95 rounded-2xl p-2 shadow-xl space-y-1">
+            <DropdownMenuItem onClick={() => setFilter("all")} className="menu-pill-item cursor-pointer">{t("logs.filterAll")}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilter("error")} className="menu-pill-item cursor-pointer">{t("logs.filterError")}</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilter("warn")} className="menu-pill-item cursor-pointer">{t("logs.filterWarn")}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant="outline" onClick={handleDownload} className="h-10 px-5 border-white/10 bg-transparent text-xs font-bold text-foreground hover:bg-black/5 dark:hover:bg-white/10 rounded-full">
-          <Download className="mr-2 h-3.5 w-3.5 text-emerald-400" /> Download
+        <Button variant="outline" onClick={handleDownload} className="h-10 px-5 border-slate-300 dark:border-white/10 bg-transparent text-xs font-bold text-foreground hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-all hover:scale-[1.02]">
+          <Download className="mr-2 h-3.5 w-3.5 text-emerald-400" /> {t("logs.download")}
         </Button>
-        <Button variant="destructive" onClick={handleClear} className="h-10 px-5 text-xs rounded-full font-bold">
-          <Trash2 className="mr-2 h-3.5 w-3.5" /> Clear
+        <Button variant="destructive" onClick={handleClear} className="h-10 px-5 text-xs rounded-full font-bold transition-all hover:scale-[1.02]">
+          <Trash2 className="mr-2 h-3.5 w-3.5" /> {t("logs.clear")}
         </Button>
       </div>
 
-      <div className="flex-1 rounded-lg border bg-zinc-950 font-mono text-sm overflow-hidden flex flex-col shadow-inner">
-        <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2 flex items-center gap-2 shrink-0">
-          <Terminal className="h-4 w-4 text-zinc-400" />
-          <span className="text-zinc-400 font-semibold text-xs tracking-wider">lupio-server ~ /var/log/syslog</span>
+      <div className="flex-1 min-h-0 rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-950 font-mono text-sm overflow-hidden flex flex-col shadow-inner">
+        <div className="bg-slate-100/80 dark:bg-zinc-900 border-b border-slate-200 dark:border-zinc-800 px-4 py-2.5 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1.5 mr-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-400/80 dark:bg-red-500/80 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80 dark:bg-yellow-500/80 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80 dark:bg-emerald-500/80 inline-block" />
+            </div>
+            <Terminal className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
+            <span className="text-slate-600 dark:text-zinc-400 font-semibold text-xs tracking-wider">lupio-server ~ /var/log/syslog</span>
+          </div>
+          <span className="text-[11px] text-muted-foreground font-sans">
+            {filteredLogs.length} {filteredLogs.length === 1 ? "entry" : "entries"}
+          </span>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 space-y-1.5 custom-scrollbar">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-1.5 custom-scrollbar">
           {filteredLogs.length === 0 ? (
-            <div className="text-zinc-500 italic">No logs to display...</div>
+            <div className="text-muted-foreground italic text-xs py-4 text-center">No logs to display...</div>
           ) : (
             filteredLogs.map(log => (
-              <div key={log.id} className="flex items-start break-all hover:bg-white/5 px-1 -mx-1 rounded">
-                <span className="text-zinc-500 shrink-0 w-44">
+              <div key={log.id} className="flex items-start break-all hover:bg-black/5 dark:hover:bg-white/5 px-1.5 py-0.5 rounded transition-colors text-xs leading-relaxed">
+                <span className="text-muted-foreground shrink-0 w-44 font-sans text-[11px]">
                   [{new Date(log.timestamp).toLocaleString()}]
                 </span>
-                <span className="text-zinc-400 shrink-0 w-24">
+                <span className="text-slate-500 dark:text-zinc-400 shrink-0 w-24 font-bold text-[11px]">
                   [{log.source}]
                 </span>
                 <span className={cn("flex-1", getLogColor(log.level))}>

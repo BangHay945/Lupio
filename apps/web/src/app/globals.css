@@ -200,8 +200,7 @@ html[data-theme="light"] header div[title] {
   box-shadow: none !important;
 }
 
-/* Custom Select & Dropdown Item Hover in Light & Dark Mode */
-.select-option-item:hover,
+/* Custom Select & Dropdown Item Hover in Light Mode */
 html[data-theme="light"] .select-option-item:not([class*="bg-emerald"]):hover,
 html[data-theme="light"] [data-slot="dropdown-menu-item"]:not([data-variant="destructive"]):hover,
 html[data-theme="light"] [data-slot="dropdown-menu-sub-trigger"]:hover,
@@ -211,11 +210,30 @@ html[data-theme="light"] [data-slot="dropdown-menu-radio-item"]:hover {
   color: #0f172a !important;
 }
 
-.select-option-item[class*="bg-emerald"],
 html[data-theme="light"] .select-option-item[class*="bg-emerald"] {
   background-color: rgba(16, 185, 129, 0.15) !important;
   color: #059669 !important;
   border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Custom Select & Dropdown Item Hover in Dark Mode */
+html:not([data-theme="light"]) .select-option-item:not([class*="bg-emerald"]):hover,
+html.dark .select-option-item:not([class*="bg-emerald"]):hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+html:not([data-theme="light"]) .select-option-item[class*="bg-emerald"],
+html.dark .select-option-item[class*="bg-emerald"] {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+html:not([data-theme="light"]) .select-option-item[class*="bg-emerald"]:hover,
+html.dark .select-option-item[class*="bg-emerald"]:hover {
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  color: #6ee7b7 !important;
 }
 
 /* Cards, Tables & Content Panels Light Mode Pure White Background */
@@ -331,19 +349,119 @@ html[data-theme="light"] aside .sidebar-status-pill {
   box-shadow: none !important;
 }
 
-/* Transparent Pill Tab Switcher in Light Mode */
-html[data-theme="light"] .pill-tab-switcher {
-  background-color: transparent !important;
-  border-color: #cbd5e1 !important;
+/* ==========================================================================
+   Universal Pill Tab Switcher (Light & Dark Mode)
+   ========================================================================== */
+.pill-tab-switcher {
+  border-radius: 9999px !important;
+  background-color: rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
+.pill-tab-switcher button {
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+  border-radius: 9999px !important;
+  border: 1px solid transparent !important;
+  font-weight: 600 !important;
+}
+
+/* Dark mode active tab */
+.pill-tab-switcher button[class*="bg-emerald"] {
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(16, 185, 129, 0.4) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.pill-tab-switcher button[class*="bg-emerald"] svg {
+  color: #34d399 !important;
+}
+
+/* Dark mode inactive hover */
+.pill-tab-switcher button:not([class*="bg-emerald"]):hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Light mode pill track */
+html[data-theme="light"] .pill-tab-switcher {
+  background-color: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Light mode inactive tab */
 html[data-theme="light"] .pill-tab-switcher button {
   color: #64748b !important;
+  border: 1px solid transparent !important;
+  font-weight: 600 !important;
 }
 
+/* Light mode inactive hover */
+html[data-theme="light"] .pill-tab-switcher button:not([class*="bg-emerald"]):hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Light mode active tab - Signature high-contrast emerald glass */
 html[data-theme="light"] .pill-tab-switcher button[class*="bg-emerald"] {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  color: #059669 !important;
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid #6ee7b7 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.12) !important;
+}
+
+html[data-theme="light"] .pill-tab-switcher button[class*="bg-emerald"] svg {
+  color: #047857 !important;
+}
+
+/* ==========================================================================
+   Empty State Card Wrapper (Light: White / Dark: Sleek Charcoal Gray)
+   ========================================================================== */
+.empty-state-wrapper {
+  background-color: #121215 !important;
+  border: 1px dashed rgba(255, 255, 255, 0.14) !important;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+html[data-theme="light"] .empty-state-wrapper {
+  background-color: #ffffff !important;
+  border: 1px dashed #cbd5e1 !important;
+  box-shadow: 0 1px 4px 0 rgba(15, 23, 42, 0.03) !important;
+}
+
+/* ==========================================================================
+   Reduced Card Shadow Intensity (Subtle Modern Depth in Dark & Light Mode)
+   ========================================================================== */
+[data-slot="card"],
+.bg-card,
+[class*="bg-card"],
+.card {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.15), 0 1px 2px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+[data-slot="card"]:hover,
+.bg-card:hover,
+[class*="bg-card"]:hover,
+.card:hover {
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="light"] [data-slot="card"],
+html[data-theme="light"] .bg-card,
+html[data-theme="light"] [class*="bg-card"],
+html[data-theme="light"] .card {
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px 0 rgba(15, 23, 42, 0.02) !important;
+}
+
+html[data-theme="light"] [data-slot="card"]:hover,
+html[data-theme="light"] .bg-card:hover,
+html[data-theme="light"] [class*="bg-card"]:hover,
+html[data-theme="light"] .card:hover {
+  box-shadow: 0 2px 6px 0 rgba(15, 23, 42, 0.05) !important;
 }
 
 html[data-theme="light"] aside nav a {
@@ -366,6 +484,58 @@ html[data-theme="light"] aside nav a.sidebar-active {
 
 html[data-theme="light"] aside nav a.sidebar-active svg {
   color: #047857 !important;
+}
+
+/* Sidebar Menu Matching Dropdown Pill Items */
+.menu-pill-item {
+  height: 2.5rem !important; /* 40px */
+  padding-left: 0.875rem !important;
+  padding-right: 0.875rem !important;
+  border-radius: 9999px !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease-in-out !important;
+  border: 1px solid transparent !important;
+  display: flex !important;
+  align-items: center !important;
+  color: #a1a1aa !important; /* zinc-400 */
+}
+
+.menu-pill-item:hover,
+.menu-pill-item:focus {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.menu-pill-item.active {
+  background-color: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important; /* emerald-400 */
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.menu-pill-item.active:hover,
+.menu-pill-item.active:focus {
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+html[data-theme="light"] .menu-pill-item {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .menu-pill-item:hover,
+html[data-theme="light"] .menu-pill-item:focus {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .menu-pill-item.active {
+  background-color: #ecfdf5 !important;
+  color: #047857 !important;
+  border: 1px solid #a7f3d0 !important;
 }
 
 /* Status Badge Text Light Mode */
@@ -400,6 +570,16 @@ html[data-theme="light"] .recharts-cartesian-axis-line,
 html[data-theme="light"] .recharts-cartesian-axis-tick-line {
   stroke: #94a3b8 !important;
 }
+
+/* Recharts Tooltip Cursor Hover in Dark & Light Theme */
+.recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.04) !important;
+}
+
+html[data-theme="light"] .recharts-tooltip-cursor {
+  fill: rgba(15, 23, 42, 0.05) !important;
+}
+
 
 @layer base {
   * {
@@ -463,4 +643,21 @@ html[data-theme="light"] select {
 html[data-theme="light"] select option {
   background-color: #ffffff !important;
   color: #0f172a !important;
+}
+
+/* ─── Light Mode Login Page Styles ─────────────────── */
+html[data-theme="light"] .login-card {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
+}
+
+html[data-theme="light"] .login-input {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] .login-input::placeholder {
+  color: #94a3b8 !important;
 }

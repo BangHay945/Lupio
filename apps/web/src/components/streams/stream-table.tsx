@@ -25,12 +25,14 @@ import { CreateStreamDialog } from "@/components/streams/create-stream-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { CustomSelect } from "@/components/ui/select";
 import { apiService } from "@/lib/services/api";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 interface StreamTableProps {
   streams: Stream[];
 }
 
 export function StreamTable({ streams }: StreamTableProps) {
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") === "schedule" ? "schedule" : "streams";
@@ -208,20 +210,20 @@ export function StreamTable({ streams }: StreamTableProps) {
           <button
             onClick={() => setMainTab("streams")}
             className={cn(
-              "flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all text-xs",
-              mainTab === "streams" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
+              "flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-colors duration-150 text-xs border",
+              mainTab === "streams" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs" : "border-transparent text-muted-foreground hover:text-white"
             )}
           >
-            <Radio className="h-4 w-4" /> Live & Broadcasts ({localStreams.length})
+            <Radio className="h-4 w-4" /> {t("table.tabStreams")} ({localStreams.length})
           </button>
           <button
             onClick={() => setMainTab("schedule")}
             className={cn(
-              "flex items-center gap-2 px-5 py-2 rounded-full font-bold transition-all text-xs",
-              mainTab === "schedule" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
+              "flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-colors duration-150 text-xs border",
+              mainTab === "schedule" ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs" : "border-transparent text-muted-foreground hover:text-white"
             )}
           >
-            <Clock className="h-4 w-4" /> 24/7 Schedule & Planner ({scheduleRules.length})
+            <Clock className="h-4 w-4" /> {t("table.tabSchedule")} ({scheduleRules.length})
           </button>
         </div>
 
@@ -232,14 +234,14 @@ export function StreamTable({ streams }: StreamTableProps) {
               variant="outline"
               className="font-bold gap-2 text-xs border-white/15 bg-white/5 hover:bg-white/10 rounded-full h-10 px-5"
             >
-              <Clock className="h-4 w-4 text-emerald-400" /> Add Time Rule
+              <Clock className="h-4 w-4 text-emerald-400" /> {t("table.btnAddRule")}
             </Button>
           )}
           <Button
             onClick={() => setIsCreateOpen(true)}
             className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
           >
-            <Plus className="h-4 w-4 fill-black" /> Create Stream
+            <Plus className="h-4 w-4 fill-black" /> {t("table.btnNewStream")}
           </Button>
         </div>
       </div>
@@ -252,7 +254,7 @@ export function StreamTable({ streams }: StreamTableProps) {
             <div className="relative w-64">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search streams or channels..."
+                placeholder={t("table.searchPlaceholder")}
                 className="pl-9 pr-4 bg-card/60 border-white/10 rounded-full h-10.5 text-xs"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -267,7 +269,7 @@ export function StreamTable({ streams }: StreamTableProps) {
                   viewMode === "table" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
                 )}
               >
-                <List className="h-3.5 w-3.5" /> Table View
+                <List className="h-3.5 w-3.5" /> {viewMode === "table" ? (t("table.actions") === "Aksi" ? "Tampilan Tabel" : "Table View") : (t("table.actions") === "Aksi" ? "Tabel" : "Table")}
               </button>
               <button
                 onClick={() => setViewMode("grid")}
@@ -276,7 +278,7 @@ export function StreamTable({ streams }: StreamTableProps) {
                   viewMode === "grid" ? "bg-emerald-500/20 text-emerald-400 shadow-xs" : "text-muted-foreground hover:text-white"
                 )}
               >
-                <LayoutGrid className="h-3.5 w-3.5" /> Grid View
+                <LayoutGrid className="h-3.5 w-3.5" /> {viewMode === "grid" ? (t("table.actions") === "Aksi" ? "Tampilan Grid" : "Grid View") : (t("table.actions") === "Aksi" ? "Grid" : "Grid")}
               </button>
             </div>
           </div>
@@ -336,55 +338,57 @@ export function StreamTable({ streams }: StreamTableProps) {
                       <MoreHorizontal className="h-4 w-4" />
                       <span className="sr-only">Stream Actions</span>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 p-1.5 w-44">
-                      <DropdownMenuItem
-                        onClick={() => router.push(`/streams/${stream.id}`)}
-                        className="cursor-pointer text-xs"
-                      >
-                        <Settings className="mr-2 h-4 w-4 text-emerald-400" /> Manage Stream
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer text-xs"
-                        onClick={() => {
-                          setEditingStream(stream);
-                          setIsCreateOpen(true);
-                        }}
-                      >
-                        <Pencil className="mr-2 h-4 w-4 text-emerald-400" /> Edit Configuration
-                      </DropdownMenuItem>
-                      {stream.status === "OFFLINE" || stream.status === "ERROR" ? (
+                    <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 p-2 w-48 rounded-2xl shadow-2xl">
+                      <div className="flex flex-col gap-1.5">
                         <DropdownMenuItem
-                          className="text-emerald-400 cursor-pointer text-xs focus:text-emerald-400"
-                          onClick={async () => {
-                            await apiService.controlStream(stream.id, "start");
-                            setLocalStreams(prev => prev.map(s => s.id === stream.id ? { ...s, status: "STARTING" as const } : s));
-                            (toast as any)({ title: "Stream Starting", description: `"${stream.name}" is starting…`, type: "success" });
+                          onClick={() => router.push(`/streams/${stream.id}`)}
+                          className="menu-pill-item cursor-pointer"
+                        >
+                          <Settings className="mr-2 h-4 w-4 text-emerald-400 shrink-0" /> {t("table.editStream")}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="menu-pill-item cursor-pointer"
+                          onClick={() => {
+                            setEditingStream(stream);
+                            setIsCreateOpen(true);
                           }}
                         >
-                          <Play className="mr-2 h-4 w-4" /> Start Stream
+                          <Pencil className="mr-2 h-4 w-4 text-emerald-400 shrink-0" /> {t("action.edit")}
                         </DropdownMenuItem>
-                      ) : (
+                        {stream.status === "OFFLINE" || stream.status === "ERROR" ? (
+                          <DropdownMenuItem
+                            className="menu-pill-item text-emerald-400 focus:text-emerald-400 cursor-pointer"
+                            onClick={async () => {
+                              await apiService.controlStream(stream.id, "start");
+                              setLocalStreams(prev => prev.map(s => s.id === stream.id ? { ...s, status: "STARTING" as const } : s));
+                              (toast as any)({ title: "Stream Starting", description: `"${stream.name}" is starting…`, type: "success" });
+                            }}
+                          >
+                            <Play className="mr-2 h-4 w-4 shrink-0" /> {t("action.start")}
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem
+                            className="menu-pill-item text-amber-400 cursor-pointer"
+                            onClick={() => openConfirm("restart", stream)}
+                          >
+                            <RotateCcw className="mr-2 h-4 w-4 shrink-0" /> {t("action.restart")}
+                          </DropdownMenuItem>
+                        )}
+                        {stream.status !== "OFFLINE" && (
+                          <DropdownMenuItem
+                            className="menu-pill-item text-red-400 focus:text-red-400 cursor-pointer"
+                            onClick={() => openConfirm("stop", stream)}
+                          >
+                            <Square className="mr-2 h-4 w-4 shrink-0" /> {t("action.stop")}
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
-                          className="cursor-pointer text-xs text-amber-400"
-                          onClick={() => openConfirm("restart", stream)}
+                          className="menu-pill-item text-red-400 focus:text-red-400 hover:bg-red-500/10 cursor-pointer"
+                          onClick={() => openConfirm("delete", stream)}
                         >
-                          <RotateCcw className="mr-2 h-4 w-4" /> Restart Stream
+                          <Trash2 className="mr-2 h-4 w-4 shrink-0" /> {t("action.delete")}
                         </DropdownMenuItem>
-                      )}
-                      {stream.status !== "OFFLINE" && (
-                        <DropdownMenuItem
-                          className="text-red-400 cursor-pointer text-xs focus:text-red-400"
-                          onClick={() => openConfirm("stop", stream)}
-                        >
-                          <Square className="mr-2 h-4 w-4" /> Stop Stream
-                        </DropdownMenuItem>
-                      )}
-                      <DropdownMenuItem
-                        className="text-red-400 cursor-pointer text-xs focus:text-red-400"
-                        onClick={() => openConfirm("delete", stream)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" /> Delete Stream
-                      </DropdownMenuItem>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -432,12 +436,12 @@ export function StreamTable({ streams }: StreamTableProps) {
           <Table>
             <TableHeader>
               <TableRow className="border-white/[0.07] hover:bg-transparent">
-                <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Stream Name</TableHead>
-                <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Channel</TableHead>
-                <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+                <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("table.title")}</TableHead>
+                <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("dash.channels")}</TableHead>
+                <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("table.status")}</TableHead>
                 <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Output</TableHead>
                 <TableHead className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Uptime</TableHead>
-                <TableHead className="text-right text-xs font-bold uppercase tracking-wider text-muted-foreground">Actions</TableHead>
+                <TableHead className="text-right text-xs font-bold uppercase tracking-wider text-muted-foreground">{t("table.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -458,54 +462,57 @@ export function StreamTable({ streams }: StreamTableProps) {
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">Open menu</span>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-white/10 bg-zinc-900">
-                        <DropdownMenuItem>
-                          <Link href={`/streams/${stream.id}`} className="flex w-full items-center cursor-pointer">
-                            <Settings className="mr-2 h-4 w-4" /> Manage
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => {
-                            setEditingStream(stream);
-                            setIsCreateOpen(true);
-                          }}
-                        >
-                          <Pencil className="mr-2 h-4 w-4" /> Edit
-                        </DropdownMenuItem>
-                        {stream.status === "OFFLINE" || stream.status === "ERROR" ? (
+                      <DropdownMenuContent align="end" className="border-white/10 bg-zinc-950 p-2 w-48 rounded-2xl shadow-2xl">
+                        <div className="flex flex-col gap-1.5">
                           <DropdownMenuItem
-                            className="text-emerald-400 cursor-pointer focus:text-emerald-400"
-                            onClick={async () => {
-                              await apiService.controlStream(stream.id, "start");
-                              setLocalStreams(prev => prev.map(s => s.id === stream.id ? { ...s, status: "STARTING" as const } : s));
-                              (toast as any)({ title: "Stream Starting", description: `"${stream.name}" is starting…`, type: "success" });
+                            onClick={() => router.push(`/streams/${stream.id}`)}
+                            className="menu-pill-item cursor-pointer"
+                          >
+                            <Settings className="mr-2 h-4 w-4 text-emerald-400 shrink-0" /> {t("table.editStream")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="menu-pill-item cursor-pointer"
+                            onClick={() => {
+                              setEditingStream(stream);
+                              setIsCreateOpen(true);
                             }}
                           >
-                            <Play className="mr-2 h-4 w-4" /> Start
+                            <Pencil className="mr-2 h-4 w-4 text-emerald-400 shrink-0" /> {t("action.edit")}
                           </DropdownMenuItem>
-                        ) : (
+                          {stream.status === "OFFLINE" || stream.status === "ERROR" ? (
+                            <DropdownMenuItem
+                              className="menu-pill-item text-emerald-400 focus:text-emerald-400 cursor-pointer"
+                              onClick={async () => {
+                                await apiService.controlStream(stream.id, "start");
+                                setLocalStreams(prev => prev.map(s => s.id === stream.id ? { ...s, status: "STARTING" as const } : s));
+                                (toast as any)({ title: "Stream Starting", description: `"${stream.name}" is starting…`, type: "success" });
+                              }}
+                            >
+                              <Play className="mr-2 h-4 w-4 shrink-0" /> {t("action.start")}
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              className="menu-pill-item text-amber-400 cursor-pointer"
+                              onClick={() => openConfirm("restart", stream)}
+                            >
+                              <RotateCcw className="mr-2 h-4 w-4 shrink-0" /> {t("action.restart")}
+                            </DropdownMenuItem>
+                          )}
+                          {stream.status !== "OFFLINE" && (
+                            <DropdownMenuItem
+                              className="menu-pill-item text-red-400 focus:text-red-400 cursor-pointer"
+                              onClick={() => openConfirm("stop", stream)}
+                            >
+                              <Square className="mr-2 h-4 w-4 shrink-0" /> {t("action.stop")}
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
-                            className="cursor-pointer"
-                            onClick={() => openConfirm("restart", stream)}
+                            className="menu-pill-item text-red-400 focus:text-red-400 hover:bg-red-500/10 cursor-pointer"
+                            onClick={() => openConfirm("delete", stream)}
                           >
-                            <RotateCcw className="mr-2 h-4 w-4" /> Restart
+                            <Trash2 className="mr-2 h-4 w-4 shrink-0" /> {t("action.delete")}
                           </DropdownMenuItem>
-                        )}
-                        {stream.status !== "OFFLINE" && (
-                          <DropdownMenuItem
-                            className="text-red-400 cursor-pointer focus:text-red-400"
-                            onClick={() => openConfirm("stop", stream)}
-                          >
-                            <Square className="mr-2 h-4 w-4" /> Stop
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                          className="text-red-400 cursor-pointer focus:text-red-400"
-                          onClick={() => openConfirm("delete", stream)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
+                        </div>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -808,6 +815,7 @@ export function StreamTable({ streams }: StreamTableProps) {
 }
 
 function StatusBadge({ status }: { status: Stream["status"] }) {
+  const { t } = useLanguage();
   const style: Record<Stream["status"], string> = {
     LIVE:       "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     STARTING:   "bg-amber-500/10 text-amber-400 border-amber-500/20",
@@ -817,11 +825,23 @@ function StatusBadge({ status }: { status: Stream["status"] }) {
     OFFLINE:    "bg-slate-200/70 text-slate-600 border-slate-300 dark:bg-white/5 dark:text-white/30 dark:border-white/10",
   };
 
+  const getLabel = () => {
+    switch (status) {
+      case "LIVE": return t("status.live");
+      case "OFFLINE": return t("status.offline");
+      case "STARTING": return t("status.starting");
+      case "RESTARTING": return t("status.restarting");
+      case "SCHEDULED": return t("status.scheduled");
+      case "ERROR": return t("status.error");
+      default: return status;
+    }
+  };
+
   return (
     <span className={cn("inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold tracking-wide border", style[status])}>
       {status === "LIVE" && <span className="mr-1 h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
       {status === "OFFLINE" && <span className="mr-1 h-1.5 w-1.5 rounded-full bg-slate-400 dark:bg-white/30" />}
-      {status}
+      {getLabel()}
     </span>
   );
 }

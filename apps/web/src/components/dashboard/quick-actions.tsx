@@ -1,40 +1,45 @@
+"use client";
+
 import { buttonVariants } from "@/components/ui/button";
 import { Plus, FolderUp, CalendarClock, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-
-const actions = [
-  {
-    href: "/streams/new",
-    icon: Plus,
-    label: "New Stream",
-    description: "Start a broadcast",
-    iconBg: "bg-emerald-500/15 text-emerald-400",
-    border: "hover:border-emerald-500/25 hover:bg-emerald-500/[0.04]",
-  },
-  {
-    href: "/media",
-    icon: FolderUp,
-    label: "Upload Media",
-    description: "Add to library",
-    iconBg: "bg-sky-500/15 text-sky-400",
-    border: "hover:border-sky-500/25 hover:bg-sky-500/[0.04]",
-  },
-  {
-    href: "/streams?tab=schedule",
-    icon: CalendarClock,
-    label: "Schedule",
-    description: "Plan a stream",
-    iconBg: "bg-violet-500/15 text-violet-400",
-    border: "hover:border-violet-500/25 hover:bg-violet-500/[0.04]",
-  },
-];
+import { useLanguage } from "@/lib/i18n/language-context";
 
 export function QuickActions() {
+  const { t } = useLanguage();
+
+  const actions = [
+    {
+      href: "/streams/new",
+      icon: Plus,
+      label: t("dash.newStream"),
+      description: t("dash.startBroadcast"),
+      iconBg: "bg-emerald-500/15 text-emerald-400",
+      border: "hover:border-emerald-500/25 hover:bg-emerald-500/[0.04]",
+    },
+    {
+      href: "/media",
+      icon: FolderUp,
+      label: t("dash.uploadMedia"),
+      description: t("dash.addToLibrary"),
+      iconBg: "bg-sky-500/15 text-sky-400",
+      border: "hover:border-sky-500/25 hover:bg-sky-500/[0.04]",
+    },
+    {
+      href: "/streams?tab=schedule",
+      icon: CalendarClock,
+      label: t("dash.schedule"),
+      description: t("dash.planStream"),
+      iconBg: "bg-violet-500/15 text-violet-400",
+      border: "hover:border-violet-500/25 hover:bg-violet-500/[0.04]",
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-4">
       <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-        Quick Actions
+        {t("dash.quickActions")}
       </span>
       <div className="flex flex-col gap-2">
         {actions.map(({ href, icon: Icon, label, description, iconBg, border }) => (

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { apiService } from "@/lib/services/api";
 import { Channel, MediaItem, Playlist, Stream } from "@/lib/mock-data";
 import { toast } from "@/components/ui/toast";
-import { Tv, Film, Video, Key, Play, Plus, Pencil, Layers, Type, ShieldAlert, Share2, Clock } from "lucide-react";
+import { Tv, Film, Video, Key, Play, Plus, Pencil, Layers, Type, ShieldAlert, Share2, Clock, Image as ImageIcon } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
 
 interface CreateStreamDialogProps {
@@ -33,6 +33,12 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
   // Advanced Overlay & Anti-Drop Backup
   const [watermarkText, setWatermarkText] = useState("");
   const [tickerText, setTickerText] = useState("");
+  const [enableDigitalClock, setEnableDigitalClock] = useState(false);
+  const [clockPosition, setClockPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right">("top-right");
+  const [clockTimezone, setClockTimezone] = useState("Asia/Jakarta");
+  const [clockShowLabel, setClockShowLabel] = useState(true);
+  const [logoWatermarkPath, setLogoWatermarkPath] = useState("");
+  const [logoPosition, setLogoPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right">("top-left");
   const [backupMediaId, setBackupMediaId] = useState("");
   const [transitionEffect, setTransitionEffect] = useState("full");
   const [maxDurationHours, setMaxDurationHours] = useState<number>(0);
@@ -65,6 +71,12 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         setStreamName(stream.name || "");
         setWatermarkText(stream.watermarkText || "");
         setTickerText(stream.tickerText || "");
+        setEnableDigitalClock(Boolean(stream.enableDigitalClock));
+        setClockPosition((stream.clockPosition as any) || "top-right");
+        setClockTimezone(stream.clockTimezone || "Asia/Jakarta");
+        setClockShowLabel(stream.clockShowLabel !== false);
+        setLogoWatermarkPath(stream.logoWatermarkPath || "");
+        setLogoPosition((stream.logoPosition as any) || "top-left");
         setBackupMediaId(stream.backupMediaId || "");
         setTransitionEffect(stream.transitionEffect || "full");
         setMaxDurationHours(stream.maxDurationHours || 0);
@@ -78,6 +90,12 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         setStreamName("");
         setWatermarkText("");
         setTickerText("");
+        setEnableDigitalClock(false);
+        setClockPosition("top-right");
+        setClockTimezone("Asia/Jakarta");
+        setClockShowLabel(true);
+        setLogoWatermarkPath("");
+        setLogoPosition("top-left");
         setBackupMediaId("");
         setMaxDurationHours(0);
         setSelectedMultiChannelIds([]);
@@ -161,9 +179,15 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
         multiChannelIds: selectedMultiChannelIds,
         watermarkText: watermarkText.trim(),
         tickerText: tickerText.trim(),
+        enableDigitalClock,
+        clockPosition,
+        clockTimezone,
+        clockShowLabel,
+        logoWatermarkPath: logoWatermarkPath.trim() || undefined,
+        logoPosition,
         backupMediaId,
         maxDurationHours: Number(maxDurationHours) || 0,
-        enableOverlay: Boolean(watermarkText || tickerText),
+        enableOverlay: Boolean(watermarkText || tickerText || enableDigitalClock || logoWatermarkPath),
       };
 
       if (stream) {
@@ -331,30 +355,154 @@ export function CreateStreamDialog({ open, onOpenChange, stream, onSuccess }: Cr
             </div>
           )}
 
-          {/* Video Overlays (Watermark & Running Ticker) */}
-          <div className="grid gap-3 md:grid-cols-2 p-3 rounded-xl border border-white/10 bg-black/40">
-            <div className="space-y-1">
-              <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
-                <Type className="h-3.5 w-3.5 text-blue-400" /> Watermark Logo Text
-              </label>
-              <Input
-                placeholder="e.g. LUPIO LIVE 24/7"
-                value={watermarkText}
-                onChange={(e) => setWatermarkText(e.target.value)}
-                className="bg-white/5 border-white/10 h-9 text-xs"
-              />
+          {/* Video Overlays & Branding (Watermark, Realtime Clock, Logo, Ticker) */}
+          <div className="space-y-3 p-3.5 rounded-xl border border-white/10 bg-black/40">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                <Layers className="h-3.5 w-3.5 text-emerald-400" /> Visual Overlays & Branding
+              </span>
+              <span className="text-[10px] text-zinc-400">FFmpeg Realtime Overlay Engine</span>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
-                <Layers className="h-3.5 w-3.5 text-yellow-400" /> Running Text Ticker Banner
-              </label>
-              <Input
-                placeholder="e.g. Subscribe for daily 24/7 stream!"
-                value={tickerText}
-                onChange={(e) => setTickerText(e.target.value)}
-                className="bg-white/5 border-white/10 h-9 text-xs"
-              />
+            {/* Row 1: Realtime Digital Clock */}
+            <div className="space-y-3 p-3 rounded-lg border border-white/5 bg-white/[0.02]">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-blue-400" /> Digital Clock Overlay
+                  </span>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Burn jam siaran real-time langsung pada siaran video.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEnableDigitalClock(!enableDigitalClock)}
+                  className={`text-[10px] px-2.5 py-1 rounded font-bold transition-all ${
+                    enableDigitalClock
+                      ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                      : "bg-white/5 text-zinc-400 border border-white/10 hover:text-white"
+                  }`}
+                >
+                  {enableDigitalClock ? "ENABLED" : "DISABLED"}
+                </button>
+              </div>
+
+              {enableDigitalClock ? (
+                <div className="space-y-2.5 pt-1 border-t border-white/5">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {/* Position */}
+                    <div className="space-y-1">
+                      <label className="font-semibold text-xs text-muted-foreground">Posisi Jam</label>
+                      <CustomSelect
+                        value={clockPosition}
+                        onChange={(val: any) => setClockPosition(val)}
+                        options={[
+                          { value: "top-right", label: "Top Right (Pojok Kanan Atas)" },
+                          { value: "top-left", label: "Top Left (Pojok Kiri Atas)" },
+                          { value: "bottom-right", label: "Bottom Right (Pojok Kanan Bawah)" },
+                          { value: "bottom-left", label: "Bottom Left (Pojok Kiri Bawah)" },
+                        ]}
+                      />
+                    </div>
+
+                    {/* Timezone / Country */}
+                    <div className="space-y-1">
+                      <label className="font-semibold text-xs text-muted-foreground">Zona Waktu / Negara</label>
+                      <CustomSelect
+                        value={clockTimezone}
+                        onChange={(val: any) => setClockTimezone(val)}
+                        options={[
+                          { value: "Asia/Jakarta", label: "🇮🇩 WIB (Jakarta / UTC+7)" },
+                          { value: "Asia/Makassar", label: "🇮🇩 WITA (Bali / Makassar / UTC+8)" },
+                          { value: "Asia/Jayapura", label: "🇮🇩 WIT (Jayapura / Papua / UTC+9)" },
+                          { value: "Asia/Singapore", label: "🇸🇬 SGT (Singapura / UTC+8)" },
+                          { value: "Asia/Riyadh", label: "🇸🇦 KSA (Makkah / UTC+3)" },
+                          { value: "Asia/Tokyo", label: "🇯🇵 JST (Tokyo / UTC+9)" },
+                          { value: "Europe/London", label: "🇬🇧 GMT (London / UTC+0)" },
+                          { value: "America/New_York", label: "🇺🇸 EST (New York / UTC-5)" },
+                          { value: "America/Los_Angeles", label: "🇺🇸 PST (Los Angeles / UTC-8)" },
+                          { value: "UTC", label: "🌐 UTC (Universal Time)" },
+                          { value: "server", label: "🖥️ Waktu Server Lokal" },
+                        ]}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Label Checkbox */}
+                  <label className="flex items-center gap-2 cursor-pointer pt-0.5 text-xs text-foreground select-none">
+                    <input
+                      type="checkbox"
+                      checked={clockShowLabel}
+                      onChange={(e) => setClockShowLabel(e.target.checked)}
+                      className="rounded border-white/20 bg-zinc-900 text-emerald-500 focus:ring-0 h-3.5 w-3.5"
+                    />
+                    <span className="text-[11px] text-zinc-300">
+                      Sertakan label zona waktu di samping jam (contoh: <span className="font-mono text-emerald-400">21:00:00 WIB</span>)
+                    </span>
+                  </label>
+                </div>
+              ) : (
+                <div className="text-xs text-zinc-500 italic">
+                  Aktifkan untuk menampilkan jam siaran langsung pada live stream
+                </div>
+              )}
+            </div>
+
+            {/* Row 2: PNG Logo Watermark */}
+            <div className="grid gap-3 sm:grid-cols-2 p-2.5 rounded-lg border border-white/5 bg-white/[0.02]">
+              <div className="space-y-1">
+                <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                  <ImageIcon className="h-3.5 w-3.5 text-purple-400" /> Logo PNG Watermark Path
+                </label>
+                <Input
+                  placeholder="e.g. uploads/logo.png"
+                  value={logoWatermarkPath}
+                  onChange={(e) => setLogoWatermarkPath(e.target.value)}
+                  className="bg-white/5 border-white/10 h-9 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-xs text-muted-foreground">Logo Position</label>
+                <CustomSelect
+                  value={logoPosition}
+                  onChange={(val: any) => setLogoPosition(val)}
+                  options={[
+                    { value: "top-left", label: "Top Left (Pojok Kiri Atas)" },
+                    { value: "top-right", label: "Top Right (Pojok Kanan Atas)" },
+                    { value: "bottom-left", label: "Bottom Left (Pojok Kiri Bawah)" },
+                    { value: "bottom-right", label: "Bottom Right (Pojok Kanan Bawah)" },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* Row 3: Text Watermark & Ticker */}
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1">
+                <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                  <Type className="h-3.5 w-3.5 text-blue-400" /> Watermark Logo Text
+                </label>
+                <Input
+                  placeholder="e.g. LUPIO LIVE 24/7"
+                  value={watermarkText}
+                  onChange={(e) => setWatermarkText(e.target.value)}
+                  className="bg-white/5 border-white/10 h-9 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-semibold text-xs text-foreground flex items-center gap-1.5">
+                  <Layers className="h-3.5 w-3.5 text-yellow-400" /> Running Text Ticker Banner
+                </label>
+                <Input
+                  placeholder="e.g. Subscribe for daily 24/7 stream!"
+                  value={tickerText}
+                  onChange={(e) => setTickerText(e.target.value)}
+                  className="bg-white/5 border-white/10 h-9 text-xs"
+                />
+              </div>
             </div>
           </div>
 

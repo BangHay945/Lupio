@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Playlist, mockPlaylists } from "@/lib/mock-data";
+import { Playlist } from "@/lib/mock-data";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, ListVideo, Clock, MoreHorizontal, Pencil, Play, Trash } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { apiService } from "@/lib/services/api";
@@ -16,8 +17,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 export default function PlaylistsPage() {
+  const router = useRouter();
+  const { t } = useLanguage();
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -63,84 +67,98 @@ export default function PlaylistsPage() {
           href={`/playlists/new`}
           className={cn(
             buttonVariants({ variant: "default" }),
-            "bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
+            "bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-sm text-xs transition-all hover:scale-[1.02]"
           )}
         >
-          <Plus className="h-4 w-4" /> Create Playlist
+          <Plus className="h-4 w-4 stroke-[2.5]" /> {t("action.createPlaylist")}
         </Link>
       </div>
 
-      <div className="rounded-2xl border border-white/[0.07] bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Items</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
+      {!loading && playlists.length === 0 ? (
+        <div className="empty-state-wrapper text-center py-16 px-6 rounded-3xl w-full">
+          <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 flex items-center justify-center mx-auto mb-4 text-emerald-500 shadow-xs">
+            <ListVideo className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <h3 className="text-base font-bold text-foreground">{t("playlist.empty")}</h3>
+          <p className="text-xs text-muted-foreground mt-1 mb-6 max-w-sm mx-auto leading-relaxed">
+            {t("playlist.emptyDesc")}
+          </p>
+          <Link
+            href="/playlists/new"
+            className="inline-flex items-center justify-center bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-10 px-6 rounded-full shadow-sm gap-2 text-xs transition-all hover:scale-[1.02]"
+          >
+            <Plus className="h-4 w-4 stroke-[2.5]" /> {t("action.createPlaylist")}
+          </Link>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-card overflow-hidden">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground animate-pulse text-xs">
-                  Loading playlists...
-                </TableCell>
+                <TableHead>{t("table.title")}</TableHead>
+                <TableHead>{t("table.items")}</TableHead>
+                <TableHead>{t("table.duration")}</TableHead>
+                <TableHead>{t("table.created")}</TableHead>
+                <TableHead className="text-right">{t("table.actions")}</TableHead>
               </TableRow>
-            ) : playlists.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-10 text-muted-foreground">
-                  No playlists found. Click "+ Create Playlist" to build a new playlist.
-                </TableCell>
-              </TableRow>
-            ) : (
-              playlists.map((playlist) => (
-                <TableRow key={playlist.id}>
-                  <TableCell className="font-semibold">
-                    <Link href={`/playlists/${playlist.id}`} className="hover:underline text-foreground flex items-center">
-                      <ListVideo className="mr-2 h-4 w-4 text-emerald-400" />
-                      {playlist.name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{playlist.itemCount} items</TableCell>
-                  <TableCell className="flex items-center">
-                    <Clock className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
-                    {playlist.totalDuration}
-                  </TableCell>
-                  <TableCell>{playlist.createdAt}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-white/10 h-8.5 w-8.5 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Open menu</span>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-white/10 bg-zinc-900">
-                        <DropdownMenuItem>
-                          <Link href={`/playlists/${playlist.id}`} className="flex w-full items-center cursor-pointer">
-                            <Pencil className="mr-2 h-4 w-4" /> Edit
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Link href={`/streams`} className="flex w-full items-center cursor-pointer">
-                            <Play className="mr-2 h-4 w-4 text-emerald-400" /> Start Stream
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-400 cursor-pointer focus:text-red-400"
-                          onClick={() => setDeleteConfirm({ open: true, playlist })}
-                        >
-                          <Trash className="mr-2 h-4 w-4" /> Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-12 text-muted-foreground animate-pulse text-xs">
+                    {t("dash.loading")}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+              ) : (
+                playlists.map((playlist) => (
+                  <TableRow key={playlist.id}>
+                    <TableCell className="font-semibold">
+                      <Link href={`/playlists/${playlist.id}`} className="hover:underline text-foreground flex items-center">
+                        <ListVideo className="mr-2 h-4 w-4 text-emerald-400" />
+                        {playlist.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{playlist.itemCount} {t("table.items")}</TableCell>
+                    <TableCell className="flex items-center">
+                      <Clock className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />
+                      {playlist.totalDuration}
+                    </TableCell>
+                    <TableCell>{playlist.createdAt}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-black/5 dark:hover:bg-white/10 h-8.5 w-8.5 p-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Open menu</span>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 border-slate-200 dark:border-white/10 bg-white/95 dark:bg-zinc-950/95 p-2 rounded-2xl shadow-xl space-y-1">
+                          <DropdownMenuItem
+                            className="menu-pill-item cursor-pointer"
+                            onClick={() => router.push(`/playlists/${playlist.id}`)}
+                          >
+                            <Pencil className="mr-2 h-3.5 w-3.5 text-zinc-400" /> {t("action.edit")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="menu-pill-item cursor-pointer"
+                            onClick={() => router.push(`/streams`)}
+                          >
+                            <Play className="mr-2 h-3.5 w-3.5 text-emerald-400" /> {t("action.start")}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="menu-pill-item cursor-pointer text-red-500 dark:text-red-400 hover:bg-red-500/10 hover:text-red-500"
+                            onClick={() => setDeleteConfirm({ open: true, playlist })}
+                          >
+                            <Trash className="h-3.5 w-3.5 mr-2 text-red-500 dark:text-red-400" /> {t("action.delete")}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      )}
 
       {/* Delete Confirmation Popup Modal */}
       {deleteConfirm.playlist && (

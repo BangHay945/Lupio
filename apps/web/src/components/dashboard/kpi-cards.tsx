@@ -3,6 +3,7 @@
 import { SystemMetrics } from "@/lib/mock-data";
 import { Radio, Cpu, Zap, HardDrive, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 interface KPICardsProps {
   metrics: SystemMetrics | null;
@@ -18,6 +19,8 @@ function MiniBar({ value, max, color }: { value: number; max: number; color: str
 }
 
 export function KPICards({ metrics }: KPICardsProps) {
+  const { t } = useLanguage();
+
   if (!metrics) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -44,7 +47,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       <div className="col-span-2 relative overflow-hidden rounded-2xl border border-emerald-500/20 bg-card p-5">
         <div className="absolute right-2 top-2 h-20 w-20 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">Live Now</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400/80">{t("dash.liveNow")}</span>
           <div className="flex items-center gap-1.5 text-emerald-400">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             <Radio className="h-4 w-4" />
@@ -52,15 +55,15 @@ export function KPICards({ metrics }: KPICardsProps) {
         </div>
         <div className="flex items-end gap-2">
           <span className="text-5xl font-bold tracking-tighter text-emerald-400 leading-none">{metrics.activeStreams}</span>
-          <span className="text-lg text-emerald-500/50 font-normal mb-0.5">/ {metrics.activeStreams + metrics.offlineStreams} streams</span>
+          <span className="text-lg text-emerald-500/50 font-normal mb-0.5">/ {metrics.activeStreams + metrics.offlineStreams} {t("dash.streams")}</span>
         </div>
-        <p className="text-xs text-emerald-400/50 mt-2">{metrics.offlineStreams} offline · System healthy</p>
+        <p className="text-xs text-emerald-400/50 mt-2">{metrics.offlineStreams} {t("dash.offline")} · {t("dash.systemHealthy")}</p>
       </div>
 
       {/* CPU */}
       <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">CPU</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("dash.cpu")}</span>
           <Cpu className="h-3.5 w-3.5 text-muted-foreground" />
         </div>
         <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.cpuUsage}<span className="text-sm font-normal text-muted-foreground">%</span></p>
@@ -70,7 +73,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       {/* RAM */}
       <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">RAM</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("dash.ram")}</span>
           <Zap className="h-3.5 w-3.5 text-violet-400" />
         </div>
         <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.ramUsed}<span className="text-sm font-normal text-muted-foreground">/{metrics.ramTotal}G</span></p>
@@ -80,7 +83,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       {/* Storage */}
       <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Storage</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("dash.storage")}</span>
           <HardDrive className="h-3.5 w-3.5 text-sky-400" />
         </div>
         <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.storageUsed}<span className="text-sm font-normal text-muted-foreground">/{metrics.storageTotal}G</span></p>
@@ -90,7 +93,7 @@ export function KPICards({ metrics }: KPICardsProps) {
       {/* Bandwidth */}
       <div className="rounded-2xl border border-white/10 bg-card p-5">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Bandwidth</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t("dash.bandwidth")}</span>
           <Network className="h-3.5 w-3.5 text-emerald-400" />
         </div>
         <p className="text-3xl font-bold tracking-tighter mt-2">{metrics.uploadBandwidth}<span className="text-sm font-normal text-muted-foreground"> Mbps</span></p>

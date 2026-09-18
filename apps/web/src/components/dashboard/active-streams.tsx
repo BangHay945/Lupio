@@ -6,6 +6,7 @@ import { Play, Square, RotateCcw, ArrowRight, Clock, Layers, AlertTriangle, Radi
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 interface ActiveStreamsProps {
   streams: Stream[];
@@ -28,6 +29,7 @@ const statusConfig: Record<Stream["status"], {
 };
 
 export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
+  const { t } = useLanguage();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
   const live = streams.filter(s => s.status === "LIVE" || s.status === "STARTING" || s.status === "RESTARTING");
@@ -46,18 +48,30 @@ export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
     }
   };
 
+  const getStatusLabel = (status: Stream["status"], fallback: string) => {
+    switch (status) {
+      case "LIVE": return t("status.live");
+      case "OFFLINE": return t("status.offline");
+      case "STARTING": return t("status.starting");
+      case "RESTARTING": return t("status.restarting");
+      case "SCHEDULED": return t("status.scheduled");
+      case "ERROR": return t("status.error");
+      default: return fallback;
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <Radio className="h-3.5 w-3.5 text-emerald-400" />
         <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Streams
+          {t("dash.activeStreams")}
         </span>
         <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-2 py-0.5">
-          {live.length} live
+          {live.length} {t("nav.live")}
         </span>
         <Link href="/streams" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-xs text-muted-foreground h-6 ml-auto")}>
-          View All <ArrowRight className="ml-1 h-3 w-3" />
+          {t("dash.viewAll")} <ArrowRight className="ml-1 h-3 w-3" />
         </Link>
       </div>
 
@@ -65,7 +79,7 @@ export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
       <div className="rounded-xl border border-white/10 bg-card overflow-hidden">
         {streams.length === 0 ? (
           <div className="p-8 text-center text-xs text-muted-foreground">
-            No streams configured. Create a stream to start broadcasting.
+            {t("dash.noStreams")}
           </div>
         ) : (
           streams.map((stream, i) => {
@@ -125,7 +139,7 @@ export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
                   {/* Right side */}
                   <div className="flex items-center gap-2 shrink-0">
                     <span className={cn("text-[11px] font-bold tracking-wider px-2 py-0.5 rounded-full border", cfg.badge)}>
-                      {cfg.label}
+                      {getStatusLabel(stream.status, cfg.label)}
                     </span>
 
                     {/* Action buttons — visible on row hover */}
@@ -134,7 +148,7 @@ export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
                         <button
                           onClick={() => handleAction(stream.id, "start")}
                           disabled={anyLoading}
-                          title="Start Stream"
+                          title={t("action.start")}
                           className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isStarting
@@ -147,7 +161,7 @@ export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
                           <button
                             onClick={() => handleAction(stream.id, "restart")}
                             disabled={anyLoading}
-                            title="Restart Stream"
+                            title={t("action.restart")}
                             className="flex h-8 w-8 items-center justify-center rounded-full bg-white/8 text-white/60 hover:bg-white/15 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {isRestarting
@@ -158,7 +172,7 @@ export function ActiveStreams({ streams, onRefresh }: ActiveStreamsProps) {
                           <button
                             onClick={() => handleAction(stream.id, "stop")}
                             disabled={anyLoading}
-                            title="Stop Stream"
+                            title={t("action.stop")}
                             className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {isStopping

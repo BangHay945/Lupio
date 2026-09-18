@@ -54,11 +54,12 @@ import {
   Plus,
 } from "lucide-react";
 import { apiService } from "@/lib/services/api";
-import { Stream, mockStreams } from "@/lib/mock-data";
+import { Stream } from "@/lib/mock-data";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { AnalyticsChart } from "@/components/dashboard/analytics-chart";
 import { CreateStreamDialog } from "@/components/streams/create-stream-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
 
 // Time series bandwidth data
 interface BandwidthPoint {
@@ -107,13 +108,13 @@ export default function AnalyticsPage() {
     try {
       setRefreshing(true);
       const fetchedStreams = await apiService.getStreams();
-      if (Array.isArray(fetchedStreams) && fetchedStreams.length > 0) {
+      if (Array.isArray(fetchedStreams)) {
         setStreams(fetchedStreams);
       } else {
-        setStreams(mockStreams);
+        setStreams([]);
       }
     } catch {
-      setStreams(mockStreams);
+      setStreams([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -127,25 +128,29 @@ export default function AnalyticsPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Parse uptime string into hours
+  // Parse uptime string into hours (e.g. "1m" -> 1/60 hr, "2h 30m" -> 2.5 hr, "0m" -> 0)
   const parseUptimeToHours = (uptimeStr: string): number => {
-    if (!uptimeStr || uptimeStr === "0m") return 0;
-    let hours = 0;
+    if (!uptimeStr || uptimeStr.trim() === "" || uptimeStr === "0m") return 0;
+    let totalMinutes = 0;
+    const dMatch = uptimeStr.match(/(\d+)\s*d/i);
     const hMatch = uptimeStr.match(/(\d+)\s*h/i);
     const mMatch = uptimeStr.match(/(\d+)\s*m/i);
-    const dMatch = uptimeStr.match(/(\d+)\s*d/i);
 
-    if (dMatch) hours += parseInt(dMatch[1], 10) * 24;
-    if (hMatch) hours += parseInt(hMatch[1], 10);
-    if (mMatch) hours += parseFloat((parseInt(mMatch[1], 10) / 60).toFixed(1));
-    return hours || 1.5;
+    if (dMatch) totalMinutes += parseInt(dMatch[1], 10) * 24 * 60;
+    if (hMatch) totalMinutes += parseInt(hMatch[1], 10) * 60;
+    if (mMatch) totalMinutes += parseInt(mMatch[1], 10);
+
+    return totalMinutes > 0 ? parseFloat((totalMinutes / 60).toFixed(2)) : 0;
   };
 
-  // Convert bitrate string (e.g. "8 Mbps" or "4 Mbps") to Mbps number
+  // Convert bitrate string (e.g. "4000 Kbps", "4 Mbps", "6000") to Mbps number
   const parseBitrateToMbps = (bitrateStr: string): number => {
-    if (!bitrateStr) return 6;
-    const match = bitrateStr.match(/(\d+(\.\d+)?)/);
-    return match ? parseFloat(match[1]) : 6;
+    if (!bitrateStr) return 4;
+    const isKbps = /kbps/i.test(bitrateStr);
+    const numMatch = bitrateStr.match(/(\d+(\.\d+)?)/);
+    if (!numMatch) return 4;
+    const val = parseFloat(numMatch[1]);
+    return isKbps || val > 100 ? val / 1000 : val;
   };
 
   // Compile detailed report items
@@ -153,10 +158,15 @@ export default function AnalyticsPage() {
     return streams.map((s, index) => {
       const hours = parseUptimeToHours(s.uptime);
       const mbps = parseBitrateToMbps(s.bitrate);
-      // Data in GB = (Mbps * 3600 * hours) / 8000
-      const estimatedDataGB = s.status === "LIVE" || s.status === "STARTING"
-        ? Math.max(12.4, parseFloat(((mbps * 3600 * Math.max(hours, 4.5)) / 8000).toFixed(1)))
-        : parseFloat(((mbps * 3600 * Math.max(hours, 0.5)) / 8000).toFixed(1));
+
+      // Data in GB = (Mbps * 3600 seconds * hours) / 8000 bits per byte
+      // If offline with 0 hours, data sent is 0
+      let estimatedDataGB = 0;
+      if (hours > 0) {
+        estimatedDataGB = parseFloat(((mbps * 3600 * hours) / 8000).toFixed(2));
+      } else if (s.status === "LIVE" || s.status === "STARTING") {
+        estimatedDataGB = 0.05; // Initial broadcast buffer
+      }
 
       const avgFps = s.fps || (s.resolution.includes("1080") ? 60 : 30);
 
@@ -174,7 +184,7 @@ export default function AnalyticsPage() {
         fps: s.fps || 60,
         bitrate: s.bitrate || "6 Mbps",
         uptime: s.uptime || "0m",
-        uptimeHours: hours > 0 ? hours : (s.status === "LIVE" ? 18.5 : 0),
+        uptimeHours: hours,
         restartCount: s.restartCount || 0,
         dataSentGB: estimatedDataGB,
         avgFps,
@@ -185,16 +195,17 @@ export default function AnalyticsPage() {
 
   // Aggregate KPI Statistics
   const stats = useMemo(() => {
-    const totalHours = streamReports.reduce((acc, curr) => acc + curr.uptimeHours, 0);
-    // Add realistic 24/7 baseline multiplier if viewing historical windows
     const rangeMultiplier = timeRange === "30d" ? 30 : timeRange === "7d" ? 7 : 1;
-    const displayBroadcastingHours = (Math.max(totalHours, 42.5) * rangeMultiplier).toLocaleString(undefined, {
+    const totalHours = streamReports.reduce((acc, curr) => acc + curr.uptimeHours, 0);
+    const displayBroadcastingHours = (totalHours * rangeMultiplier).toLocaleString(undefined, {
+      minimumFractionDigits: 1,
       maximumFractionDigits: 1,
     });
 
     const totalDataGB = streamReports.reduce((acc, curr) => acc + curr.dataSentGB, 0);
-    const displayDataTransmitted = (Math.max(totalDataGB, 128.4) * rangeMultiplier).toLocaleString(undefined, {
-      maximumFractionDigits: 1,
+    const displayDataTransmitted = (totalDataGB * rangeMultiplier).toLocaleString(undefined, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 2,
     });
 
     const activeStreamsCount = streamReports.filter((s) => s.status === "LIVE" || s.status === "STARTING").length;
@@ -383,7 +394,7 @@ export default function AnalyticsPage() {
       {/* 4 Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total Broadcasting Hours */}
-        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-lg relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm relative overflow-hidden group hover:border-emerald-500/30 transition-all">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -406,7 +417,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Card 2: Data Transmitted (GB) */}
-        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-lg relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm relative overflow-hidden group hover:border-emerald-500/30 transition-all">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -429,7 +440,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Card 3: Avg FPS */}
-        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-lg relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm relative overflow-hidden group hover:border-emerald-500/30 transition-all">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -452,7 +463,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Card 4: Total Restarts */}
-        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-lg relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm relative overflow-hidden group hover:border-emerald-500/30 transition-all">
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500/0 via-emerald-500/50 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -477,12 +488,25 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Real-time Bitrate Telemetry & Stability Monitor */}
-      <AnalyticsChart />
+      {streams.length === 0 ? (
+        <EmptyState
+          icon={Tv}
+          title="Belum ada data analitik siaran"
+          description="Mulai siaran langsung pertama Anda untuk memantau performa bitrate, uptime, dan bandwidth secara real-time."
+          action={{
+            label: "Buat Stream Baru",
+            href: "/streams/new",
+          }}
+          className="bg-card/40 my-6"
+        />
+      ) : (
+        <>
+          <AnalyticsChart />
 
       {/* 2 Recharts Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Chart 1: Bandwidth & Data Sent per Stream (AreaChart with Emerald fill) */}
-        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-xl">
+        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -498,7 +522,7 @@ export default function AnalyticsPage() {
           </CardHeader>
 
           <CardContent className="pt-2">
-            <div className="h-72 w-full bg-card rounded-xl border border-white/10 p-3 pt-4">
+            <div className="h-72 w-full bg-black/40 dark:bg-black/40 rounded-xl border border-white/10 p-3 pt-4">
               {mounted ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={bandwidthTimelineData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -581,7 +605,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Chart 2: Stream Uptime Distribution (BarChart with Emerald bars) */}
-        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-xl">
+        <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
               <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -597,11 +621,11 @@ export default function AnalyticsPage() {
           </CardHeader>
 
           <CardContent className="pt-2">
-            <div className="h-72 w-full bg-card rounded-xl border border-white/10 p-3 pt-4">
+            <div className="h-72 w-full bg-black/40 dark:bg-black/40 rounded-xl border border-white/10 p-3 pt-4">
               {mounted ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={uptimeDistributionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#88888820" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#88888818" vertical={false} />
                     <XAxis
                       dataKey="name"
                       stroke="#88888860"
@@ -617,6 +641,7 @@ export default function AnalyticsPage() {
                       tickFormatter={(val) => `${val}h`}
                     />
                     <Tooltip
+                      cursor={{ fill: "rgba(255, 255, 255, 0.05)" }}
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           const item = payload[0].payload as UptimeDistributionPoint;
@@ -658,7 +683,8 @@ export default function AnalyticsPage() {
                       dataKey="uptimeHours"
                       name="Uptime (Hours)"
                       fill="#10b981"
-                      radius={[4, 4, 0, 0]}
+                      maxBarSize={48}
+                      radius={[6, 6, 0, 0]}
                     />
                   </BarChart>
                 </ResponsiveContainer>
@@ -673,7 +699,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Stream Performance Summary Table */}
-      <Card className="border-white/10 bg-card/60 backdrop-blur shadow-xl">
+      <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm">
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4">
           <div>
             <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
@@ -774,6 +800,8 @@ export default function AnalyticsPage() {
           </div>
         </CardContent>
       </Card>
+      </>
+      )}
 
     </div>
   );

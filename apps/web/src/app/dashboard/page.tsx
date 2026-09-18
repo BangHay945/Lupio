@@ -6,8 +6,10 @@ import { ActiveStreams } from "@/components/dashboard/active-streams";
 import { QuickActions } from "@/components/dashboard/quick-actions";
 import { SystemMetrics, Stream } from "@/lib/mock-data";
 import { apiService } from "@/lib/services/api";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null);
   const [streams, setStreams] = useState<Stream[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-[1fr_260px] items-start">
         {loading ? (
           <div className="p-12 rounded-xl border border-white/10 bg-card/60 backdrop-blur text-center text-xs text-muted-foreground animate-pulse">
-            Loading live operational streams...
+            {t("dash.loading")}
           </div>
         ) : (
           <ActiveStreams streams={streams} onRefresh={loadData} />

@@ -22,7 +22,13 @@ import {
   X,
   Plus,
   RefreshCw,
+  Globe,
+  Link2,
+  DownloadCloud,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 export interface QueuedUploadFile {
   id: string;
@@ -46,10 +52,18 @@ export function UploadMediaDialog({
   onSuccess,
   initialFiles,
 }: UploadMediaDialogProps) {
+  const { t } = useLanguage();
+  const [activeTab, setActiveTab] = useState<"file" | "url">("file");
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [fileQueue, setFileQueue] = useState<QueuedUploadFile[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // URL import state
+  const [importUrl, setImportUrl] = useState("");
+  const [customFilename, setCustomFilename] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
 
   // Sync initialFiles when dialog opens with pre-selected files
   useEffect(() => {
@@ -228,17 +242,100 @@ export function UploadMediaDialog({
   const isAllFinished = totalCount > 0 && completedCount + errorCount === totalCount;
   const allSuccessful = totalCount > 0 && completedCount === totalCount;
 
+  const handleImportUrl = async () => {
+    if (!importUrl.trim()) {
+      setImportError("Please enter a valid video or Google Drive URL");
+      return;
+    }
+    setImporting(true);
+    setImportError(null);
+    try {
+      (toast as any)({
+        title: "Starting Download",
+        description: "Downloading video from remote URL to Lupio server...",
+        type: "info",
+      });
+
+      const newItem = await apiService.importMediaFromUrl(
+        importUrl.trim(),
+        customFilename.trim() || undefined
+      );
+
+      (toast as any)({
+        title: "Import Complete! 🎉",
+        description: `Successfully imported "${newItem.filename}" (${newItem.size}, ${newItem.resolution}).`,
+        type: "success",
+      });
+
+      onSuccess(newItem);
+      setImportUrl("");
+      setCustomFilename("");
+      onOpenChange(false);
+    } catch (err: any) {
+      setImportError(err.message || "Failed to download and process media file");
+      (toast as any)({
+        title: "Import Error",
+        description: err.message || "Download failed",
+        type: "error",
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(val) => !uploading && onOpenChange(val)}>
+    <Dialog open={open} onOpenChange={(val) => !uploading && !importing && onOpenChange(val)}>
       <DialogContent className="sm:max-w-[620px] bg-white/98 dark:bg-zinc-950/98 border border-slate-200 dark:border-white/10 p-6 rounded-2xl shadow-2xl text-foreground">
         <DialogHeader className="gap-1">
           <DialogTitle className="text-xl font-bold flex items-center gap-2">
-            <UploadCloud className="h-5 w-5 text-emerald-400" /> Upload Media Assets
+            {activeTab === "file" ? (
+              <>
+                <UploadCloud className="h-5 w-5 text-emerald-400" /> {t("media.uploadTitle")}
+              </>
+            ) : (
+              <>
+                <Globe className="h-5 w-5 text-emerald-400" /> {t("media.cloudTitle")}
+              </>
+            )}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Select or drag multiple video files to upload directly to your Lupio server.
+            {activeTab === "file"
+              ? t("media.fileDesc")
+              : t("media.cloudDesc")}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Tab Selection Switcher */}
+        <div className="pill-tab-switcher flex items-center p-1.5 rounded-full border border-slate-300 dark:border-white/10 bg-transparent text-xs w-full">
+          <button
+            type="button"
+            disabled={uploading || importing}
+            onClick={() => setActiveTab("file")}
+            className={cn(
+              "flex-1 py-2 px-4 text-xs font-bold rounded-full transition-all flex items-center justify-center gap-2 border",
+              activeTab === "file"
+                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+                : "border-transparent text-muted-foreground hover:text-white"
+            )}
+          >
+            <UploadCloud className="h-4 w-4" />
+            {t("media.tabLocal")}
+          </button>
+          <button
+            type="button"
+            disabled={uploading || importing}
+            onClick={() => setActiveTab("url")}
+            className={cn(
+              "flex-1 py-2 px-4 text-xs font-bold rounded-full transition-all flex items-center justify-center gap-2 border",
+              activeTab === "url"
+                ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+                : "border-transparent text-muted-foreground hover:text-white"
+            )}
+          >
+            <Globe className="h-4 w-4" />
+            {t("media.tabCloud")}
+          </button>
+        </div>
 
         <input
           type="file"
@@ -249,144 +346,229 @@ export function UploadMediaDialog({
           onChange={handleFileInputChange}
         />
 
-        <div className="py-2 space-y-4">
-          {/* Dropzone Area */}
-          <div
-            onDragOver={(e) => {
-              e.preventDefault();
-              if (!uploading) setDragOver(true);
-            }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleDrop}
-            onClick={() => !uploading && fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${
-              dragOver
-                ? "border-emerald-500 bg-emerald-500/10 scale-[0.99]"
-                : fileQueue.length > 0
-                ? "border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20"
-                : "border-white/15 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/25"
-            }`}
-          >
-            <UploadCloud
-              className={`h-9 w-9 mb-2 transition-colors ${
-                dragOver ? "text-emerald-400 animate-bounce" : "text-muted-foreground"
-              }`}
-            />
-            <h4 className="text-sm font-semibold text-foreground">
-              {dragOver
-                ? "Drop video files to add to queue"
-                : fileQueue.length > 0
-                ? "Click or drag more video files here"
-                : "Click or drag video files to upload"}
-            </h4>
-            <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-              Supports multiple files (MP4, MKV, MOV, AVI, TS, WEBM)
-            </p>
-          </div>
-
-          {/* Overall Progress Bar (visible during or after upload) */}
-          {(uploading || (totalCount > 0 && (completedCount > 0 || errorCount > 0))) && (
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-foreground flex items-center gap-1.5">
-                  {uploading && <Loader2 className="h-3.5 w-3.5 text-emerald-400 animate-spin" />}
-                  {uploading
-                    ? `Uploading (${completedCount}/${totalCount} files completed)`
-                    : allSuccessful
-                    ? "All files uploaded successfully"
-                    : `Upload finished (${completedCount} of ${totalCount} succeeded)`}
-                </span>
-                <span className="font-mono text-emerald-400 font-bold">{overallPercentage}%</span>
-              </div>
-              <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden relative">
-                <div
-                  className={`h-full transition-all duration-300 ${
-                    errorCount > 0 && !uploading ? "bg-amber-500" : "bg-emerald-500"
-                  }`}
-                  style={{ width: `${overallPercentage}%` }}
+        {activeTab === "url" ? (
+          <div className="py-2 space-y-4">
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                  <Link2 className="h-3.5 w-3.5 text-blue-400" /> {t("media.urlLabel")}
+                </label>
+                <Input
+                  placeholder="https://example.com/video.mp4 or https://drive.google.com/file/d/.../view"
+                  value={importUrl}
+                  onChange={(e) => {
+                    setImportUrl(e.target.value);
+                    if (importError) setImportError(null);
+                  }}
+                  disabled={importing}
+                  className="bg-black/30 border-white/15 focus-visible:border-blue-500/60 focus-visible:ring-blue-500/30 text-xs font-mono"
                 />
               </div>
-            </div>
-          )}
 
-          {/* File Queue List */}
-          {fileQueue.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs px-1 text-muted-foreground">
-                <span>
-                  Queued Files ({fileQueue.length})
-                  {completedCount > 0 && ` · ${completedCount} completed`}
-                  {errorCount > 0 && ` · ${errorCount} failed`}
-                </span>
-                {!uploading && (
-                  <button
-                    type="button"
-                    onClick={() => setFileQueue([])}
-                    className="text-[11px] text-zinc-400 hover:text-white transition-colors"
-                  >
-                    Clear list
-                  </button>
-                )}
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                  {t("media.filenameLabel")}
+                </label>
+                <Input
+                  placeholder="Leave blank to auto-detect from remote header/link"
+                  value={customFilename}
+                  onChange={(e) => setCustomFilename(e.target.value)}
+                  disabled={importing}
+                  className="bg-black/30 border-white/15 text-xs"
+                />
               </div>
 
-              <div className="max-h-[210px] overflow-y-auto space-y-2 pr-1 rounded-xl">
-                {fileQueue.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-white/10 bg-white/[0.02] text-xs"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                      <div className="h-7 w-7 rounded-md bg-white/5 flex items-center justify-center shrink-0">
-                        {item.status === "completed" ? (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                        ) : item.status === "uploading" ? (
-                          <Loader2 className="h-4 w-4 text-emerald-400 animate-spin" />
-                        ) : item.status === "error" ? (
-                          <AlertCircle className="h-4 w-4 text-red-400" />
-                        ) : (
-                          <FileVideo className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
+              {/* Cloud Service Badges & Info */}
+              <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3.5 text-xs space-y-2">
+                <div className="flex items-center gap-2 font-medium text-foreground">
+                  <Globe className="h-4 w-4 text-blue-400" />
+                  <span>Supported Cloud Sources & Direct Downloads</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-muted-foreground">
+                  <div className="flex items-start gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 mt-1 shrink-0" />
+                    <span><strong>Direct URLs:</strong> Any HTTP/HTTPS link (.mp4, .mkv, .ts, .mov, etc.).</span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-400 mt-1 shrink-0" />
+                    <span><strong>Google Drive:</strong> Public link ("Anyone with link can view").</span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 mt-1 shrink-0" />
+                    <span><strong>Dropbox:</strong> Automatically converted to raw stream.</span>
+                  </div>
+                  <div className="flex items-start gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-purple-400 mt-1 shrink-0" />
+                    <span><strong>Server-Side FFmpeg:</strong> Auto metadata probing & thumbnail generation.</span>
+                  </div>
+                </div>
+              </div>
 
-                      <div className="min-w-0 flex-1">
-                        <p className="font-medium text-foreground truncate">{item.file.name}</p>
-                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                          <span>{(item.file.size / (1024 * 1024)).toFixed(1)} MB</span>
-                          {item.status === "uploading" && (
-                            <span className="text-emerald-400">Uploading... {item.progress}%</span>
-                          )}
-                          {item.status === "completed" && (
-                            <span className="text-emerald-400">Uploaded</span>
-                          )}
-                          {item.status === "error" && (
-                            <span className="text-red-400 truncate max-w-[200px]">
-                              {item.errorMessage || "Failed"}
-                            </span>
+              {/* Importing Spinner / Status */}
+              {importing && (
+                <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-3.5 flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 text-blue-400 animate-spin shrink-0" />
+                  <div className="text-xs space-y-0.5">
+                    <div className="font-semibold text-blue-300">Downloading & Processing Media...</div>
+                    <div className="text-zinc-400 text-[11px]">
+                      Your Lupio server is streaming bytes directly and extracting metadata.
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Error display */}
+              {importError && (
+                <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 flex items-start gap-2.5 text-xs text-red-300">
+                  <AlertCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="font-semibold">Import Error:</span>
+                    <p className="text-[11px] text-red-200/90">{importError}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="py-2 space-y-4">
+            {/* Dropzone Area */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (!uploading) setDragOver(true);
+              }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => !uploading && fileInputRef.current?.click()}
+              className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center transition-all cursor-pointer select-none ${
+                dragOver
+                  ? "border-emerald-500 bg-emerald-500/10 scale-[0.99]"
+                  : fileQueue.length > 0
+                  ? "border-white/10 bg-white/[0.02] hover:bg-white/[0.04] hover:border-white/20"
+                  : "border-white/15 bg-white/[0.02] hover:bg-white/[0.05] hover:border-white/25"
+              }`}
+            >
+              <UploadCloud
+                className={`h-9 w-9 mb-2 transition-colors ${
+                  dragOver ? "text-emerald-400 animate-bounce" : "text-muted-foreground"
+                }`}
+              />
+              <h4 className="text-sm font-semibold text-foreground">
+                {dragOver
+                  ? "Drop video files to add to queue"
+                  : fileQueue.length > 0
+                  ? "Click or drag more video files here"
+                  : "Click or drag video files to upload"}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                Supports multiple files (MP4, MKV, MOV, AVI, TS, WEBM)
+              </p>
+            </div>
+
+            {/* Overall Progress Bar (visible during or after upload) */}
+            {(uploading || (totalCount > 0 && (completedCount > 0 || errorCount > 0))) && (
+              <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-foreground flex items-center gap-1.5">
+                    {uploading && <Loader2 className="h-3.5 w-3.5 text-emerald-400 animate-spin" />}
+                    {uploading
+                      ? `Uploading (${completedCount}/${totalCount} files completed)`
+                      : allSuccessful
+                      ? "All files uploaded successfully"
+                      : `Upload finished (${completedCount} of ${totalCount} succeeded)`}
+                  </span>
+                  <span className="font-mono text-emerald-400 font-bold">{overallPercentage}%</span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden relative">
+                  <div
+                    className={`h-full transition-all duration-300 ${
+                      errorCount > 0 && !uploading ? "bg-amber-500" : "bg-emerald-500"
+                    }`}
+                    style={{ width: `${overallPercentage}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* File Queue List */}
+            {fileQueue.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs px-1 text-muted-foreground">
+                  <span>
+                    Queued Files ({fileQueue.length})
+                    {completedCount > 0 && ` · ${completedCount} completed`}
+                    {errorCount > 0 && ` · ${errorCount} failed`}
+                  </span>
+                  {!uploading && (
+                    <button
+                      type="button"
+                      onClick={() => setFileQueue([])}
+                      className="text-[11px] text-zinc-400 hover:text-white transition-colors"
+                    >
+                      Clear list
+                    </button>
+                  )}
+                </div>
+
+                <div className="max-h-[210px] overflow-y-auto space-y-2 pr-1 rounded-xl">
+                  {fileQueue.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-white/10 bg-white/[0.02] text-xs"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className="h-7 w-7 rounded-md bg-white/5 flex items-center justify-center shrink-0">
+                          {item.status === "completed" ? (
+                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                          ) : item.status === "uploading" ? (
+                            <Loader2 className="h-4 w-4 text-emerald-400 animate-spin" />
+                          ) : item.status === "error" ? (
+                            <AlertCircle className="h-4 w-4 text-red-400" />
+                          ) : (
+                            <FileVideo className="h-4 w-4 text-muted-foreground" />
                           )}
                         </div>
-                      </div>
-                    </div>
 
-                    {!uploading && item.status !== "completed" && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveFile(item.id)}
-                        className="p-1 rounded-md hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
-                        title="Remove file"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-foreground truncate">{item.file.name}</p>
+                          <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                            <span>{(item.file.size / (1024 * 1024)).toFixed(1)} MB</span>
+                            {item.status === "uploading" && (
+                              <span className="text-emerald-400">Uploading... {item.progress}%</span>
+                            )}
+                            {item.status === "completed" && (
+                              <span className="text-emerald-400">Uploaded</span>
+                            )}
+                            {item.status === "error" && (
+                              <span className="text-red-400 truncate max-w-[200px]">
+                                {item.errorMessage || "Failed"}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {!uploading && item.status !== "completed" && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveFile(item.id)}
+                          className="p-1 rounded-md hover:bg-white/10 text-muted-foreground hover:text-white transition-colors"
+                          title="Remove file"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         <DialogFooter className="gap-2 sm:gap-0 pt-2 border-t border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            {!uploading && (
+            {activeTab === "file" && !uploading && (
               <Button
                 type="button"
                 variant="outline"
@@ -404,31 +586,52 @@ export function UploadMediaDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={uploading}
+              disabled={uploading || importing}
               className="border-white/10"
             >
-              {allSuccessful ? "Done" : "Cancel"}
+              {activeTab === "file" && allSuccessful ? "Done" : "Cancel"}
             </Button>
 
-            {!allSuccessful && (
+            {activeTab === "file" ? (
+              !allSuccessful && (
+                <Button
+                  type="button"
+                  onClick={handleStartUpload}
+                  disabled={fileQueue.length === 0 || uploading || (pendingCount === 0 && errorCount === 0)}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold gap-1.5"
+                >
+                  {uploading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : errorCount > 0 && pendingCount === 0 ? (
+                    <RefreshCw className="h-4 w-4" />
+                  ) : (
+                    <UploadCloud className="h-4 w-4" />
+                  )}
+                  {uploading
+                    ? `Uploading (${completedCount}/${totalCount})...`
+                    : errorCount > 0 && pendingCount === 0
+                    ? `Retry Failed (${errorCount})`
+                    : `Start Upload${totalCount > 0 ? ` (${totalCount})` : ""}`}
+                </Button>
+              )
+            ) : (
               <Button
                 type="button"
-                onClick={handleStartUpload}
-                disabled={fileQueue.length === 0 || uploading || (pendingCount === 0 && errorCount === 0)}
-                className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold gap-1.5"
+                onClick={handleImportUrl}
+                disabled={!importUrl.trim() || importing}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-semibold gap-1.5 shadow-lg shadow-blue-500/20"
               >
-                {uploading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : errorCount > 0 && pendingCount === 0 ? (
-                  <RefreshCw className="h-4 w-4" />
+                {importing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Importing to Server...
+                  </>
                 ) : (
-                  <UploadCloud className="h-4 w-4" />
+                  <>
+                    <DownloadCloud className="h-4 w-4" />
+                    Download & Import
+                  </>
                 )}
-                {uploading
-                  ? `Uploading (${completedCount}/${totalCount})...`
-                  : errorCount > 0 && pendingCount === 0
-                  ? `Retry Failed (${errorCount})`
-                  : `Start Upload${totalCount > 0 ? ` (${totalCount})` : ""}`}
               </Button>
             )}
           </div>

@@ -33,6 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     document.documentElement.setAttribute("data-theme", "dark");
                     document.documentElement.classList.add("dark");
                   }
+                  var savedLang = localStorage.getItem("lupio_language");
+                  if (savedLang) {
+                    document.documentElement.lang = savedLang;
+                  } else {
+                    document.documentElement.lang = "id";
+                  }
                 } catch (e) {}
               })();
             `,

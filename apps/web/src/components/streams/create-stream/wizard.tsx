@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { mockPlaylists, mockMedia, mockChannels, MediaItem, Playlist, Channel } from "@/lib/mock-data";
+import { MediaItem, Playlist, Channel } from "@/lib/mock-data";
 import { apiService } from "@/lib/services/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,9 @@ import {
   Calendar,
   Rocket,
   ShieldCheck,
+  Clock,
+  Image as ImageIcon,
+  Layers,
 } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
 import Link from "next/link";
@@ -38,21 +41,21 @@ export function CreateStreamWizard() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
 
-  const [mediaList, setMediaList] = useState<MediaItem[]>(mockMedia);
-  const [playlistList, setPlaylistList] = useState<Playlist[]>(mockPlaylists);
-  const [channelList, setChannelList] = useState<Channel[]>(mockChannels);
+  const [mediaList, setMediaList] = useState<MediaItem[]>([]);
+  const [playlistList, setPlaylistList] = useState<Playlist[]>([]);
+  const [channelList, setChannelList] = useState<Channel[]>([]);
 
   // Form State
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     contentType: "playlist" as "playlist" | "single",
-    selectedPlaylistId: mockPlaylists[0]?.id || "",
-    selectedMediaId: mockMedia[0]?.id || "",
+    selectedPlaylistId: "",
+    selectedMediaId: "",
     playbackMode: "sequential" as "sequential" | "shuffle",
     loopMode: "forever" as "forever" | "once",
     channelType: "existing" as "existing" | "custom",
-    selectedChannelId: mockChannels[0]?.id || "",
+    selectedChannelId: "",
     customRtmpUrl: "rtmp://a.rtmp.youtube.com/live2",
     customStreamKey: "",
     preset: "1080p30",
@@ -60,6 +63,12 @@ export function CreateStreamWizard() {
     fps: "30",
     videoBitrate: "8000",
     audioBitrate: "128",
+    enableDigitalClock: false,
+    clockPosition: "top-right" as "top-left" | "top-right" | "bottom-left" | "bottom-right",
+    clockTimezone: "Asia/Jakarta",
+    clockShowLabel: true,
+    logoWatermarkPath: "",
+    logoPosition: "top-left" as "top-left" | "top-right" | "bottom-left" | "bottom-right",
     scheduleType: "now" as "now" | "scheduled",
     startDate: new Date().toISOString().split("T")[0],
     startTime: "20:00",
@@ -75,17 +84,23 @@ export function CreateStreamWizard() {
           apiService.getChannels(),
         ]);
 
-        if (realMedia && realMedia.length > 0) {
+        if (Array.isArray(realMedia)) {
           setMediaList(realMedia);
-          setFormData((prev) => ({ ...prev, selectedMediaId: realMedia[0].id }));
+          if (realMedia.length > 0) {
+            setFormData((prev) => ({ ...prev, selectedMediaId: prev.selectedMediaId || realMedia[0].id }));
+          }
         }
-        if (realPlaylists && realPlaylists.length > 0) {
+        if (Array.isArray(realPlaylists)) {
           setPlaylistList(realPlaylists);
-          setFormData((prev) => ({ ...prev, selectedPlaylistId: realPlaylists[0].id }));
+          if (realPlaylists.length > 0) {
+            setFormData((prev) => ({ ...prev, selectedPlaylistId: prev.selectedPlaylistId || realPlaylists[0].id }));
+          }
         }
-        if (realChannels && realChannels.length > 0) {
+        if (Array.isArray(realChannels)) {
           setChannelList(realChannels);
-          setFormData((prev) => ({ ...prev, selectedChannelId: realChannels[0].id }));
+          if (realChannels.length > 0) {
+            setFormData((prev) => ({ ...prev, selectedChannelId: prev.selectedChannelId || realChannels[0].id }));
+          }
         }
       } catch (e) {
         console.error("Failed to load options from backend:", e);
@@ -100,8 +115,28 @@ export function CreateStreamWizard() {
 
   const handleNext = () => {
     if (currentStep === 1 && !formData.name.trim()) {
-      (toast as any)({ title: "Validation Error", description: "Please enter a stream name.", type: "error" });
+      (toast as any)({ title: "Validation Error", description: "Silakan masukkan nama stream.", type: "error" });
       return;
+    }
+    if (currentStep === 2) {
+      if (formData.contentType === "playlist" && (!formData.selectedPlaylistId || playlistList.length === 0)) {
+        (toast as any)({ title: "Validation Error", description: "Silakan buat dan pilih playlist terlebih dahulu.", type: "error" });
+        return;
+      }
+      if (formData.contentType === "single" && (!formData.selectedMediaId || mediaList.length === 0)) {
+        (toast as any)({ title: "Validation Error", description: "Silakan upload dan pilih video terlebih dahulu.", type: "error" });
+        return;
+      }
+    }
+    if (currentStep === 3) {
+      if (formData.channelType === "existing" && (!formData.selectedChannelId || channelList.length === 0)) {
+        (toast as any)({ title: "Validation Error", description: "Silakan tambahkan dan pilih channel target terlebih dahulu.", type: "error" });
+        return;
+      }
+      if (formData.channelType === "custom" && !formData.customStreamKey.trim()) {
+        (toast as any)({ title: "Validation Error", description: "Silakan masukkan Stream Key RTMP.", type: "error" });
+        return;
+      }
     }
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
@@ -148,6 +183,12 @@ export function CreateStreamWizard() {
         fps: formData.fps,
         videoBitrate: formData.videoBitrate,
         scheduleType: startNow ? "now" : formData.scheduleType,
+        enableDigitalClock: formData.enableDigitalClock,
+        clockPosition: formData.clockPosition,
+        clockTimezone: formData.clockTimezone,
+        clockShowLabel: formData.clockShowLabel,
+        logoWatermarkPath: formData.logoWatermarkPath || undefined,
+        logoPosition: formData.logoPosition,
       });
 
       (toast as any)({
@@ -287,33 +328,63 @@ export function CreateStreamWizard() {
               {/* Selector */}
               {formData.contentType === "playlist" ? (
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Playlist</label>
-                  <select
-                    value={formData.selectedPlaylistId}
-                    onChange={(e) => updateForm({ selectedPlaylistId: e.target.value })}
-                    className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                  >
-                    {playlistList.map((pl) => (
-                      <option key={pl.id} value={pl.id}>
-                        {pl.name} ({pl.itemCount} items · {pl.totalDuration})
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Playlist</label>
+                    <Link href="/playlists" target="_blank" className="text-[11px] text-emerald-400 hover:underline">
+                      + Buat Playlist
+                    </Link>
+                  </div>
+                  {playlistList.length === 0 ? (
+                    <div className="p-4 rounded-xl border border-dashed border-white/15 bg-white/[0.02] text-center space-y-2">
+                      <p className="text-xs text-muted-foreground">Belum ada playlist yang dibuat.</p>
+                      <Link href="/playlists" target="_blank" className="text-xs text-emerald-400 hover:underline font-medium inline-block">
+                        + Buat Playlist Baru &rarr;
+                      </Link>
+                    </div>
+                  ) : (
+                    <select
+                      value={formData.selectedPlaylistId}
+                      onChange={(e) => updateForm({ selectedPlaylistId: e.target.value })}
+                      className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    >
+                      <option value="">-- Pilih Playlist --</option>
+                      {playlistList.map((pl) => (
+                        <option key={pl.id} value={pl.id}>
+                          {pl.name} ({pl.itemCount} items · {pl.totalDuration})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Media File</label>
-                  <select
-                    value={formData.selectedMediaId}
-                    onChange={(e) => updateForm({ selectedMediaId: e.target.value })}
-                    className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus-ring-emerald-500/50"
-                  >
-                    {mediaList.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.filename} ({m.duration} · {m.size})
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Select Media File</label>
+                    <Link href="/media" target="_blank" className="text-[11px] text-emerald-400 hover:underline">
+                      + Upload Video
+                    </Link>
+                  </div>
+                  {mediaList.length === 0 ? (
+                    <div className="p-4 rounded-xl border border-dashed border-white/15 bg-white/[0.02] text-center space-y-2">
+                      <p className="text-xs text-muted-foreground">Belum ada video yang diunggah.</p>
+                      <Link href="/media" target="_blank" className="text-xs text-emerald-400 hover:underline font-medium inline-block">
+                        + Upload Video ke Media Library &rarr;
+                      </Link>
+                    </div>
+                  ) : (
+                    <select
+                      value={formData.selectedMediaId}
+                      onChange={(e) => updateForm({ selectedMediaId: e.target.value })}
+                      className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    >
+                      <option value="">-- Pilih Video --</option>
+                      {mediaList.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.filename} ({m.duration} · {m.size})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               )}
 
@@ -414,18 +485,33 @@ export function CreateStreamWizard() {
 
               {formData.channelType === "existing" ? (
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Target Channel</label>
-                  <select
-                    value={formData.selectedChannelId}
-                    onChange={(e) => updateForm({ selectedChannelId: e.target.value })}
-                    className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                  >
-                    {channelList.map((ch) => (
-                      <option key={ch.id} value={ch.id}>
-                        {ch.name} ({ch.platform})
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Target Channel</label>
+                    <Link href="/channels" target="_blank" className="text-[11px] text-emerald-400 hover:underline">
+                      + Tambah Channel
+                    </Link>
+                  </div>
+                  {channelList.length === 0 ? (
+                    <div className="p-4 rounded-xl border border-dashed border-white/15 bg-white/[0.02] text-center space-y-2">
+                      <p className="text-xs text-muted-foreground">Belum ada channel RTMP tersimpan.</p>
+                      <Link href="/channels" target="_blank" className="text-xs text-emerald-400 hover:underline font-medium inline-block">
+                        + Tambahkan Channel Baru &rarr;
+                      </Link>
+                    </div>
+                  ) : (
+                    <select
+                      value={formData.selectedChannelId}
+                      onChange={(e) => updateForm({ selectedChannelId: e.target.value })}
+                      className="w-full h-10 rounded-md border border-white/10 bg-zinc-900 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                    >
+                      <option value="">-- Pilih Channel Target --</option>
+                      {channelList.map((ch) => (
+                        <option key={ch.id} value={ch.id}>
+                          {ch.name} ({ch.platform})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -503,6 +589,126 @@ export function CreateStreamWizard() {
                 <div className="space-y-2">
                   <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Audio Bitrate (Kbps)</label>
                   <Input value={formData.audioBitrate} onChange={(e) => updateForm({ audioBitrate: e.target.value })} className="bg-white/5 border-white/10" />
+                </div>
+              </div>
+
+              {/* Overlays & Branding (Clock & Logo Watermark) */}
+              <div className="space-y-4 border-t border-white/10 pt-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold flex items-center gap-1.5">
+                      <Layers className="h-4 w-4 text-emerald-400" /> Visual Overlays & Branding
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Burn digital clock timecode and logo watermark into the stream.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Digital Clock */}
+                  <div className="p-3.5 rounded-xl border border-white/10 bg-white/[0.02] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
+                        <Clock className="h-3.5 w-3.5 text-blue-400" /> Realtime Digital Clock
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => updateForm({ enableDigitalClock: !formData.enableDigitalClock })}
+                        className={cn(
+                          "text-[10px] px-2.5 py-0.5 rounded font-bold transition-all",
+                          formData.enableDigitalClock
+                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                            : "bg-white/5 text-zinc-400 border border-white/10 hover:text-white"
+                        )}
+                      >
+                        {formData.enableDigitalClock ? "ENABLED" : "DISABLED"}
+                      </button>
+                    </div>
+
+                    {formData.enableDigitalClock ? (
+                      <div className="space-y-2.5">
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground font-medium">Clock Placement</label>
+                          <select
+                            value={formData.clockPosition}
+                            onChange={(e) => updateForm({ clockPosition: e.target.value as any })}
+                            className="w-full h-9 rounded-md border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          >
+                            <option value="top-right">Top Right (Pojok Kanan Atas)</option>
+                            <option value="top-left">Top Left (Pojok Kiri Atas)</option>
+                            <option value="bottom-right">Bottom Right (Pojok Kanan Bawah)</option>
+                            <option value="bottom-left">Bottom Left (Pojok Kiri Bawah)</option>
+                          </select>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground font-medium">Zona Waktu / Negara</label>
+                          <select
+                            value={formData.clockTimezone}
+                            onChange={(e) => updateForm({ clockTimezone: e.target.value })}
+                            className="w-full h-9 rounded-md border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                          >
+                            <option value="Asia/Jakarta">🇮🇩 WIB (Jakarta, Jawa, Sumatra - UTC+7)</option>
+                            <option value="Asia/Makassar">🇮🇩 WITA (Bali, Makassar, NTB - UTC+8)</option>
+                            <option value="Asia/Jayapura">🇮🇩 WIT (Jayapura, Maluku, Papua - UTC+9)</option>
+                            <option value="Asia/Singapore">🇸🇬 SGT (Singapura & Malaysia - UTC+8)</option>
+                            <option value="Asia/Riyadh">🇸🇦 KSA (Arab Saudi / Makkah - UTC+3)</option>
+                            <option value="Asia/Tokyo">🇯🇵 JST (Tokyo / Jepang - UTC+9)</option>
+                            <option value="Europe/London">🇬🇧 GMT/UTC (London / Inggris - UTC+0)</option>
+                            <option value="America/New_York">🇺🇸 EST (New York / AS - UTC-5)</option>
+                            <option value="America/Los_Angeles">🇺🇸 PST (Los Angeles / AS - UTC-8)</option>
+                            <option value="UTC">🌐 UTC (Universal Coordinated Time)</option>
+                            <option value="server">🖥️ Waktu Server Lokal (System Default)</option>
+                          </select>
+                        </div>
+
+                        <label className="flex items-center gap-2 cursor-pointer pt-1 text-xs select-none">
+                          <input
+                            type="checkbox"
+                            checked={formData.clockShowLabel}
+                            onChange={(e) => updateForm({ clockShowLabel: e.target.checked })}
+                            className="rounded border-white/20 bg-zinc-900 text-emerald-500 focus:ring-0 h-3.5 w-3.5"
+                          />
+                          <span className="text-[11px] text-zinc-300">
+                            Tampilkan label zona waktu (misal: <span className="font-mono text-emerald-400">21:00:00 WIB</span>)
+                          </span>
+                        </label>
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-zinc-500 italic">
+                        Real-time UTC/Server HH:MM:SS live timecode burned into broadcast video.
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Logo Watermark */}
+                  <div className="p-3.5 rounded-xl border border-white/10 bg-white/[0.02] space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
+                        <ImageIcon className="h-3.5 w-3.5 text-purple-400" /> Logo PNG Watermark
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="File path, e.g. uploads/logo.png"
+                        value={formData.logoWatermarkPath}
+                        onChange={(e) => updateForm({ logoWatermarkPath: e.target.value })}
+                        className="bg-white/5 border-white/10 text-xs h-9"
+                      />
+                      <select
+                        value={formData.logoPosition}
+                        onChange={(e) => updateForm({ logoPosition: e.target.value as any })}
+                        className="w-full h-9 rounded-md border border-white/10 bg-zinc-900 px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      >
+                        <option value="top-left">Top Left (Pojok Kiri Atas)</option>
+                        <option value="top-right">Top Right (Pojok Kanan Atas)</option>
+                        <option value="bottom-left">Bottom Left (Pojok Kiri Bawah)</option>
+                        <option value="bottom-right">Bottom Right (Pojok Kanan Bawah)</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -587,8 +793,8 @@ export function CreateStreamWizard() {
                   <p className="text-xs font-semibold text-muted-foreground uppercase">Content Source</p>
                   <p className="font-semibold text-foreground mt-0.5">
                     {formData.contentType === "playlist"
-                      ? `Playlist: ${mockPlaylists.find((p) => p.id === formData.selectedPlaylistId)?.name || formData.selectedPlaylistId}`
-                      : `Single File: ${mockMedia.find((m) => m.id === formData.selectedMediaId)?.filename || formData.selectedMediaId}`}
+                      ? `Playlist: ${playlistList.find((p) => p.id === formData.selectedPlaylistId)?.name || formData.selectedPlaylistId || "Belum dipilih"}`
+                      : `Single File: ${mediaList.find((m) => m.id === formData.selectedMediaId)?.filename || formData.selectedMediaId || "Belum dipilih"}`}
                   </p>
                 </div>
 
@@ -596,7 +802,7 @@ export function CreateStreamWizard() {
                   <p className="text-xs font-semibold text-muted-foreground uppercase">Destination</p>
                   <p className="font-semibold text-foreground mt-0.5">
                     {formData.channelType === "existing"
-                      ? mockChannels.find((c) => c.id === formData.selectedChannelId)?.name || formData.selectedChannelId
+                      ? channelList.find((c) => c.id === formData.selectedChannelId)?.name || formData.selectedChannelId || "Belum dipilih"
                       : `Custom RTMPS (${formData.customRtmpUrl})`}
                   </p>
                 </div>

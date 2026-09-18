@@ -69,7 +69,7 @@ export function AnalyticsChart() {
   const latest = data[data.length - 1] || { bitrate: 7800, cpu: 28, ram: 48 };
 
   return (
-    <Card className="border-white/10 bg-card/60 backdrop-blur shadow-xl">
+    <Card className="border-white/10 bg-card/60 backdrop-blur shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-base font-bold flex items-center gap-2 text-foreground">
           <Activity className="h-5 w-5 text-emerald-400" /> Live Bitrate Stability & Broadcast Telemetry

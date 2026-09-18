@@ -9,19 +9,22 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiService } from "@/lib/services/api";
+import { useLanguage } from "@/lib/i18n/language-context";
+import { TranslationKey } from "@/lib/i18n/translations";
 
-const nav = [
-  { label: "Dashboard", name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Analytics", name: "Analytics", href: "/analytics", icon: BarChart2 },
-  { label: "Streams", name: "Streams", href: "/streams", icon: Radio },
-  { label: "Media", name: "Media", href: "/media", icon: FileVideo },
-  { label: "Playlists", name: "Playlists", href: "/playlists", icon: ListVideo },
-  { label: "Channels", name: "Channels", href: "/channels", icon: Tv },
-  { label: "Logs", name: "Logs", href: "/logs", icon: FileText },
+const navItems: { key: TranslationKey; fallback: string; href: string; icon: any }[] = [
+  { key: "nav.dashboard", fallback: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "nav.analytics", fallback: "Analytics", href: "/analytics", icon: BarChart2 },
+  { key: "nav.streams", fallback: "Streams", href: "/streams", icon: Radio },
+  { key: "nav.media", fallback: "Media", href: "/media", icon: FileVideo },
+  { key: "nav.playlists", fallback: "Playlists", href: "/playlists", icon: ListVideo },
+  { key: "nav.channels", fallback: "Channels", href: "/channels", icon: Tv },
+  { key: "nav.logs", fallback: "Logs", href: "/logs", icon: FileText },
 ];
 
 export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [liveCount, setLiveCount] = useState<number>(0);
 
   const loadMetrics = async () => {
@@ -67,7 +70,8 @@ export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
 
       {/* Nav */}
       <nav className="flex-1 px-2 py-2.5 space-y-1.5 overflow-y-auto overflow-x-hidden">
-        {nav.map(({ label, href, icon: Icon }) => {
+        {navItems.map(({ key, fallback, href, icon: Icon }) => {
+          const label = t(key, fallback);
           const active = pathname === href || (href !== "/" && pathname.startsWith(href));
           return (
             <Link
@@ -100,7 +104,7 @@ export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
       <div className="px-2 mb-3 pt-2.5 space-y-1.5 overflow-hidden">
         <Link
           href="/settings"
-          title={collapsed ? "Settings" : undefined}
+          title={collapsed ? t("nav.settings") : undefined}
           className={cn(
             "group relative flex items-center rounded-full text-xs font-semibold transition-all duration-200 border border-transparent overflow-hidden h-10",
             collapsed ? "w-10 aspect-square p-0 justify-center" : "w-full",
@@ -115,13 +119,13 @@ export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
               pathname.startsWith("/settings") ? "text-emerald-400" : "text-zinc-400 group-hover:text-emerald-400"
             )} />
           </div>
-          {!collapsed && <span className="truncate pr-3 font-semibold text-xs whitespace-nowrap">Settings</span>}
+          {!collapsed && <span className="truncate pr-3 font-semibold text-xs whitespace-nowrap">{t("nav.settings")}</span>}
         </Link>
 
         {/* Server status pill */}
         {collapsed ? (
           <div
-            title={`${liveCount} stream(s) live`}
+            title={`${liveCount} ${t("nav.liveCount")}`}
             className="flex h-10 w-10 shrink-0 aspect-square items-center justify-center rounded-full bg-black/40 border border-white/10"
           >
             <span
@@ -140,10 +144,10 @@ export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
               )}
             />
             <span className="text-[11px] font-medium text-foreground truncate">
-              {liveCount} live
+              {liveCount} {t("nav.live")}
             </span>
             <span className={cn("ml-auto text-[10px] font-bold shrink-0", liveCount > 0 ? "text-emerald-400" : "text-zinc-500")}>
-              {liveCount > 0 ? "OK" : "IDLE"}
+              {liveCount > 0 ? "OK" : t("nav.idle")}
             </span>
           </div>
         )}

@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 import { 
   mockStreams, mockMedia, mockPlaylists, mockChannels, 
   Stream, MediaItem, Playlist, Channel, ScheduleRule, UserAccount, ApiKey 
@@ -34,6 +35,21 @@ export interface SettingsData {
   // Feature 4: Audio Normalizer (EBU R128) Settings
   enableAudioNormalizer?: boolean;
   loudnessLevel?: string;
+
+  // General Settings - Server & Time
+  timezone?: string;
+  timeFormat?: string;
+  publicServerUrl?: string;
+
+  // General Settings - Interface & Localization
+  defaultTheme?: string;
+  defaultLandingPage?: string;
+
+  // General Settings - Storage & System Policies
+  mediaStoragePath?: string;
+  maxUploadSizeMb?: number;
+  logRetentionDays?: number;
+  clearTempSegmentsOnStop?: boolean;
 }
 
 interface DBData {
@@ -50,6 +66,9 @@ interface DBData {
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_PATH = path.join(DATA_DIR, "db.json");
+const DB_TMP_PATH = path.join(DATA_DIR, "db.json.tmp");
+
+let inMemoryCache: DBData | null = null;
 
 function ensureDirectoryExists() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -90,6 +109,15 @@ const initialData: DBData = {
     maxWatchdogRetries: 3,
     enableAudioNormalizer: true,
     loudnessLevel: "-16 LUFS (EBU R128)",
+    timezone: "Asia/Jakarta",
+    timeFormat: "24h",
+    publicServerUrl: "http://localhost:3000",
+    defaultTheme: "dark",
+    defaultLandingPage: "dashboard",
+    mediaStoragePath: "storage/media",
+    maxUploadSizeMb: 5000,
+    logRetentionDays: 14,
+    clearTempSegmentsOnStop: true,
   },
   scheduleRules: [
     {
@@ -143,13 +171,14 @@ const initialData: DBData = {
 export function readDB(): DBData {
   ensureDirectoryExists();
   if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(initialData, null, 2), "utf-8");
+    inMemoryCache = initialData;
+    writeDB(initialData);
     return initialData;
   }
   try {
     const raw = fs.readFileSync(DB_PATH, "utf-8");
     const parsed = JSON.parse(raw);
-    return {
+    const result: DBData = {
       ...initialData,
       ...parsed,
       settings: { ...initialData.settings, ...(parsed.settings || {}) },
@@ -157,15 +186,46 @@ export function readDB(): DBData {
       users: parsed.users || initialData.users,
       apiKeys: parsed.apiKeys || initialData.apiKeys,
     };
+    inMemoryCache = result;
+    return result;
   } catch (err) {
-    console.error("Error reading DB JSON, resetting to initial:", err);
+    console.error("Error reading DB JSON:", err);
+    // CRITICAL: Prevent total data loss. Do NOT wipe DB to initialData on read glitch!
+    try {
+      const backupPath = path.join(DATA_DIR, `db.json.corrupted.${Date.now()}`);
+      if (fs.existsSync(DB_PATH)) {
+        fs.copyFileSync(DB_PATH, backupPath);
+        console.warn(`Saved corrupted DB copy to ${backupPath}`);
+      }
+    } catch (bErr) {
+      console.error("Failed to backup corrupted DB:", bErr);
+    }
+
+    // Return in-memory cache if available to protect active state
+    if (inMemoryCache) {
+      console.warn("Using last valid in-memory cache instead of resetting to initialData.");
+      return inMemoryCache;
+    }
     return initialData;
   }
 }
 
 export function writeDB(data: DBData): void {
   ensureDirectoryExists();
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), "utf-8");
+  inMemoryCache = data;
+  try {
+    // Atomic file write: write to temporary file first, then atomic rename
+    const content = JSON.stringify(data, null, 2);
+    fs.writeFileSync(DB_TMP_PATH, content, "utf-8");
+    fs.renameSync(DB_TMP_PATH, DB_PATH);
+  } catch (err) {
+    console.error("Atomic write failed, using direct write fallback:", err);
+    try {
+      fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2), "utf-8");
+    } catch (fallbackErr) {
+      console.error("Fatal error writing to DB:", fallbackErr);
+    }
+  }
 }
 
 export const db = {
@@ -415,7 +475,7 @@ export const db = {
   createApiKey: (name: string): ApiKey => {
     const data = readDB();
     const keys = data.apiKeys || [];
-    const randHex = Array.from({ length: 12 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+    const randHex = crypto.randomBytes(16).toString("hex");
     const newKey: ApiKey = {
       id: `key_${Date.now()}`,
       name: name || "Default API Key",

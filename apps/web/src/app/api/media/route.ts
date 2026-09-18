@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
 import { MediaItem } from "@/lib/mock-data";
 import { probeMedia } from "@/lib/server/media-probe";
+import { requireAuth } from "@/lib/server/session";
 import fs from "fs";
 import path from "path";
 
@@ -13,12 +14,18 @@ function ensureUploadsDir() {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   const media = db.getMedia();
   return NextResponse.json(media);
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     ensureUploadsDir();
     const formData = await req.formData();
@@ -29,6 +36,18 @@ export async function POST(req: Request) {
     }
 
     const filename = file.name;
+    const ext = path.extname(filename).toLowerCase();
+    const ALLOWED_EXTENSIONS = new Set([
+      ".mp4", ".mkv", ".mov", ".webm", ".avi", ".ts", ".flv", ".mp3", ".m4a", ".aac", ".wav"
+    ]);
+
+    if (!ALLOWED_EXTENSIONS.has(ext)) {
+      return NextResponse.json(
+        { error: `Format file "${ext}" tidak didukung. Hanya file video/audio (.mp4, .mkv, .mov, .webm, dll.) yang diizinkan.` },
+        { status: 400 }
+      );
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -65,4 +84,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-

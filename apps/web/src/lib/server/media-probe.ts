@@ -5,10 +5,19 @@ import { db } from "./db";
 
 export function getFfmpegPath(): string {
   const settings = db.getSettings();
-  if (settings.ffmpegPath && fs.existsSync(settings.ffmpegPath)) {
+  if (settings.ffmpegPath && settings.ffmpegPath !== "ffmpeg" && fs.existsSync(settings.ffmpegPath)) {
     return settings.ffmpegPath;
   }
-  return "ffmpeg";
+  const bundledStaticPath = path.join(
+    process.cwd(),
+    "node_modules",
+    "ffmpeg-static",
+    process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"
+  );
+  if (fs.existsSync(bundledStaticPath)) {
+    return bundledStaticPath;
+  }
+  return settings.ffmpegPath || "ffmpeg";
 }
 
 export interface ProbeResult {

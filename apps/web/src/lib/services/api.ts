@@ -81,6 +81,19 @@ export const apiService = {
     return await res.json();
   },
 
+  importMediaFromUrl: async (url: string, filename?: string): Promise<MediaItem> => {
+    const res = await fetch("/api/media/import-url", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url, filename }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to import media from URL");
+    }
+    return data;
+  },
+
   deleteMedia: async (id: string): Promise<boolean> => {
     const res = await fetch(`/api/media/${id}`, { method: "DELETE" });
     return res.ok;

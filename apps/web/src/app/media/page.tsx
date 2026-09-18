@@ -32,8 +32,10 @@ import { UploadMediaDialog } from "@/components/media/upload-media-dialog";
 import { MediaPreviewDialog } from "@/components/media/media-preview-dialog";
 import { MediaMetadataDialog } from "@/components/media/media-metadata-dialog";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 export default function MediaPage() {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -138,7 +140,7 @@ export default function MediaPage() {
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search by title, filename..."
+              placeholder={t("media.search")}
               className="pl-9 pr-4 bg-card/60 border-white/10 rounded-full h-10.5 text-xs"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -169,7 +171,7 @@ export default function MediaPage() {
           }}
           className="shrink-0 bg-emerald-500 hover:bg-emerald-600 text-black font-bold gap-2 rounded-full h-10 px-5 shadow-lg shadow-emerald-500/10 text-xs"
         >
-          <Plus className="h-4 w-4" /> Upload Media
+          <Plus className="h-4 w-4" /> {t("action.uploadMedia")}
         </Button>
       </div>
 
@@ -255,14 +257,14 @@ export default function MediaPage() {
                       className="cursor-pointer text-xs"
                       onClick={() => setEditMetadataMedia(item)}
                     >
-                      <FileEdit className="mr-2 h-3.5 w-3.5 text-sky-400" /> Edit Metadata
+                      <FileEdit className="mr-2 h-3.5 w-3.5 text-sky-400" /> {t("action.edit")} Metadata
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-white/10" />
                     <DropdownMenuItem
                       className="text-red-400 cursor-pointer focus:text-red-400 text-xs"
                       onClick={() => setDeleteConfirm({ open: true, media: item })}
                     >
-                      <Trash className="mr-2 h-3.5 w-3.5" /> Delete
+                      <Trash className="mr-2 h-3.5 w-3.5" /> {t("action.delete")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -284,28 +286,29 @@ export default function MediaPage() {
       {/* Loading Skeleton */}
       {loading && (
         <div className="text-center py-20 text-xs text-muted-foreground animate-pulse">
-          Loading media library...
+          {t("dash.loading")}
         </div>
       )}
 
       {!loading && filteredMedia.length === 0 && (
-        <div className="text-center py-16 rounded-2xl border border-dashed border-white/10 bg-white/[0.01]">
-          <UploadCloud className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-sm font-semibold">No media files found</h3>
-          <p className="text-xs text-muted-foreground mt-1 mb-4">
+        <div className="empty-state-wrapper text-center py-16 px-6 rounded-3xl w-full">
+          <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 flex items-center justify-center mx-auto mb-4 text-emerald-500 shadow-xs">
+            <UploadCloud className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <h3 className="text-base font-bold text-foreground">{t("media.empty")}</h3>
+          <p className="text-xs text-muted-foreground mt-1 mb-6 max-w-sm mx-auto leading-relaxed">
             {search
               ? `No media files match "${search}".`
-              : "Upload video files to start creating playlists and streams."}
+              : t("media.emptyDesc")}
           </p>
           <Button
             onClick={() => {
               setInitialFiles([]);
               setUploadOpen(true);
             }}
-            variant="outline"
-            size="sm"
+            className="bg-emerald-500 hover:bg-emerald-600 text-black font-bold h-10 px-6 rounded-full shadow-lg shadow-emerald-500/20 gap-2 text-xs transition-all hover:scale-[1.02]"
           >
-            <Plus className="mr-1.5 h-4 w-4" /> Upload Video Now
+            <Plus className="h-4 w-4 stroke-[2.5]" /> {t("action.uploadMedia")}
           </Button>
         </div>
       )}

@@ -22,6 +22,12 @@ export interface Stream {
   transitionEffect?: string;
   maxDurationHours?: number; // 0 or undefined for 24/7 non-stop
   manualStop?: boolean; // true = user explicitly stopped, block all auto-restarts
+  logoWatermarkPath?: string; // Path to PNG logo file
+  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  enableDigitalClock?: boolean; // Show realtime digital clock overlay
+  clockPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  clockTimezone?: string; // e.g. "Asia/Jakarta", "Asia/Makassar", "UTC", etc.
+  clockShowLabel?: boolean; // true = append timezone label (e.g. "WIB")
 }
 
 export interface SystemMetrics {

@@ -7,14 +7,17 @@ import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/toast";
 import { 
   Save, Settings, Video, Cpu, Globe, CheckCircle2, ShieldCheck, 
-  BellRing, ShieldAlert, Type, Key, Users, Copy, Plus, Trash2, Volume2, Activity, User, Lock, Mail, Shield 
+  BellRing, ShieldAlert, Type, Key, Users, Copy, Plus, Trash2, Volume2, Activity, User, Lock, Mail, Shield,
+  Server, Clock, Palette, Languages, Layout, HardDrive, Info, Layers, FolderKanban
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiService } from "@/lib/services/api";
 import { MediaItem, UserAccount, ApiKey } from "@/lib/mock-data";
 import { CustomSelect } from "@/components/ui/select";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 export default function SettingsPage() {
+  const { language, setLanguage, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"general" | "profile" | "ffmpeg" | "streaming" | "webhooks" | "security">("general");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,7 +46,16 @@ export default function SettingsPage() {
 
   const [settings, setSettings] = useState({
     serverName: "Lupio Production Node 1",
-    language: "English",
+    language: "id",
+    timezone: "Asia/Jakarta",
+    timeFormat: "24h",
+    publicServerUrl: "http://localhost:3000",
+    defaultTheme: "dark",
+    defaultLandingPage: "dashboard",
+    mediaStoragePath: "storage/media",
+    maxUploadSizeMb: 5000,
+    logRetentionDays: 14,
+    clearTempSegmentsOnStop: true,
     ffmpegPath: "ffmpeg",
     hardwareAccel: "None (CPU Only)",
     threadCount: 4,
@@ -71,7 +83,19 @@ export default function SettingsPage() {
         apiService.getApiKeys(),
       ]);
       if (real && Object.keys(real).length > 0) {
-        setSettings((prev) => ({ ...prev, ...real }));
+        setSettings((prev) => ({
+          ...prev,
+          ...real,
+          timezone: real.timezone || prev.timezone,
+          timeFormat: real.timeFormat || prev.timeFormat,
+          publicServerUrl: real.publicServerUrl || prev.publicServerUrl,
+          defaultTheme: real.defaultTheme || prev.defaultTheme,
+          defaultLandingPage: real.defaultLandingPage || prev.defaultLandingPage,
+          mediaStoragePath: real.mediaStoragePath || prev.mediaStoragePath,
+          maxUploadSizeMb: real.maxUploadSizeMb !== undefined ? real.maxUploadSizeMb : prev.maxUploadSizeMb,
+          logRetentionDays: real.logRetentionDays !== undefined ? real.logRetentionDays : prev.logRetentionDays,
+          clearTempSegmentsOnStop: real.clearTempSegmentsOnStop !== undefined ? real.clearTempSegmentsOnStop : prev.clearTempSegmentsOnStop,
+        }));
       }
       if (Array.isArray(media)) setMediaList(media);
       if (Array.isArray(uData)) setUsers(uData);
@@ -100,6 +124,25 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await apiService.updateSettings(settings);
+
+      // Synchronize language if changed
+      if (settings.language && (settings.language === "id" || settings.language === "en")) {
+        setLanguage(settings.language as "id" | "en");
+      }
+
+      // Synchronize theme if changed
+      if (settings.defaultTheme) {
+        localStorage.setItem("lupio_theme", settings.defaultTheme);
+        document.documentElement.setAttribute("data-theme", settings.defaultTheme);
+        if (settings.defaultTheme === "light") {
+          document.documentElement.classList.add("light");
+          document.documentElement.classList.remove("dark");
+        } else {
+          document.documentElement.classList.add("dark");
+          document.documentElement.classList.remove("light");
+        }
+      }
+
       (toast as any)({
         title: "Settings Saved! ⚙️",
         description: "Your system configuration has been updated successfully.",
@@ -142,22 +185,31 @@ export default function SettingsPage() {
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentPass || !newPass || !confirmPass) {
-      (toast as any)({ title: "Validation Error", description: "Please fill in all password fields.", type: "error" });
+      (toast as any)({ title: "Validation Error", description: "Mohon isi semua field password.", type: "error" });
       return;
     }
     if (newPass !== confirmPass) {
-      (toast as any)({ title: "Validation Error", description: "New password and confirmation do not match.", type: "error" });
+      (toast as any)({ title: "Validation Error", description: "Password baru dan konfirmasi tidak cocok.", type: "error" });
       return;
     }
-    if (newPass.length < 4) {
-      (toast as any)({ title: "Validation Error", description: "Password must be at least 4 characters long.", type: "error" });
+    if (newPass.length < 8) {
+      (toast as any)({ title: "Validation Error", description: "Password baru minimal 8 karakter.", type: "error" });
       return;
     }
 
     setUpdatingPass(true);
     try {
-      localStorage.setItem("lupio_admin_password", newPass);
-      await apiService.updateSettings({ adminPassword: newPass });
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ currentPassword: currentPass, newPassword: newPass }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        (toast as any)({ title: "Update Error", description: data.error || "Gagal mengganti password.", type: "error" });
+        return;
+      }
 
       setCurrentPass("");
       setNewPass("");
@@ -165,7 +217,7 @@ export default function SettingsPage() {
 
       (toast as any)({
         title: "Password Updated! 🔒",
-        description: "Your security password has been changed successfully.",
+        description: "Password keamanan berhasil diperbarui.",
         type: "success",
       });
     } catch (err: any) {
@@ -284,103 +336,185 @@ export default function SettingsPage() {
         <button
           onClick={() => setActiveTab("general")}
           className={cn(
-            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-colors duration-150 border",
             activeTab === "general"
-              ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
-              : "text-muted-foreground hover:text-white"
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-white"
           )}
         >
-          <Settings className="h-3.5 w-3.5" /> General
+          <Settings className="h-3.5 w-3.5" /> {t("settings.tabGeneral")}
         </button>
 
         <button
           onClick={() => setActiveTab("profile")}
           className={cn(
-            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-colors duration-150 border",
             activeTab === "profile"
-              ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
-              : "text-muted-foreground hover:text-white"
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-white"
           )}
         >
-          <User className="h-3.5 w-3.5" /> Edit Admin Profile
+          <User className="h-3.5 w-3.5" /> {t("settings.tabProfile")}
         </button>
 
         <button
           onClick={() => setActiveTab("ffmpeg")}
           className={cn(
-            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-colors duration-150 border",
             activeTab === "ffmpeg"
-              ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
-              : "text-muted-foreground hover:text-white"
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-white"
           )}
         >
-          <Cpu className="h-3.5 w-3.5" /> FFmpeg & Audio
+          <Cpu className="h-3.5 w-3.5" /> {t("settings.tabFfmpeg")}
         </button>
 
         <button
           onClick={() => setActiveTab("streaming")}
           className={cn(
-            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-colors duration-150 border",
             activeTab === "streaming"
-              ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
-              : "text-muted-foreground hover:text-white"
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-white"
           )}
         >
-          <Video className="h-3.5 w-3.5" /> Auto-Healing & Backup
+          <Video className="h-3.5 w-3.5" /> {t("settings.tabStreaming")}
         </button>
 
         <button
           onClick={() => setActiveTab("webhooks")}
           className={cn(
-            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-colors duration-150 border",
             activeTab === "webhooks"
-              ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
-              : "text-muted-foreground hover:text-white"
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-white"
           )}
         >
-          <BellRing className="h-3.5 w-3.5" /> Telegram & Discord
+          <BellRing className="h-3.5 w-3.5" /> {t("settings.tabWebhooks")}
         </button>
 
         <button
           onClick={() => setActiveTab("security")}
           className={cn(
-            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-all",
+            "flex items-center gap-2 px-4.5 py-2 rounded-full font-semibold transition-colors duration-150 border",
             activeTab === "security"
-              ? "bg-emerald-500/20 text-emerald-400 shadow-xs"
-              : "text-muted-foreground hover:text-white"
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-white"
           )}
         >
-          <ShieldCheck className="h-3.5 w-3.5" /> Users & REST API Keys
+          <ShieldCheck className="h-3.5 w-3.5" /> {t("settings.tabSecurity")}
         </button>
       </div>
 
       {/* Main Settings Card Container - Full Page Width */}
-      <Card className="p-8 border-white/10 bg-card/60 backdrop-blur space-y-6 min-h-[500px]">
-        {/* Tab 1: General */}
+      <Card className="p-8 border-white/10 bg-card/60 backdrop-blur space-y-6 min-h-[500px] overflow-visible">
+        {/* Tab 1: General - Essential & Functional Settings Only */}
         {activeTab === "general" && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-foreground">General Settings</h3>
-              <p className="text-xs text-muted-foreground">System node identification and default application preferences</p>
+              <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Settings className="h-5 w-5 text-emerald-400" /> {t("settings.general")}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                {language === "id" 
+                  ? "Konfigurasi identitas studio siaran, zona waktu operasional 24/7, dan pemeliharaan penyimpanan server." 
+                  : "Configure broadcast studio identity, 24/7 operational timezone, and server storage maintenance."}
+              </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Server Node Name</label>
-                <Input
-                  value={settings.serverName}
-                  onChange={(e) => setSettings({ ...settings, serverName: e.target.value })}
-                  className="bg-white/5 border-white/10 text-sm h-11"
-                />
+            {/* Essential Card: Server Identity & Operational Timezone */}
+            <div className="p-6 rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-black/30 space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                {/* 1. Server / Studio Name */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Server className="h-3.5 w-3.5 text-emerald-400" /> {t("settings.serverName")}
+                  </label>
+                  <Input
+                    value={settings.serverName}
+                    onChange={(e) => setSettings({ ...settings, serverName: e.target.value })}
+                    placeholder="Lupio Live Studio 1"
+                    className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-sm h-11"
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    {language === "id" ? "Nama identitas studio siaran Anda pada sistem." : "Broadcast node identification name."}
+                  </p>
+                </div>
+
+                {/* 2. Operational Timezone */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-emerald-400" /> {t("settings.timezone")}
+                  </label>
+                  <CustomSelect
+                    value={settings.timezone || "Asia/Jakarta"}
+                    onChange={(val) => setSettings({ ...settings, timezone: val })}
+                    options={[
+                      { value: "Asia/Jakarta", label: "Asia/Jakarta (WIB · UTC+7)" },
+                      { value: "Asia/Makassar", label: "Asia/Makassar (WITA · UTC+8)" },
+                      { value: "Asia/Jayapura", label: "Asia/Jayapura (WIT · UTC+9)" },
+                      { value: "UTC", label: "UTC (Coordinated Universal Time)" },
+                      { value: "Asia/Singapore", label: "Asia/Singapore (SGT · UTC+8)" },
+                      { value: "Asia/Tokyo", label: "Asia/Tokyo (JST · UTC+9)" },
+                      { value: "Europe/London", label: "Europe/London (GMT/BST)" },
+                      { value: "America/New_York", label: "America/New_York (EST/EDT)" },
+                    ]}
+                  />
+                  <p className="text-[11px] text-muted-foreground">
+                    {language === "id" ? "Acuan waktu untuk jadwal pergantian video otomatis 24/7." : "Reference clock for automated 24/7 scheduled streams."}
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Dashboard Language</label>
-                <Input
-                  value={settings.language}
-                  onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-                  className="bg-white/5 border-white/10 text-sm h-11"
-                />
+              {/* Divider */}
+              <div className="border-t border-slate-200 dark:border-white/10 pt-5 space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <HardDrive className="h-3.5 w-3.5 text-emerald-400" />
+                  {language === "id" ? "Pemeliharaan Penyimpanan Otomatis" : "Automated Storage Maintenance"}
+                </h4>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* 3. Log Cleanup Retention */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Trash2 className="h-3.5 w-3.5 text-zinc-400" /> {t("settings.logRetention")}
+                    </label>
+                    <CustomSelect
+                      value={String(settings.logRetentionDays ?? 14)}
+                      onChange={(val) => setSettings({ ...settings, logRetentionDays: parseInt(val, 10) })}
+                      options={[
+                        { value: "7", label: `7 ${t("settings.days")}` },
+                        { value: "14", label: `14 ${t("settings.days")} (Standard)` },
+                        { value: "30", label: `30 ${t("settings.days")}` },
+                        { value: "0", label: t("settings.noCleanup") },
+                      ]}
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      {language === "id" ? "Menghapus riwayat log lama agar tidak menumpuk di disk." : "Prune old encoder logs to prevent disk clutter."}
+                    </p>
+                  </div>
+
+                  {/* 4. HLS Temp Cache Cleanup Toggle */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                      <Trash2 className="h-3.5 w-3.5 text-zinc-400" /> {t("settings.clearTemp")}
+                    </label>
+                    <label className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition-colors h-11">
+                      <input
+                        type="checkbox"
+                        checked={settings.clearTempSegmentsOnStop ?? true}
+                        onChange={(e) => setSettings({ ...settings, clearTempSegmentsOnStop: e.target.checked })}
+                        className="h-4 w-4 rounded accent-emerald-500 cursor-pointer"
+                      />
+                      <span className="text-xs text-foreground font-medium">
+                        {language === "id" ? "Aktif (Otomatis Hapus Sampah Temp)" : "Enabled (Auto-purge temp cache)"}
+                      </span>
+                    </label>
+                    <p className="text-[11px] text-muted-foreground">
+                      {t("settings.clearTempDesc")}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

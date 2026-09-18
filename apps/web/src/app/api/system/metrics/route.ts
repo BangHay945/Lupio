@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
+import { requireAuth } from "@/lib/server/session";
 import os from "os";
 import fs from "fs";
 import path from "path";
@@ -24,7 +25,10 @@ function getFolderSizeBytes(dirPath: string): number {
   return size;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   const streams = db.getStreams();
   const activeStreams = streams.filter((s) => s.status === "LIVE" || s.status === "STARTING").length;
   const offlineStreams = streams.length - activeStreams;
@@ -33,20 +37,17 @@ export async function GET() {
   const freeMemGB = (os.freemem() / (1024 * 1024 * 1024)).toFixed(1);
   const usedMemGB = (parseFloat(totalMemGB) - parseFloat(freeMemGB)).toFixed(1);
 
-  // Calculate CPU load average percentage
   const loadAvg = os.loadavg();
   const cpus = os.cpus().length || 1;
   const cpuPercent = Math.min(Math.round(((loadAvg[0] || 0.4) / cpus) * 100) || 18, 99);
 
-  // Real Uploads Folder Size + Base OS/Apps (approx 4.2 GB)
   const uploadsDir = path.join(process.cwd(), "uploads");
   const uploadsSizeBytes = getFolderSizeBytes(uploadsDir);
   const uploadsGB = uploadsSizeBytes / (1024 * 1024 * 1024);
-  const baseAppGB = 4.2; // Base OS and Lupio node dependencies
-  const totalStorageGB = 100; // VPS 100 GB plan
+  const baseAppGB = 4.2;
+  const totalStorageGB = 100;
   const storageUsedGB = parseFloat((baseAppGB + uploadsGB).toFixed(2));
 
-  // Compute realistic upload bandwidth based on active stream bitrates
   let totalBitrateKbps = 0;
   for (const st of streams) {
     if (st.status === "LIVE" || st.status === "STARTING") {

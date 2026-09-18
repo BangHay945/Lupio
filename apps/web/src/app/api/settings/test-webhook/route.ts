@@ -1,8 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sendStreamNotification } from "@/lib/server/webhook";
 import { db } from "@/lib/server/db";
+import { requireAuth } from "@/lib/server/session";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const settings = db.getSettings();
     if (!settings.enableWebhooks) {

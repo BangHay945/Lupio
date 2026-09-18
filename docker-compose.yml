@@ -1,0 +1,34 @@
+services:
+  lupio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: lupio-stream
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - TZ=Asia/Jakarta
+    volumes:
+      # Persistent storage for JSON database and playlist manifests
+      - ./apps/web/data:/app/data
+      # Persistent storage for uploaded videos and media assets
+      - ./apps/web/uploads:/app/uploads
+
+    # Prevent container log files from consuming infinite disk space
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+    # Optional: Enable NVIDIA GPU hardware acceleration (NVENC) if available on your VPS
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu, video]

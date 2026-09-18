@@ -9,6 +9,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { apiService } from "@/lib/services/api";
+import { LivePreviewPlayer } from "@/components/streams/live-preview-player";
 
 export default function StreamDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);
@@ -141,61 +142,13 @@ export default function StreamDetailPage(props: { params: Promise<{ id: string }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-black rounded-xl border border-white/10 overflow-hidden relative group">
-                {stream.status === "LIVE" ? (
-                  <div className="relative w-full h-full flex items-center justify-center bg-black">
-                    <div className="absolute top-3 left-3 z-20 bg-emerald-500/20 backdrop-blur border border-emerald-500/40 text-emerald-400 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-lg">
-                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> LIVE STREAM TRANSMITTING
-                    </div>
-
-                    {sourceMedia ? (
-                      <video
-                        src={`/api/media/${sourceMedia.id}/file`}
-                        controls
-                        autoPlay
-                        loop
-                        className="w-full h-full object-contain"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center text-center p-4">
-                        <MonitorPlay className="h-14 w-14 text-emerald-400 animate-pulse mb-3" />
-                        <p className="text-emerald-400 font-bold text-base">Encoding & Transmitting to RTMP Server</p>
-                        <p className="text-xs text-zinc-300 font-medium mt-1 bg-black/60 px-3 py-1 rounded-full border border-white/10">
-                          Source: {stream.playlistName}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : stream.status === "STARTING" ? (
-                  <div className="flex flex-col items-center justify-center h-full text-amber-400 gap-2">
-                    <Activity className="h-10 w-10 animate-spin" />
-                    <p className="font-semibold text-sm">Initializing FFmpeg Encoder...</p>
-                  </div>
-                ) : stream.status === "ERROR" ? (
-                  <div className="flex flex-col items-center justify-center h-full text-red-400 gap-2">
-                    <p className="font-bold text-base">Stream Encoder Error</p>
-                    <p className="text-xs text-muted-foreground">Check FFmpeg log output below for details.</p>
-                  </div>
-                ) : (
-                  sourceMedia ? (
-                    <div className="relative w-full h-full flex items-center justify-center bg-black">
-                      <div className="absolute top-3 left-3 z-20 bg-white/10 backdrop-blur border border-white/20 text-white/70 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                        <span className="h-2 w-2 rounded-full bg-zinc-500" /> OFFLINE PREVIEW
-                      </div>
-                      <video
-                        src={`/api/media/${sourceMedia.id}/file`}
-                        controls
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2">
-                      <MonitorPlay className="h-12 w-12 text-zinc-600" />
-                      <p className="text-xs font-medium">Stream is offline</p>
-                    </div>
-                  )
-                )}
-              </div>
+              <LivePreviewPlayer
+                streamId={stream.id}
+                streamName={stream.name}
+                isLive={stream.status === "LIVE"}
+                status={stream.status}
+                fallbackMediaUrl={sourceMedia ? `/api/media/${sourceMedia.id}/file` : undefined}
+              />
             </CardContent>
           </Card>
 

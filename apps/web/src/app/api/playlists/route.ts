@@ -1,13 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/server/db";
 import { parseDurationToSeconds, formatSecondsToDuration } from "@/lib/server/media-probe";
 import { MediaItem } from "@/lib/mock-data";
+import { requireAuth } from "@/lib/server/session";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   return NextResponse.json(db.getPlaylists());
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const body = await req.json();
     const mediaItems: MediaItem[] = body.mediaItems || [];
@@ -35,4 +42,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-
