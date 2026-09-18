@@ -385,7 +385,7 @@ export function UploadMediaDialog({
       <Dialog
         open={open && !isMinimized}
         onOpenChange={(val) => {
-          if (!val && uploading) {
+          if (!val && (uploading || importing)) {
             setIsMinimized(true);
             return;
           }
@@ -398,7 +398,7 @@ export function UploadMediaDialog({
         >
           {/* Top-Right Window Controls (Strip Minimize & Close Aligned) */}
           <div className="absolute top-3.5 right-3.5 flex items-center gap-1 z-20">
-            {(uploading || fileQueue.length > 0) && (
+            {(uploading || importing || fileQueue.length > 0) && (
               <Button
                 type="button"
                 variant="ghost"
@@ -784,12 +784,14 @@ export function UploadMediaDialog({
     </Dialog>
 
     {/* Floating Bottom-Right Dock Widget when Minimized */}
-    {isMinimized && (uploading || fileQueue.length > 0) && (
+    {isMinimized && (uploading || importing || fileQueue.length > 0) && (
       <div className="fixed bottom-6 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 dark:border-white/15 bg-white/98 dark:bg-zinc-900/98 backdrop-blur-xl p-4 shadow-2xl space-y-3 animate-in fade-in slide-in-from-bottom-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             {uploading ? (
               <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            ) : importing ? (
+              <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
             ) : allSuccessful ? (
               <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
             ) : (
@@ -798,6 +800,8 @@ export function UploadMediaDialog({
             <span className="text-xs font-bold text-foreground truncate">
               {uploading
                 ? `Mengunggah (${completedCount}/${totalCount} berkas)...`
+                : importing
+                ? "Mengunduh dari Cloud..."
                 : allSuccessful
                 ? "Unggahan Selesai 🎉"
                 : "Unggahan Terhenti"}
@@ -812,7 +816,7 @@ export function UploadMediaDialog({
             >
               <Maximize2 className="h-3.5 w-3.5" />
             </button>
-            {!uploading && (
+            {!uploading && !importing && (
               <button
                 type="button"
                 onClick={() => {
@@ -829,7 +833,7 @@ export function UploadMediaDialog({
           </div>
         </div>
 
-        {/* Active File Summary */}
+        {/* Active Local File Upload Summary */}
         {uploading && currentUploadingItem && (
           <div className="text-[11px] space-y-1">
             <div className="flex items-center justify-between text-muted-foreground">
@@ -850,14 +854,35 @@ export function UploadMediaDialog({
           </div>
         )}
 
+        {/* Active Cloud Import Summary */}
+        {importing && (
+          <div className="text-[11px] space-y-1">
+            <div className="flex items-center justify-between text-muted-foreground">
+              <span className="truncate max-w-[240px] font-medium text-foreground">
+                {customFilename || importUrl.replace(/^https?:\/\//, "").slice(0, 30) + "..."}
+              </span>
+              <span className="text-blue-400 font-semibold text-[10px] animate-pulse flex items-center gap-1">
+                <DownloadCloud className="h-3 w-3" /> Mengunduh
+              </span>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Server sedang mengalirkan video langsung ke penyimpanan...
+            </p>
+          </div>
+        )}
+
         {/* Mini Progress Bar */}
         <div className="w-full bg-slate-200 dark:bg-white/10 rounded-full h-1.5 overflow-hidden">
-          <div
-            className={`h-full transition-all duration-300 ${
-              errorCount > 0 && !uploading ? "bg-amber-500" : "bg-emerald-500"
-            }`}
-            style={{ width: `${overallPercentage}%` }}
-          />
+          {importing ? (
+            <div className="h-full bg-blue-500 rounded-full w-2/3 animate-[pulse_1s_ease-in-out_infinite]" />
+          ) : (
+            <div
+              className={`h-full transition-all duration-300 ${
+                errorCount > 0 && !uploading ? "bg-amber-500" : "bg-emerald-500"
+              }`}
+              style={{ width: `${overallPercentage}%` }}
+            />
+          )}
         </div>
       </div>
     )}
