@@ -724,21 +724,7 @@ export function UploadMediaDialog({
           </div>
         )}
 
-        <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-between w-full min-w-0">
-          <div className="flex items-center gap-2">
-            {activeTab === "file" && !uploading && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                className="border-slate-300 dark:border-white/10 text-xs gap-1.5"
-              >
-                <Plus className="h-3.5 w-3.5" /> Add More
-              </Button>
-            )}
-          </div>
-
+        <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-slate-200 dark:border-white/10 flex items-center justify-end w-full min-w-0">
           <div className="flex items-center gap-2">
             <Button
               type="button"
