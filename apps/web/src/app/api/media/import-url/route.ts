@@ -84,6 +84,17 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
+      if (isGoogleDrive && (response.status === 404 || response.status === 403)) {
+        return NextResponse.json(
+          {
+            error:
+              "File Google Drive tidak dapat diakses (" +
+              response.status +
+              " Not Found / Forbidden). Pastikan setelan Share file di Google Drive sudah diubah dari 'Dibatasi' (Restricted) menjadi 'Siapa saja yang memiliki link' (Anyone with the link).",
+          },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
         { error: `Download failed with HTTP status ${response.status}: ${response.statusText}` },
         { status: 400 }
@@ -101,7 +112,7 @@ export async function POST(req: NextRequest) {
 
       if (confirmMatch && fileId) {
         const confirmToken = confirmMatch[1];
-        const secondUrl = `https://drive.google.com/uc?export=download&confirm=${confirmToken}&id=${fileId}`;
+        const secondUrl = `https://drive.usercontent.google.com/download?id=${fileId}&export=download&confirm=${confirmToken}`;
         
         // Pass cookies if any
         const setCookie = response.headers.get("set-cookie");
@@ -117,7 +128,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error:
-              "Could not access Google Drive file. Ensure the file sharing setting is set to 'Anyone with the link can view' (Public).",
+              "File Google Drive tidak dapat diunduh langsung (mengembalikan halaman web/login). Pastikan setelan berbagi (Share) file di Google Drive sudah diatur ke 'Siapa saja yang memiliki link' (Anyone with the link).",
           },
           { status: 400 }
         );
@@ -200,14 +211,17 @@ export async function POST(req: NextRequest) {
       fs.unlinkSync(filePath);
       return NextResponse.json(
         {
-          error:
-            "The URL returned an HTML webpage instead of a video stream. Please check that the URL is a direct media link or a publicly accessible Google Drive file.",
+          error: isGoogleDrive
+            ? "File Google Drive tidak dapat diunduh karena akses file masih 'Dibatasi' (Restricted / Private) atau link tidak ditemukan. Silakan buka file tersebut di Google Drive -> Klik kanan -> Bagikan (Share) -> Ubah Akses Umum menjadi 'Siapa saja yang memiliki link' (Anyone with the link), lalu coba kembali."
+            : "URL yang dimasukkan mengembalikan halaman web (HTML), bukan file video langsung. Pastikan URL merupakan link langsung ke file media (.mp4, .mkv, dll) atau file publik.",
         },
         { status: 400 }
       );
     }
 
-    const sizeInMB = (stat.size / (1024 * 1024)).toFixed(1) + " MB";
+    const sizeFormatted = stat.size >= 1024 * 1024 * 1024
+      ? (stat.size / (1024 * 1024 * 1024)).toFixed(2) + " GB"
+      : (stat.size / (1024 * 1024)).toFixed(1) + " MB";
     const mediaId = `med_${Date.now()}`;
 
     // Probe metadata & generate thumbnail
@@ -219,7 +233,7 @@ export async function POST(req: NextRequest) {
       duration: probe.duration || "00:00:00",
       resolution: probe.resolution || "1080p",
       thumbnail: probe.thumbnail,
-      size: sizeInMB,
+      size: sizeFormatted,
       filepath: filePath,
       type: "video",
       uploadDate: new Date().toISOString().split("T")[0],
@@ -232,7 +246,7 @@ export async function POST(req: NextRequest) {
     db.addLog(
       "info",
       "media",
-      `Imported cloud media from URL "${derivedName}" (${sizeInMB}, ${newItem.duration}, ${newItem.resolution})`
+      `Imported cloud media from URL "${derivedName}" (${sizeFormatted}, ${newItem.duration}, ${newItem.resolution})`
     );
 
     return NextResponse.json(newItem, { status: 201 });
