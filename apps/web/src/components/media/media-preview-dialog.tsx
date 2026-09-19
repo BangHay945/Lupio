@@ -63,7 +63,7 @@ export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDi
               <>
                 <video
                   key={`${media.id}-${reloadKey}`}
-                  src={`/api/media/${media.id}/preview-stream`}
+                  src={`/api/media/${media.id}/file`}
                   controls
                   autoPlay
                   playsInline
