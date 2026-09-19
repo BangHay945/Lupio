@@ -696,7 +696,11 @@ export class StreamManager {
     const hwSetting = (settings.hardwareAccel || "").toLowerCase();
     let videoCodec = "libx264";
     let presetArg = ["-preset", "veryfast"];
-    const threadsArg = settings.threadCount ? ["-threads", String(settings.threadCount)] : [];
+    // Limit CPU threads to max 2 to prevent memory starvation on low-RAM VPS
+    const safeThreads = Math.min(settings.threadCount || 2, 2);
+    const threadsArg = ["-threads", String(safeThreads)];
+    // Safe x264 params: disable AVX-512 (prevents hypervisor illegal instruction crashes) and limit lookahead queue to cut memory by 150MB
+    const x264Params = ["-x264-params", "asm=avx2:rc-lookahead=10:sync-lookahead=10"];
 
     if (hwSetting.includes("nvenc")) {
       videoCodec = "h264_nvenc";
@@ -713,6 +717,7 @@ export class StreamManager {
       "-c:v", videoCodec,
       ...presetArg,
       ...threadsArg,
+      ...(videoCodec === "libx264" ? x264Params : []),
       "-b:v", cleanBitrate,
       "-maxrate", cleanBitrate,
       "-bufsize", bufsize,
@@ -841,9 +846,13 @@ export class StreamManager {
         }
       });
 
-      child.on("close", (code) => {
-        db.addLog("info", "ffmpeg", `FFmpeg process for "${stream.name}" exited with code ${code}`);
+      child.on("close", (code, signal) => {
+        db.addLog("info", "ffmpeg", `FFmpeg process for "${stream.name}" exited with code ${code} (signal: ${signal || "none"})`);
         
+        if (signal === "SIGKILL") {
+          db.addLog("error", "system", `[${stream.name}] Process was terminated by OS (SIGKILL/OOM Killer). Memory limit exceeded on VPS. Recommended: add a 2GB swapfile.`);
+        }
+
         // If crash, log the last meaningful error line from stderr
         if (code !== 0 && recentStderr.length > 0) {
           const detailLines = recentStderr.filter((l) =>
