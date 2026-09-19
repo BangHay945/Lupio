@@ -104,7 +104,7 @@ const initialData: DBData = {
     discordWebhookUrl: "",
     enableWebhooks: true,
     backupMediaId: "",
-    globalWatermarkText: "LUPIO LIVE 24/7",
+    globalWatermarkText: "",
     enableAutoHealing: true,
     maxWatchdogRetries: 3,
     enableAudioNormalizer: true,

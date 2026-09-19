@@ -477,12 +477,18 @@ export class StreamManager {
     // Scaling, Watermark & Ticker Overlay Chain
     const filterParts: string[] = [];
 
-    // 1. Auto-scale & pad video to match selected output resolution
-    let targetScale = "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2";
+    // Safe Mode Check: If this is an auto-recovery retry after a crash, strip risky filters to ensure stream goes live
+    const isSafeRecovery = (stream.restartCount || 0) > 0;
+    if (isSafeRecovery) {
+      db.addLog("info", "watchdog", `[Safe Mode] Stream "${stream.name}" starting with essential filters only to guarantee broadcast recovery.`);
+    }
+
+    // 1. Auto-scale & pad video to match selected output resolution (force divisible by 2 to prevent pad/encoder crashes)
+    let targetScale = "scale=1920:1080:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=1920:1080:(ow-iw)/2:(oh-ih)/2";
     if (stream.resolution === "720p") {
-      targetScale = "scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2";
+      targetScale = "scale=1280:720:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=1280:720:(ow-iw)/2:(oh-ih)/2";
     } else if (stream.resolution === "4K") {
-      targetScale = "scale=3840:2160:force_original_aspect_ratio=decrease,pad=3840:2160:(ow-iw)/2:(oh-ih)/2";
+      targetScale = "scale=3840:2160:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=3840:2160:(ow-iw)/2:(oh-ih)/2";
     }
     filterParts.push(targetScale);
 
@@ -499,18 +505,37 @@ export class StreamManager {
         .replace(/\]/g, "\\]");
     };
 
-    if (watermarkText) {
+    // Helper to find a system TTF font file if available
+    const getSystemFontFile = () => {
+      const candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
+        "/usr/share/fonts/TTF/DejaVuSans.ttf",
+        "C:\\Windows\\Fonts\\arial.ttf",
+        "C:\\Windows\\Fonts\\segoeui.ttf",
+      ];
+      for (const p of candidates) {
+        if (fs.existsSync(/*turbopackIgnore: true*/ p)) return p.replace(/\\/g, "/");
+      }
+      return null;
+    };
+    const systemFont = getSystemFontFile();
+    const canUseDrawtext = !isSafeRecovery && (process.platform === "win32" || Boolean(systemFont));
+    const fontArg = systemFont ? `fontfile='${systemFont}':` : "";
+
+    if (canUseDrawtext && watermarkText) {
       const cleanW = sanitizeFfmpegDrawtext(watermarkText);
-      filterParts.push(`drawtext=text='${cleanW}':x=w-tw-30:y=30:fontsize=24:fontcolor=white@0.8:shadowcolor=black@0.6:shadowx=2:shadowy=2`);
+      filterParts.push(`drawtext=${fontArg}text='${cleanW}':x=w-tw-30:y=30:fontsize=24:fontcolor=white@0.8:shadowcolor=black@0.6:shadowx=2:shadowy=2`);
     }
 
-    if (tickerText) {
+    if (canUseDrawtext && tickerText) {
       const cleanT = sanitizeFfmpegDrawtext(tickerText);
-      filterParts.push(`drawtext=text='${cleanT}':x=w-mod(t*110\\,w+tw):y=h-50:fontsize=22:fontcolor=yellow@0.9:box=1:boxcolor=black@0.6:boxborderw=8`);
+      filterParts.push(`drawtext=${fontArg}text='${cleanT}':x=w-mod(t*110\\,w+tw):y=h-50:fontsize=22:fontcolor=yellow@0.9:box=1:boxcolor=black@0.6:boxborderw=8`);
     }
 
     // Feature: Realtime Digital Clock Overlay (with Timezone & Country support)
-    if (stream.enableDigitalClock) {
+    if (canUseDrawtext && stream.enableDigitalClock) {
       const pos = stream.clockPosition || "top-right";
       let clockX = "w-tw-30";
       let clockY = "30";
@@ -535,11 +560,15 @@ export class StreamManager {
         ? ` ${tzLabels[stream.clockTimezone]}`
         : "";
 
-      filterParts.push(`drawtext=fontcolor=white:fontsize=22:box=1:boxcolor=black@0.6:boxborderw=6:x=${clockX}:y=${clockY}:text='%{localtime\\:%T}${tzSuffix}'`);
+      filterParts.push(`drawtext=${fontArg}fontcolor=white:fontsize=22:box=1:boxcolor=black@0.6:boxborderw=6:x=${clockX}:y=${clockY}:text='%{localtime\\:%T}${tzSuffix}'`);
+    }
+
+    if (!canUseDrawtext && !isSafeRecovery && (watermarkText || tickerText || stream.enableDigitalClock)) {
+      db.addLog("warn", "ffmpeg", `[Overlay] Skipping text overlay for "${stream.name}" — system font not found. Please install fonts-dejavu-core.`);
     }
 
     // Feature: PNG Logo Watermark Overlay
-    if (stream.logoWatermarkPath && fs.existsSync(stream.logoWatermarkPath)) {
+    if (!isSafeRecovery && stream.logoWatermarkPath && fs.existsSync(stream.logoWatermarkPath)) {
       const safeLogo = stream.logoWatermarkPath.replace(/\\/g, "/");
       const pos = stream.logoPosition || "top-left";
       let overlayCoord = "30:30";
@@ -552,23 +581,26 @@ export class StreamManager {
 
     // Playlist & Stream Transition Effects (Anti-Drop Smooth Fades)
     const effectiveTransition = stream.transitionEffect || playlist?.transitionEffect || "full";
-    if (effectiveTransition === "fade" || effectiveTransition === "full") {
-      filterParts.push("fade=t=in:st=0:d=1.0:color=black");
-    }
-
-    if (effectiveTransition !== "none") {
-      db.addLog("info", "stream", `[Transition Engine] Stream "${stream.name}" activated with "${effectiveTransition}" smooth broadcast transition.`);
+    if (!isSafeRecovery) {
+      if (effectiveTransition === "fade" || effectiveTransition === "full") {
+        filterParts.push("fade=t=in:st=0:d=1.0:color=black");
+      }
+      if (effectiveTransition !== "none") {
+        db.addLog("info", "stream", `[Transition Engine] Stream "${stream.name}" activated with "${effectiveTransition}" smooth broadcast transition.`);
+      }
     }
 
     const filterArgs = filterParts.length > 0 ? ["-vf", filterParts.join(",")] : [];
 
     // Feature 4: Audio Normalizer & Soft Transition Filter Chain
     const audioFilters: string[] = ["aformat=channel_layouts=stereo:sample_rates=44100"];
-    if (effectiveTransition === "crossfade" || effectiveTransition === "full") {
-      audioFilters.push("afade=t=in:ss=0:d=1.5");
-    }
-    if (settings.enableAudioNormalizer !== false) {
-      audioFilters.push("loudnorm=I=-16:TP=-1.5:LRA=11");
+    if (!isSafeRecovery) {
+      if (effectiveTransition === "crossfade" || effectiveTransition === "full") {
+        audioFilters.push("afade=t=in:ss=0:d=1.5");
+      }
+      if (settings.enableAudioNormalizer !== false) {
+        audioFilters.push("loudnorm=I=-16:TP=-1.5:LRA=11");
+      }
     }
     const audioFilterArgs = audioFilters.length > 0 ? ["-af", audioFilters.join(",")] : [];
 
@@ -593,7 +625,7 @@ export class StreamManager {
         return `[f=flv:flvflags=no_duration_filesize:onfail=ignore]${url}${c.streamKey.trim()}`;
       });
       const allOutputs = [...rtmpOutputs, hlsMuxer].join("|");
-      outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", allOutputs];
+      outputArgs = ["-f", "tee", "-map", "0:v?", "-map", "0:a?", allOutputs];
     } else {
       const ch = targetChannels[0];
       const rtmpBase = ch.rtmpUrl.endsWith("/") ? ch.rtmpUrl : `${ch.rtmpUrl}/`;
@@ -606,7 +638,7 @@ export class StreamManager {
         : `[f=flv:flvflags=no_duration_filesize:onfail=ignore]${destination}`;
 
       const allOutputs = `${flvOutput}|${hlsMuxer}`;
-      outputArgs = ["-f", "tee", "-map", "0:v", "-map", "0:a", allOutputs];
+      outputArgs = ["-f", "tee", "-map", "0:v?", "-map", "0:a?", allOutputs];
     }
 
     // Hardware Acceleration & Encoder selection
@@ -751,12 +783,19 @@ export class StreamManager {
 
       sendStreamNotification("START", stream.name, targetChannels.map((c) => `${c.platform} (${c.name})`).join(", "), isBackup ? "Active Backup Video Mode" : "Normal Live Transmission");
 
+      const recentStderr: string[] = [];
       child.stderr?.on("data", (chunk: Buffer) => {
         const str = chunk.toString();
         activeProc.lastHeartbeat = new Date();
 
+        // Buffer recent stderr lines for failure diagnosis
+        const rawLines = str.split("\n").map((l) => l.trim()).filter(Boolean);
+        for (const line of rawLines) {
+          recentStderr.push(line);
+          if (recentStderr.length > 25) recentStderr.shift();
+        }
+
         // Parse real stats from FFmpeg progress output
-        // FFmpeg writes lines like: frame=  120 fps= 30 q=28.0 size=    4096kB time=00:00:04.00 bitrate=8389.0kbits/s drop=0 speed=1.00x
         const fpsMatch = str.match(/fps=\s*([\d.]+)/);
         if (fpsMatch) activeProc.fps = parseFloat(fpsMatch[1]);
 
@@ -773,6 +812,20 @@ export class StreamManager {
 
       child.on("close", (code) => {
         db.addLog("info", "ffmpeg", `FFmpeg process for "${stream.name}" exited with code ${code}`);
+        
+        // If crash, log the last meaningful error line from stderr
+        if (code !== 0 && recentStderr.length > 0) {
+          const detailLines = recentStderr.filter((l) =>
+            !l.startsWith("frame=") &&
+            !l.startsWith("size=") &&
+            !l.startsWith("configuration:") &&
+            !l.includes("built with gcc")
+          ).slice(-3);
+          if (detailLines.length > 0) {
+            db.addLog("error", "ffmpeg", `[${stream.name}] Crash reason: ${detailLines.join(" | ")}`);
+          }
+        }
+
         this.activeProcesses.delete(streamId);
 
         const currentStream = db.getStreamById(streamId);
