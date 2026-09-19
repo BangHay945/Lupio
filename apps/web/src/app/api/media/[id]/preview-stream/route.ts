@@ -32,6 +32,7 @@ export async function GET(
       "-c:v", "libx264",
       "-preset", "ultrafast",
       "-tune", "zerolatency",
+      "-pix_fmt", "yuv420p",
       "-crf", "26",
       "-c:a", "aac",
       "-b:a", "128k",
@@ -42,6 +43,12 @@ export async function GET(
 
     const child = spawn(ffmpegPath, args, {
       stdio: ["ignore", "pipe", "ignore"],
+    });
+
+    req.signal.addEventListener("abort", () => {
+      try {
+        child.kill("SIGKILL");
+      } catch {}
     });
 
     const stream = new ReadableStream({
