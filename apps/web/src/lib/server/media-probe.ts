@@ -8,6 +8,10 @@ export function getFfmpegPath(): string {
   if (settings.ffmpegPath && settings.ffmpegPath !== "ffmpeg" && fs.existsSync(settings.ffmpegPath)) {
     return settings.ffmpegPath;
   }
+  if (process.platform === "linux") {
+    if (fs.existsSync(/*turbopackIgnore: true*/ "/usr/bin/ffmpeg")) return "/usr/bin/ffmpeg";
+    if (fs.existsSync(/*turbopackIgnore: true*/ "/usr/local/bin/ffmpeg")) return "/usr/local/bin/ffmpeg";
+  }
   const bundledStaticPath = path.join(
     process.cwd(),
     "node_modules",

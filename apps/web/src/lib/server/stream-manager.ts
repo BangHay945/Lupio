@@ -1,10 +1,55 @@
-import { spawn, exec, ChildProcess } from "child_process";
+import { spawn, spawnSync, exec, ChildProcess } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { db } from "./db";
 import { Stream, Channel, MediaItem } from "../mock-data";
 import { sendStreamNotification } from "./webhook";
+
+const cachedDrawtextSupport: Record<string, boolean> = {};
+
+export function resolveFfmpegBinary(): string {
+  const settings = db.getSettings();
+  if (settings.ffmpegPath && settings.ffmpegPath !== "ffmpeg" && fs.existsSync(settings.ffmpegPath)) {
+    return settings.ffmpegPath;
+  }
+  // On Linux (such as Docker container), prefer native system FFmpeg which has full filter/codec support
+  if (process.platform === "linux") {
+    if (fs.existsSync(/*turbopackIgnore: true*/ "/usr/bin/ffmpeg")) return "/usr/bin/ffmpeg";
+    if (fs.existsSync(/*turbopackIgnore: true*/ "/usr/local/bin/ffmpeg")) return "/usr/local/bin/ffmpeg";
+  }
+  const bundledStaticPath = path.join(
+    process.cwd(),
+    "node_modules",
+    "ffmpeg-static",
+    process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"
+  );
+  if (fs.existsSync(bundledStaticPath)) {
+    return bundledStaticPath;
+  }
+  try {
+    const ffmpegStatic = require("ffmpeg-static");
+    if (ffmpegStatic && fs.existsSync(ffmpegStatic)) {
+      return ffmpegStatic;
+    }
+  } catch (e) {}
+  return settings.ffmpegPath || "ffmpeg";
+}
+
+export function supportsDrawtext(ffmpegPath: string): boolean {
+  if (typeof cachedDrawtextSupport[ffmpegPath] === "boolean") {
+    return cachedDrawtextSupport[ffmpegPath];
+  }
+  try {
+    const res = spawnSync(ffmpegPath, ["-filters"], { encoding: "utf8", timeout: 2500 });
+    const hasDrawtext = res.stdout ? res.stdout.includes("drawtext") : false;
+    cachedDrawtextSupport[ffmpegPath] = hasDrawtext;
+    return hasDrawtext;
+  } catch {
+    cachedDrawtextSupport[ffmpegPath] = false;
+    return false;
+  }
+}
 
 interface ActiveProcess {
   streamId: string;
@@ -474,6 +519,10 @@ export class StreamManager {
       }
     }
 
+    // Resolve FFmpeg binary early to check supported features
+    const ffmpegPath = resolveFfmpegBinary();
+    const hasDrawtext = supportsDrawtext(ffmpegPath);
+
     // Scaling, Watermark & Ticker Overlay Chain
     const filterParts: string[] = [];
 
@@ -521,7 +570,7 @@ export class StreamManager {
       return null;
     };
     const systemFont = getSystemFontFile();
-    const canUseDrawtext = !isSafeRecovery && (process.platform === "win32" || Boolean(systemFont));
+    const canUseDrawtext = !isSafeRecovery && hasDrawtext && (process.platform === "win32" || Boolean(systemFont));
     const fontArg = systemFont ? `fontfile='${systemFont}':` : "";
 
     if (canUseDrawtext && watermarkText) {
@@ -563,7 +612,9 @@ export class StreamManager {
       filterParts.push(`drawtext=${fontArg}fontcolor=white:fontsize=22:box=1:boxcolor=black@0.6:boxborderw=6:x=${clockX}:y=${clockY}:text='%{localtime\\:%T}${tzSuffix}'`);
     }
 
-    if (!canUseDrawtext && !isSafeRecovery && (watermarkText || tickerText || stream.enableDigitalClock)) {
+    if (!hasDrawtext && !isSafeRecovery && (watermarkText || tickerText || stream.enableDigitalClock)) {
+      db.addLog("warn", "ffmpeg", `[Overlay] Skipping text overlay for "${stream.name}" — FFmpeg binary (${ffmpegPath}) does not support 'drawtext' filter.`);
+    } else if (!canUseDrawtext && !isSafeRecovery && (watermarkText || tickerText || stream.enableDigitalClock)) {
       db.addLog("warn", "ffmpeg", `[Overlay] Skipping text overlay for "${stream.name}" — system font not found. Please install fonts-dejavu-core.`);
     }
 
@@ -717,26 +768,6 @@ export class StreamManager {
       ];
     }
 
-    let ffmpegPath = settings.ffmpegPath || "ffmpeg";
-    const bundledStaticPath = path.join(
-      process.cwd(),
-      "node_modules",
-      "ffmpeg-static",
-      process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg"
-    );
-
-    if (settings.ffmpegPath && settings.ffmpegPath !== "ffmpeg" && fs.existsSync(settings.ffmpegPath)) {
-      ffmpegPath = settings.ffmpegPath;
-    } else if (fs.existsSync(bundledStaticPath)) {
-      ffmpegPath = bundledStaticPath;
-    } else {
-      try {
-        const ffmpegStatic = require("ffmpeg-static");
-        if (ffmpegStatic && fs.existsSync(ffmpegStatic)) {
-          ffmpegPath = ffmpegStatic;
-        }
-      } catch (e) {}
-    }
 
     try {
       db.addLog("info", "ffmpeg", `Initiating FFmpeg process (${ffmpegPath}) for "${stream.name}" [EBU R128: ${settings.enableAudioNormalizer !== false ? "ON" : "OFF"}]`);
