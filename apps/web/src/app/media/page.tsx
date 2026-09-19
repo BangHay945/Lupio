@@ -224,9 +224,9 @@ export default function MediaPage() {
         {filteredMedia.map((item) => (
           <Card
             key={item.id}
-            className="overflow-hidden group border-white/10 bg-card/60 backdrop-blur hover:border-white/20 transition-all"
+            className="overflow-hidden group border-white/10 bg-card/60 backdrop-blur hover:border-emerald-500/40 hover:shadow-lg transition-all"
           >
-            {/* Thumbnail with Play Hover */}
+            {/* Thumbnail with Clean Hover */}
             <div
               onClick={() => setPreviewMedia(item)}
               className="media-thumbnail-preview aspect-video bg-slate-900 flex items-center justify-center relative cursor-pointer transition-colors overflow-hidden border-b border-slate-200 dark:border-white/10"
@@ -238,16 +238,19 @@ export default function MediaPage() {
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               ) : (
-                <FileVideo className="h-10 w-10 text-muted-foreground/40 group-hover:scale-90 group-hover:opacity-0 transition-all duration-200" />
+                <FileVideo className="h-10 w-10 text-muted-foreground/40 group-hover:scale-110 transition-all duration-200" />
               )}
 
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-[2px]">
-                <div className="h-10 w-10 rounded-full bg-emerald-500 text-black flex items-center justify-center shadow-lg transform group-hover:scale-100 scale-75 transition-transform">
-                  <Play className="h-5 w-5 fill-black ml-0.5" />
-                </div>
+              {/* Bottom Subtle Gradient for Badge Legibility */}
+              <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+
+              {/* Play Preview Indicator on Hover (Bottom Left - leaves thumbnail completely visible) */}
+              <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-all duration-200 flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500 text-black text-[10px] font-semibold shadow-md pointer-events-none transform group-hover:translate-x-0 -translate-x-1">
+                <Play className="h-2.5 w-2.5 fill-black" />
+                <span>Preview</span>
               </div>
 
-              <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded font-mono border border-white/10">
+              <div className="absolute bottom-2 right-2 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded font-mono border border-white/10 shadow-sm">
                 {item.duration}
               </div>
 
