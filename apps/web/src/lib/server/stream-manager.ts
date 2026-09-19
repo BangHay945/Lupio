@@ -695,7 +695,7 @@ export class StreamManager {
     // Hardware Acceleration & Encoder selection
     const hwSetting = (settings.hardwareAccel || "").toLowerCase();
     let videoCodec = "libx264";
-    let presetArg = ["-preset", "veryfast"];
+    let presetArg = ["-preset", "ultrafast"];
     // Limit CPU threads to max 2 to prevent memory starvation on low-RAM VPS
     const safeThreads = Math.min(settings.threadCount || 2, 2);
     const threadsArg = ["-threads", String(safeThreads)];
