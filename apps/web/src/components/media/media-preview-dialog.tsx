@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { MediaItem } from "@/lib/mock-data";
-import { Film, HardDrive, Clock, Video, Download, AlertCircle, RotateCw } from "lucide-react";
+import { Film, HardDrive, Clock, Video, Download, AlertCircle, RotateCw, Info } from "lucide-react";
 
 interface MediaPreviewDialogProps {
   open: boolean;
@@ -13,11 +13,14 @@ interface MediaPreviewDialogProps {
 
 export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDialogProps) {
   const [videoError, setVideoError] = useState(false);
+  const [codecUnsupported, setCodecUnsupported] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     if (open) {
       setVideoError(false);
+      setCodecUnsupported(false);
       setReloadKey(0);
     }
   }, [open, media?.id]);
@@ -26,7 +29,18 @@ export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDi
 
   const handleReload = () => {
     setVideoError(false);
+    setCodecUnsupported(false);
     setReloadKey((prev) => prev + 1);
+  };
+
+  // Detect black-screen codec failure: browser loads metadata but can't decode frames
+  const handleLoadedMetadata = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    // If videoWidth is 0 after metadata loads, the browser silently failed to decode
+    if (video.videoWidth === 0) {
+      setCodecUnsupported(true);
+    }
   };
 
   return (
@@ -62,6 +76,7 @@ export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDi
             {media.filepath ? (
               <>
                 <video
+                  ref={videoRef}
                   key={`${media.id}-${reloadKey}`}
                   src={`/api/media/${media.id}/file`}
                   controls
@@ -70,7 +85,38 @@ export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDi
                   preload="metadata"
                   className="w-full h-full object-contain bg-zinc-950"
                   onError={() => setVideoError(true)}
+                  onLoadedMetadata={handleLoadedMetadata}
                 />
+                {/* Codec not supported (H.265/HEVC black screen in Chrome/Firefox) */}
+                {codecUnsupported && !videoError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-zinc-950/97 text-center text-white backdrop-blur-sm z-10">
+                    <div className="p-3 bg-blue-500/10 rounded-full border border-blue-500/20 mb-3">
+                      <Info className="h-8 w-8 text-blue-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-zinc-100 mb-1">
+                      Format H.265/HEVC Tidak Didukung Browser
+                    </h3>
+                    <p className="text-xs text-zinc-400 max-w-sm mb-1 leading-relaxed">
+                      Video ini menggunakan codec <span className="text-white font-semibold">H.265 (HEVC)</span> yang tidak dapat diputar di Chrome/Firefox.
+                    </p>
+                    <p className="text-xs text-emerald-400 font-semibold mb-4">
+                      ✅ File video ini tetap valid dan akan berjalan normal saat siaran live.
+                    </p>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                      <a
+                        href={`/api/media/${media.id}/file?download=1`}
+                        download={media.filename}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shadow transition-colors"
+                      >
+                        <Download className="h-3.5 w-3.5" /> Unduh untuk Ditonton Lokal
+                      </a>
+                      <p className="text-[11px] text-zinc-500 w-full mt-1">
+                        💡 Gunakan <span className="text-white">Microsoft Edge</span> atau <span className="text-white">Safari</span> untuk preview H.265 langsung di browser.
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {/* General error overlay */}
                 {videoError && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-zinc-950/95 text-center text-white backdrop-blur-sm z-10">
                     <div className="p-3 bg-amber-500/10 rounded-full border border-amber-500/20 mb-3">
@@ -107,6 +153,7 @@ export function MediaPreviewDialog({ open, onOpenChange, media }: MediaPreviewDi
                 <p className="text-xs font-medium">Video preview player ready</p>
               </div>
             )}
+
           </div>
         </div>
       </DialogContent>
