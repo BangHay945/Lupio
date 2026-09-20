@@ -532,12 +532,12 @@ export class StreamManager {
       db.addLog("info", "watchdog", `[Safe Mode] Stream "${stream.name}" starting with essential filters only to guarantee broadcast recovery.`);
     }
 
-    // 1. Auto-scale & pad video to match selected output resolution (force divisible by 2 to prevent pad/encoder crashes)
-    let targetScale = "scale=1920:1080:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=1920:1080:(ow-iw)/2:(oh-ih)/2";
+    // 1. Auto-scale video to match selected output resolution (force full-screen, no black bars)
+    let targetScale = "scale=1920:1080,setsar=1";
     if (stream.resolution === "720p") {
-      targetScale = "scale=1280:720:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=1280:720:(ow-iw)/2:(oh-ih)/2";
+      targetScale = "scale=1280:720,setsar=1";
     } else if (stream.resolution === "4K") {
-      targetScale = "scale=3840:2160:force_original_aspect_ratio=decrease:force_divisible_by=2,pad=3840:2160:(ow-iw)/2:(oh-ih)/2";
+      targetScale = "scale=3840:2160,setsar=1";
     }
     filterParts.push(targetScale);
 
