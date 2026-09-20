@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { 
   Search, Settings, Play, Square, RotateCcw, MoreHorizontal, Radio, 
   Trash2, Plus, Pencil, LayoutGrid, List, ListFilter, Clock, Calendar, 
-  RotateCw, ShieldCheck, Film, CheckCircle2 
+  RotateCw, ShieldCheck, Film, CheckCircle2, AlertTriangle 
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -405,6 +405,19 @@ export function StreamTable({ streams }: StreamTableProps) {
                   <span className="font-semibold text-foreground">{stream.resolution}</span>
                 </div>
               </div>
+
+              {/* ⚠️ Hardware Warning — shown when stream crashes frequently */}
+              {((stream as any).restartCount >= 2 || stream.status === "ERROR") && (
+                <div className="flex gap-2 p-2.5 rounded-xl border border-amber-500/25 bg-amber-500/[0.06]">
+                  <AlertTriangle className="h-3.5 w-3.5 text-amber-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-[11px] font-bold text-amber-300">Perangkat Mungkin Tidak Kuat</p>
+                    <p className="text-[10px] text-muted-foreground leading-snug mt-0.5">
+                      Stream ini sering crash. Coba turunkan ke <span className="text-emerald-400 font-semibold">720p + 3000 Kbps</span> agar siaran lebih stabil.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Action Button */}
               {stream.status === "OFFLINE" || stream.status === "ERROR" ? (

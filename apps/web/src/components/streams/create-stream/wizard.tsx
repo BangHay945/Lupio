@@ -24,6 +24,8 @@ import {
   Clock,
   Image as ImageIcon,
   Layers,
+  AlertTriangle,
+  Cpu,
 } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
 import Link from "next/link";
@@ -584,6 +586,65 @@ export function CreateStreamWizard() {
                   <p className="text-xs text-muted-foreground mt-1">3840x2160 @ 60fps · 15 Mbps</p>
                 </button>
               </div>
+
+              {/* ⚡ Hardware Performance Warning — shown dynamically */}
+              {(() => {
+                const bitrate = parseInt(formData.videoBitrate) || 0;
+                const is4K = formData.resolution === "4K";
+                const is1080p = formData.resolution === "1080p";
+                const is720p = formData.resolution === "720p";
+                const isHeavy = is4K || (is1080p && bitrate >= 5000) || (is720p && bitrate >= 6000);
+                const isMedium = is1080p && bitrate < 5000 || (is720p && bitrate >= 4000 && bitrate < 6000);
+
+                if (is4K) return (
+                  <div className="flex gap-3 p-4 rounded-xl border border-red-500/30 bg-red-500/[0.07] text-sm">
+                    <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 shrink-0" />
+                    <div className="space-y-1">
+                      <p className="font-bold text-red-300 text-xs">⛔ 4K Tidak Disarankan untuk VPS Kecil</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Resolusi 4K membutuhkan minimal <span className="text-white font-semibold">8 vCPU + 8 GB RAM</span>. Pada VPS 1–2 core, siaran akan terus crash dan gagal.
+                        <br /><span className="text-amber-300 font-semibold">Disarankan: Gunakan 720p + 3000 Kbps untuk VPS kecil.</span>
+                      </p>
+                    </div>
+                  </div>
+                );
+
+                if (isHeavy) return (
+                  <div className="flex gap-3 p-4 rounded-xl border border-amber-500/30 bg-amber-500/[0.07] text-sm">
+                    <Cpu className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
+                    <div className="space-y-1">
+                      <p className="font-bold text-amber-300 text-xs">⚠️ Kualitas Tinggi — Pastikan VPS Anda Mampu</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Pengaturan <span className="text-white font-semibold">{formData.resolution} @ {formData.videoBitrate} Kbps</span> membutuhkan minimal{" "}
+                        <span className="text-white font-semibold">{is1080p ? "2 vCPU + 2 GB RAM" : "4 vCPU + 4 GB RAM"}</span>.
+                        Pada VPS 1 core / RAM di bawah 1 GB, siaran kemungkinan akan mengalami <span className="text-red-300">buffering atau crash</span>.
+                      </p>
+                      <p className="text-xs text-emerald-300 font-semibold">
+                        💡 Untuk VPS 1 core: gunakan 720p + 3000 Kbps agar siaran lancar.
+                      </p>
+                    </div>
+                  </div>
+                );
+
+                if (isMedium) return (
+                  <div className="flex gap-3 p-3 rounded-xl border border-blue-500/20 bg-blue-500/[0.05] text-sm">
+                    <Cpu className="h-4 w-4 text-blue-400 mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      Pengaturan ini membutuhkan minimal <span className="text-white font-semibold">2 vCPU</span> untuk berjalan stabil.
+                      Jika VPS Anda hanya 1 core, pertimbangkan menurunkan ke <span className="text-emerald-400 font-semibold">720p + 3000 Kbps</span>.
+                    </p>
+                  </div>
+                );
+
+                return (
+                  <div className="flex gap-3 p-3 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.05] text-sm">
+                    <Check className="h-4 w-4 text-emerald-400 mt-0.5 shrink-0" />
+                    <p className="text-xs text-muted-foreground">
+                      ✅ Pengaturan ini <span className="text-emerald-400 font-semibold">ringan dan efisien</span> — cocok untuk VPS kecil (1 core / 1 GB RAM). Siaran akan berjalan stabil.
+                    </p>
+                  </div>
+                );
+              })()}
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 border-t border-white/10 pt-4">
                 <div className="space-y-2">
