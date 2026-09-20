@@ -28,14 +28,16 @@ export async function GET(
     const args = [
       "-ss", startSec,
       "-i", media.filepath,
-      "-vf", "scale='min(1280,iw)':-2",
+      "-t", "90",                          // Max 90 seconds preview to save CPU
+      "-vf", "scale='min(480,iw)':-2",     // Max 480p for lightweight preview
       "-c:v", "libx264",
       "-preset", "ultrafast",
       "-tune", "zerolatency",
       "-pix_fmt", "yuv420p",
-      "-crf", "26",
+      "-crf", "35",                        // Low quality = faster encode
+      "-threads", "1",                     // Limit to 1 thread to not starve live stream
       "-c:a", "aac",
-      "-b:a", "128k",
+      "-b:a", "64k",
       "-f", "mp4",
       "-movflags", "frag_keyframe+empty_moov+default_base_moof",
       "pipe:1",
